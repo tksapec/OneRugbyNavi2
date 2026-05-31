@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="OneRugbyNavi2.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:OneRugbyNavi2"
+    Title="One Rugby Navi2">
+
+    <TabBar>
+        <ShellContent
+            Title="日程"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="SchedulePage" />
+
+        <ShellContent
+            Title="チーム"
+            ContentTemplate="{DataTemplate local:TeamListPage}"
+            Route="TeamListPage" />
+
+        <ShellContent
+            Title="選手"
+            ContentTemplate="{DataTemplate local:PlayerDirectoryPage}"
+            Route="PlayerDirectoryPage" />
+
+        <ShellContent
+            Title="出身校"
+            ContentTemplate="{DataTemplate local:SchoolSearchPage}"
+            Route="SchoolSearchPage" />
+
+        <ShellContent
+            Title="ランキング"
+            ContentTemplate="{DataTemplate local:RankingPage}"
+            Route="RankingPage" />
+
+        <ShellContent
+            Title="情報"
+            ContentTemplate="{DataTemplate local:InfoPage}"
+            Route="InfoPage" />
+    </TabBar>
+
+</Shell>
+

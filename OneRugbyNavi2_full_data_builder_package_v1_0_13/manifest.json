@@ -1,0 +1,20 @@
+{
+  "package": "OneRugbyNavi2 full data builder",
+  "created_at": "2026-05-24T09:49:37.763283+00:00",
+  "target_repository": "https://github.com/tksapec/OneRugbyNavi2.git",
+  "files": [
+    "schema.sql",
+    "build_full_database.py",
+    "requirements.txt",
+    "README_full_data_builder.md",
+    "CODEX_FULL_DB_INSTRUCTIONS.md"
+  ],
+  "note": "Run build_full_database.py in an internet-enabled environment to generate the full SQLite DB.",
+  "builder_version": "1.0.13",
+  "updated_at": "2026-05-30T01:15:24.099276+00:00",
+  "fixes": [
+    "Support full-width slash in height/weight label.",
+    "Support label-only line followed by value line.",
+    "Add build-time data quality summary for profile completeness."
+  ]
+}

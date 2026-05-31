@@ -1,0 +1,577 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:OneRugbyNavi2"
+    x:Class="OneRugbyNavi2.MainPage"
+    Title="One Rugby Navi2"
+    Shell.NavBarIsVisible="False"
+    BackgroundColor="#F5F7FB">
+
+    <ContentPage.Resources>
+        <Color x:Key="LeagueBlue">#0057B8</Color>
+        <Color x:Key="LeagueNavy">#10233F</Color>
+        <Color x:Key="MutedText">#667085</Color>
+        <Color x:Key="CardStroke">#E5EAF3</Color>
+
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="#172033" />
+        </Style>
+
+        <Style TargetType="Picker">
+            <Setter Property="TextColor" Value="{StaticResource LeagueNavy}" />
+            <Setter Property="TitleColor" Value="{StaticResource MutedText}" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+
+        <Style x:Key="IconActionButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="TextColor" Value="{StaticResource LeagueNavy}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="MinimumHeightRequest" Value="40" />
+        </Style>
+
+        <Style x:Key="SegmentButton" TargetType="Button">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="BorderWidth" Value="0" />
+            <Setter Property="MinimumHeightRequest" Value="42" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
+          Padding="14,10"
+          RowSpacing="10">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                  ColumnSpacing="8"
+                  VerticalOptions="Center">
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="One Rugby Navi2"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource LeagueNavy}" />
+                    <Label Text="2025-26 Season"
+                           FontSize="12"
+                           TextColor="{StaticResource MutedText}" />
+                </VerticalStackLayout>
+
+                <Button Grid.Column="1"
+                        Text="更新"
+                        Style="{StaticResource IconActionButton}"
+                        Clicked="OnRefreshClicked" />
+                <Button Grid.Column="2"
+                        Text="順位表"
+                        Style="{StaticResource IconActionButton}"
+                        Clicked="OnStandingsClicked" />
+                <Button Grid.Column="3"
+                        Text="情報"
+                        Style="{StaticResource IconActionButton}"
+                        Clicked="OnInfoClicked" />
+            </Grid>
+
+            <HorizontalStackLayout x:Name="loadingPanel"
+                                   Spacing="8"
+                                   VerticalOptions="Center"
+                                   IsVisible="False">
+                <ActivityIndicator IsRunning="True" Color="{StaticResource LeagueBlue}" />
+                <Label Text="読み込み中..."
+                       VerticalTextAlignment="Center"
+                       TextColor="{StaticResource MutedText}" />
+            </HorizontalStackLayout>
+
+            <Border x:Name="messagePanel"
+                    IsVisible="False"
+                    Stroke="#BBD7FF"
+                    StrokeThickness="1"
+                    BackgroundColor="#EAF3FF"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Label x:Name="messageLabel"
+                       LineBreakMode="WordWrap"
+                       TextColor="{StaticResource LeagueNavy}" />
+            </Border>
+
+            <Border x:Name="cachePanel"
+                    IsVisible="False"
+                    Stroke="#FFE3A3"
+                    StrokeThickness="1"
+                    BackgroundColor="#FFF8E6"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12" />
+                </Border.StrokeShape>
+                <Label x:Name="cacheLabel"
+                       LineBreakMode="WordWrap"
+                       TextColor="#7A4E00" />
+            </Border>
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1"
+                x:Name="nextMatchCard"
+                HeightRequest="124"
+                Stroke="#D7E5FB"
+                StrokeThickness="1"
+                BackgroundColor="#0B376D"
+                Padding="12,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18" />
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnNextMatchTapped" />
+            </Border.GestureRecognizers>
+
+            <Grid RowDefinitions="Auto,*,Auto"
+                  RowSpacing="8">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="Auto,*"
+                      ColumnSpacing="8">
+                    <Border BackgroundColor="#1A73E8"
+                            Padding="10,4"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Label Text="次の試合"
+                               FontSize="12"
+                               FontAttributes="Bold"
+                               TextColor="White" />
+                    </Border>
+                    <Label x:Name="nextMetaLabel"
+                           Grid.Column="1"
+                           VerticalTextAlignment="Center"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           TextColor="#DCEBFF"
+                           LineBreakMode="TailTruncation" />
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto,*"
+                      ColumnSpacing="10">
+                    <Label x:Name="nextHomeLabel"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalTextAlignment="Start"
+                           VerticalTextAlignment="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="3" />
+                    <VerticalStackLayout Grid.Column="1"
+                                         Spacing="0"
+                                         HorizontalOptions="Center"
+                                         VerticalOptions="Center">
+                        <Label x:Name="nextScoreLabel"
+                               Text="vs"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalTextAlignment="Center" />
+                        <Label x:Name="nextKickoffLabel"
+                               FontSize="11"
+                               TextColor="#DCEBFF"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                    <Label x:Name="nextAwayLabel"
+                           Grid.Column="2"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalTextAlignment="End"
+                           VerticalTextAlignment="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="3" />
+                </Grid>
+
+                <VerticalStackLayout Grid.Row="2"
+                                     Spacing="2">
+                    <Label x:Name="nextDateLabel"
+                           FontSize="13"
+                           TextColor="#DCEBFF"
+                           HorizontalTextAlignment="Center" />
+                    <Label x:Name="nextVenueLabel"
+                           FontSize="12"
+                           TextColor="#DCEBFF"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*,*"
+              Padding="4"
+              BackgroundColor="#E9EEF7"
+              ColumnSpacing="4">
+            <Button x:Name="btnDiv1"
+                    Text="Div1"
+                    Style="{StaticResource SegmentButton}"
+                    Clicked="OnDiv1Clicked" />
+            <Button x:Name="btnDiv2"
+                    Text="Div2"
+                    Grid.Column="1"
+                    Style="{StaticResource SegmentButton}"
+                    Clicked="OnDiv2Clicked" />
+            <Button x:Name="btnDiv3"
+                    Text="Div3"
+                    Grid.Column="2"
+                    Style="{StaticResource SegmentButton}"
+                    Clicked="OnDiv3Clicked" />
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="3" Spacing="10">
+            <Border Stroke="{StaticResource CardStroke}"
+                    BackgroundColor="White"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <Grid RowDefinitions="Auto,Auto"
+                      ColumnDefinitions="Auto,*"
+                      RowSpacing="8"
+                      ColumnSpacing="10">
+                    <Button x:Name="filterToggleButton"
+                            Text="フィルタを開く"
+                            BackgroundColor="#EDF3FF"
+                            TextColor="{StaticResource LeagueBlue}"
+                            FontAttributes="Bold"
+                            CornerRadius="14"
+                            Padding="14,8"
+                            Clicked="OnToggleFiltersClicked" />
+
+                    <Label x:Name="lastUpdatedLabel"
+                           Grid.Column="1"
+                           HorizontalTextAlignment="End"
+                           VerticalTextAlignment="Center"
+                           FontSize="12"
+                           TextColor="{StaticResource MutedText}"
+                           Text="最終更新: -" />
+
+                    <VerticalStackLayout Grid.Row="1"
+                                         Grid.ColumnSpan="2"
+                                         Spacing="6">
+                        <Label x:Name="filterSummaryLabel"
+                               FontSize="13"
+                               TextColor="{StaticResource LeagueNavy}"
+                               LineBreakMode="TailTruncation"
+                               MaxLines="2"
+                               Text="フィルタなし" />
+                        <Border BackgroundColor="#FFF6D9"
+                                Stroke="#F3D88A"
+                                StrokeThickness="1"
+                                Padding="10,5"
+                                HorizontalOptions="Start">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="999" />
+                            </Border.StrokeShape>
+                            <Label x:Name="favoriteChipLabel"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#7A4E00"
+                                   Text="★ 未登録" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <Border x:Name="filterDetailsPanel"
+                    IsVisible="False"
+                    Stroke="{StaticResource CardStroke}"
+                    BackgroundColor="White"
+                    Padding="12">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10">
+                        <Border Stroke="{StaticResource CardStroke}"
+                                BackgroundColor="White"
+                                Padding="10,6">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Picker x:Name="teamPicker"
+                                    Title="チーム"
+                                    TextColor="{StaticResource LeagueNavy}"
+                                    TitleColor="{StaticResource MutedText}"
+                                    BackgroundColor="Transparent"
+                                    SelectedIndexChanged="OnTeamFilterChanged" />
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Stroke="{StaticResource CardStroke}"
+                                BackgroundColor="White"
+                                Padding="10,6">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Picker x:Name="venuePicker"
+                                    Title="会場"
+                                    TextColor="{StaticResource LeagueNavy}"
+                                    TitleColor="{StaticResource MutedText}"
+                                    BackgroundColor="Transparent"
+                                    SelectedIndexChanged="OnVenueFilterChanged" />
+                        </Border>
+                    </Grid>
+
+                    <Border Stroke="{StaticResource CardStroke}"
+                            BackgroundColor="White"
+                            Padding="10,6">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Picker x:Name="periodPicker"
+                                Title="期間"
+                                TextColor="{StaticResource LeagueNavy}"
+                                TitleColor="{StaticResource MutedText}"
+                                BackgroundColor="Transparent"
+                                SelectedIndexChanged="OnPeriodFilterChanged" />
+                    </Border>
+
+                    <Border Stroke="{StaticResource CardStroke}"
+                            BackgroundColor="#F8FAFD"
+                            Padding="12,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="14" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10"
+                              VerticalOptions="Center">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="お気に入りチーム"
+                                       FontSize="12"
+                                       TextColor="{StaticResource MutedText}" />
+                                <Label x:Name="favoriteTeamLabel"
+                                       Text="お気に入り: 未登録"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource LeagueNavy}"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Button x:Name="favoriteButton"
+                                    Grid.Column="1"
+                                    Text="お気に入り登録"
+                                    BackgroundColor="#EDF3FF"
+                                    TextColor="{StaticResource LeagueBlue}"
+                                    FontAttributes="Bold"
+                                    CornerRadius="14"
+                                    Padding="12,8"
+                                    Clicked="OnFavoriteClicked" />
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="10">
+                        <Button Text="クリア"
+                                BackgroundColor="#EDF3FF"
+                                TextColor="{StaticResource LeagueBlue}"
+                                FontAttributes="Bold"
+                                CornerRadius="14"
+                                Padding="12,10"
+                                Clicked="OnClearFilters" />
+                        <Button Grid.Column="1"
+                                Text="フィルタを閉じる"
+                                BackgroundColor="#F3F5F9"
+                                TextColor="{StaticResource LeagueNavy}"
+                                FontAttributes="Bold"
+                                CornerRadius="14"
+                                Padding="12,10"
+                                Clicked="OnToggleFiltersClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="4">
+            <CollectionView x:Name="list"
+                            VerticalOptions="FillAndExpand"
+                            SelectionMode="Single"
+                            SelectionChanged="OnMatchSelectionChanged"
+                            ItemSizingStrategy="MeasureFirstItem">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:MatchItem">
+                        <Border Margin="0,0,0,12"
+                                Padding="14"
+                                Stroke="{StaticResource CardStroke}"
+                                StrokeThickness="1"
+                                BackgroundColor="White">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="18" />
+                            </Border.StrokeShape>
+
+                            <Grid RowDefinitions="Auto,Auto,Auto"
+                                  ColumnDefinitions="*,Auto"
+                                  RowSpacing="10">
+                                <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Spacing="8">
+                                    <Border BackgroundColor="#0057B8" Padding="9,4">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="9" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Section}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="White" />
+                                    </Border>
+                                    <Border BackgroundColor="#E8F5E2"
+                                            Padding="9,4"
+                                            IsVisible="{Binding IsCompleted}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="9" />
+                                        </Border.StrokeShape>
+                                        <Label Text="試合終了"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#2E7D32" />
+                                    </Border>
+                                    <Border BackgroundColor="#FFF3D9"
+                                            Padding="9,4"
+                                            IsVisible="{Binding HasSpecialStatus}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="9" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding StatusBadgeText}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#B26A00" />
+                                    </Border>
+                                    <Label Text="{Binding Conference}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource MutedText}"
+                                           VerticalTextAlignment="Center" />
+                                </HorizontalStackLayout>
+
+                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          ColumnSpacing="8">
+                                        <Border WidthRequest="36"
+                                                HeightRequest="36"
+                                                BackgroundColor="#F5F7FB"
+                                                Stroke="{StaticResource CardStroke}"
+                                                StrokeThickness="1"
+                                                VerticalOptions="Start">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="18" />
+                                            </Border.StrokeShape>
+                                            <Grid>
+                                                <Image Source="{Binding HomeLogoPath}"
+                                                       WidthRequest="24"
+                                                       HeightRequest="24"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"
+                                                       IsVisible="{Binding HasHomeLogo}" />
+                                                <Label Text="{Binding HomeBadgeText}"
+                                                       FontSize="11"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{StaticResource LeagueBlue}"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"
+                                                       IsVisible="{Binding HasHomeBadge}" />
+                                            </Grid>
+                                        </Border>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding HomeTeam}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Start"
+                                               VerticalTextAlignment="Center"
+                                               LineBreakMode="WordWrap" />
+                                    </Grid>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding ScoreText}"
+                                           FontSize="22"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource LeagueBlue}"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center" />
+                                    <Grid Grid.Column="2"
+                                          ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="8">
+                                        <Label Text="{Binding AwayTeam}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="End"
+                                               VerticalTextAlignment="Center"
+                                               LineBreakMode="WordWrap" />
+                                        <Border Grid.Column="1"
+                                                WidthRequest="36"
+                                                HeightRequest="36"
+                                                BackgroundColor="#F5F7FB"
+                                                Stroke="{StaticResource CardStroke}"
+                                                StrokeThickness="1"
+                                                VerticalOptions="Start">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="18" />
+                                            </Border.StrokeShape>
+                                            <Grid>
+                                                <Image Source="{Binding AwayLogoPath}"
+                                                       WidthRequest="24"
+                                                       HeightRequest="24"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"
+                                                       IsVisible="{Binding HasAwayLogo}" />
+                                                <Label Text="{Binding AwayBadgeText}"
+                                                       FontSize="11"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{StaticResource LeagueBlue}"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center"
+                                                       IsVisible="{Binding HasAwayBadge}" />
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Grid>
+
+                                <VerticalStackLayout Grid.Row="2" Spacing="2">
+                                    <Label Text="{Binding DateTimeCompact}"
+                                           FontSize="13"
+                                           TextColor="{StaticResource LeagueNavy}" />
+                                    <Label Text="{Binding VenueCompact}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource MutedText}"
+                                           LineBreakMode="TailTruncation" />
+                                </VerticalStackLayout>
+
+                                <Label Grid.Row="1"
+                                       Grid.Column="1"
+                                       Grid.RowSpan="2"
+                                       Text=">"
+                                       FontSize="34"
+                                       TextColor="{StaticResource LeagueBlue}"
+                                       VerticalTextAlignment="Center"
+                                       HorizontalTextAlignment="End" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Border x:Name="emptyStatePanel"
+                    IsVisible="False"
+                    Stroke="{StaticResource CardStroke}"
+                    BackgroundColor="White"
+                    Padding="18"
+                    VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="18" />
+                </Border.StrokeShape>
+                <Label x:Name="emptyStateLabel"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap"
+                       TextColor="{StaticResource MutedText}"
+                       Text="該当する試合はありません" />
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>
+

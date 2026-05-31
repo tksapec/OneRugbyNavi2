@@ -1,0 +1,10 @@
+bin/
+obj/
+*.user
+*.userprefs
+*.suo
+*.vs/
+*.apk
+*.aab
+.vscode/
+Resources/Raw/*.local.json
