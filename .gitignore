@@ -8,3 +8,7 @@ obj/
 *.aab
 .vscode/
 Resources/Raw/*.local.json
+leagueone_update_team_*.db
+leagueone.db
+leagueone.db.backup-*
+AppData/

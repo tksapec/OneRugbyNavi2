@@ -18,7 +18,17 @@ public static class AssetImageResolver
 
         return new StreamImageSource
         {
-            Stream = cancellationToken => FileSystem.OpenAppPackageFileAsync(normalized)
+            Stream = async cancellationToken =>
+            {
+                try
+                {
+                    return await FileSystem.OpenAppPackageFileAsync(normalized);
+                }
+                catch
+                {
+                    return Stream.Null;
+                }
+            }
         };
     }
 }

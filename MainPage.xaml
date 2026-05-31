@@ -60,7 +60,7 @@
                 </VerticalStackLayout>
 
                 <Button Grid.Column="1"
-                        Text="更新"
+                        Text="再読込"
                         Style="{StaticResource IconActionButton}"
                         Clicked="OnRefreshClicked" />
                 <Button Grid.Column="2"

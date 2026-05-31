@@ -22,7 +22,7 @@ public sealed class TeamUpdateService
         IsRunning = true;
         try
         {
-            progress?.Report($"{team.TeamName} の一時DBを準備しています...");
+            progress?.Report($"{team.TeamName} の一時DB方式を確認しています...");
             await _database.InitializeAsync();
 
             var sourceDb = _database.GetDatabasePath();
@@ -34,7 +34,7 @@ public sealed class TeamUpdateService
 
             File.Copy(sourceDb, tempDb);
 
-            progress?.Report($"{team.TeamName} の更新対象を確認しています...");
+            progress?.Report($"{team.TeamName} の確認対象を読み取っています...");
             var playerCount = await _database.CountPlayersForTeamAsync(team.Id);
 
             // The first in-app version keeps the current DB intact unless a real team fetcher is added.
@@ -50,7 +50,7 @@ public sealed class TeamUpdateService
                 UpdatedImages = 0,
                 FailedPages = 0,
                 UpdatedAt = DateTime.Now,
-                Message = "チーム別更新の安全な一時DB処理を完了しました。公式サイト再取得ロジックは後続でこの境界に接続します。"
+                Message = "既存DBを壊さず一時DBを作成・破棄できることを確認しました。公式サイトからの実更新処理は未実装です。"
             };
         }
         finally

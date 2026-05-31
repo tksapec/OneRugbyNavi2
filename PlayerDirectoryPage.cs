@@ -6,6 +6,7 @@ public sealed class PlayerDirectoryPage : ContentPage
 {
     private readonly ObservableCollection<PlayerCard> _players = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
+    private readonly Entry _keyword = new() { Placeholder = "名前・チーム・ポジション・出身校で検索" };
     private readonly Picker _sortPicker = new() { Title = "並び替え" };
 
     public PlayerDirectoryPage()
@@ -16,6 +17,16 @@ public sealed class PlayerDirectoryPage : ContentPage
         _sortPicker.ItemsSource = new[] { "名前", "チーム", "ポジション", "身長", "体重", "年齢", "キャップ数" };
         _sortPicker.SelectedIndex = 0;
         _sortPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
+        _keyword.Completed += async (_, _) => await LoadAsync();
+
+        var search = new Button
+        {
+            Text = "検索",
+            BackgroundColor = PageStyles.Blue,
+            TextColor = Colors.White,
+            CornerRadius = 12
+        };
+        search.Clicked += async (_, _) => await LoadAsync();
 
         var list = new CollectionView
         {
@@ -39,14 +50,25 @@ public sealed class PlayerDirectoryPage : ContentPage
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
+                new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Star)
             },
             Children =
             {
                 PageStyles.Title("選手名鑑"),
-                _sortPicker.Row(1).Margin(new Thickness(16, 0, 16, 8)),
-                _status.Row(2).Margin(new Thickness(16, 0, 16, 8)),
-                list.Row(3)
+                new Grid
+                {
+                    ColumnDefinitions =
+                    {
+                        new ColumnDefinition(GridLength.Star),
+                        new ColumnDefinition(GridLength.Auto)
+                    },
+                    Margin = new Thickness(16, 0, 16, 8),
+                    Children = { _keyword.Column(0), search.Column(1) }
+                }.Row(1),
+                _sortPicker.Row(2).Margin(new Thickness(16, 0, 16, 8)),
+                _status.Row(3).Margin(new Thickness(16, 0, 16, 8)),
+                list.Row(4)
             }
         };
     }
@@ -65,12 +87,14 @@ public sealed class PlayerDirectoryPage : ContentPage
         try
         {
             _players.Clear();
-            foreach (var player in await AppServices.Database.GetPlayersAsync(sort: SortKey()))
+            foreach (var player in await AppServices.Database.GetPlayersAsync(_keyword.Text, SortKey()))
             {
                 _players.Add(player);
             }
 
-            _status.Text = $"{_players.Count}人";
+            _status.Text = string.IsNullOrWhiteSpace(_keyword.Text)
+                ? $"{_players.Count}人"
+                : $"検索結果: {_players.Count}人";
         }
         catch (Exception ex)
         {

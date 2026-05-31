@@ -90,7 +90,7 @@ public sealed class TeamListPage : ContentPage
 
         var update = new Button
         {
-            Text = "更新",
+            Text = "更新準備確認",
             BackgroundColor = PageStyles.Blue,
             TextColor = Colors.White,
             Padding = new Thickness(14, 6),
@@ -129,8 +129,8 @@ public sealed class TeamListPage : ContentPage
 
         var confirmed = await DisplayAlert(
             "確認",
-            $"{team.TeamName} のデータ更新を開始します。時間がかかる場合があります。本当に更新しますか？",
-            "更新する",
+            $"{team.TeamName} の更新準備確認を行います。\n\n実更新は未実装です。現在は一時DB方式の準備確認のみ行います。",
+            "確認する",
             "キャンセル");
 
         if (!confirmed)
@@ -141,12 +141,12 @@ public sealed class TeamListPage : ContentPage
         try
         {
             _busy.IsRunning = true;
-            _status.Text = $"{team.TeamName} を更新中...";
+            _status.Text = $"{team.TeamName} の更新準備を確認中...";
             var progress = new Progress<string>(message => _status.Text = message);
             var result = await AppServices.TeamUpdater.UpdateTeamAsync(team, progress);
             await DisplayAlert(
                 "更新結果",
-                $"更新対象チーム: {result.TeamName}\n更新選手数: {result.UpdatedPlayers}\n新規選手数: {result.NewPlayers}\n削除/未掲載候補: {result.MissingCandidates}\n画像更新数: {result.UpdatedImages}\n取得失敗件数: {result.FailedPages}\n更新日時: {result.UpdatedAt:yyyy-MM-dd HH:mm}\n\n{result.Message}",
+                $"更新対象チーム: {result.TeamName}\n確認済み選手数: {result.UpdatedPlayers}\n新規選手数: {result.NewPlayers}\n削除/未掲載候補: {result.MissingCandidates}\n画像更新数: {result.UpdatedImages}\n取得失敗件数: {result.FailedPages}\n確認日時: {result.UpdatedAt:yyyy-MM-dd HH:mm}\n\n実更新は未実装です。現在は一時DB方式の準備確認のみ行います。\n\n{result.Message}",
                 "OK");
             await LoadAsync();
         }

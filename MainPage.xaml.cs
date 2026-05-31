@@ -11,6 +11,7 @@ namespace OneRugbyNavi2
         private readonly ScheduleViewModel _vm = new();
 
         private const string FetchFailedMessage = "\u65E5\u7A0B\u3092\u53D6\u5F97\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u901A\u4FE1\u72B6\u614B\u3092\u78BA\u8A8D\u3057\u3066\u518D\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002";
+        private const string EmptyDatabaseScheduleMessage = "同梱DBに表示可能な日程がありません。日程データを含むseed DBに差し替えてください。";
         private const string PartialFailureMessage = "\u4E00\u90E8\u306EDivision\u306E\u53D6\u5F97\u307E\u305F\u306F\u7D50\u679C\u88DC\u5B8C\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u8868\u793A\u3067\u304D\u308B\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059\u3002";
         private const string RefreshSuccessMessage = "\u6700\u65B0\u30C7\u30FC\u30BF\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F\u3002";
         private const string ShowingCacheMessage = "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059";
@@ -90,32 +91,12 @@ namespace OneRugbyNavi2
                 var selectedTeam = _vm.TeamFilter;
                 var selectedVenue = _vm.VenueFilter;
                 var selectedPeriod = _vm.PeriodFilter;
-                var cache = await ScheduleCacheStore.LoadAsync();
-                var fetchResult = await ScheduleFetcher.FetchAllAsync();
+                var fetchResult = await AppServices.Database.GetScheduleAsync();
 
                 var div1 = fetchResult.Div1;
                 var div2 = fetchResult.Div2;
                 var div3 = fetchResult.Div3;
-                bool usedCache = false;
                 _isShowingCache = false;
-
-                if (div1.Count == 0 && cache?.Div1.Count > 0)
-                {
-                    div1 = cache.Div1;
-                    usedCache = true;
-                }
-
-                if (div2.Count == 0 && cache?.Div2.Count > 0)
-                {
-                    div2 = cache.Div2;
-                    usedCache = true;
-                }
-
-                if (div3.Count == 0 && cache?.Div3.Count > 0)
-                {
-                    div3 = cache.Div3;
-                    usedCache = true;
-                }
 
                 if (div1.Count == 0 && div2.Count == 0 && div3.Count == 0)
                 {
@@ -125,9 +106,9 @@ namespace OneRugbyNavi2
                     _vm.VenueFilter = null;
                     RefreshPickers(preserveSelection: false);
 
-                    _lastUpdatedAt = cache?.LastUpdated;
+                    _lastUpdatedAt = null;
                     UpdateLastUpdatedLabel();
-                    SetMessage(FetchFailedMessage, true);
+                    SetMessage(EmptyDatabaseScheduleMessage, true);
                     UpdateEmptyState();
                     UpdateNextMatchCard();
                     UpdateFilterSummaryUi();
@@ -149,42 +130,13 @@ namespace OneRugbyNavi2
                 _vm.ApplyFilters();
                 RefreshPickers(preserveSelection: true);
 
-                bool networkSucceededForAll = fetchResult.Div1.Count > 0 &&
-                    fetchResult.Div2.Count > 0 &&
-                    fetchResult.Div3.Count > 0;
-
-                if (networkSucceededForAll && string.IsNullOrWhiteSpace(fetchResult.ResultsError))
-                {
-                    _isShowingCache = false;
-                    _lastUpdatedAt = DateTimeOffset.Now;
-                    await ScheduleCacheStore.SaveAsync(div1, div2, div3, _lastUpdatedAt.Value);
-                }
-                else if (cache != null)
-                {
-                    _lastUpdatedAt = cache.LastUpdated;
-                }
-                else if (_lastUpdatedAt == null && fetchResult.HasAnyData)
-                {
-                    _lastUpdatedAt = DateTimeOffset.Now;
-                }
+                _lastUpdatedAt = DateTimeOffset.Now;
 
                 UpdateLastUpdatedLabel();
 
-                var errors = fetchResult.GetErrors().ToList();
-                if (usedCache)
+                if (showSuccessMessage)
                 {
-                    _isShowingCache = true;
-                    cacheLabel.Text = ShowingCacheMessage;
-                    cachePanel.IsVisible = true;
-                }
-
-                if (errors.Count > 0)
-                {
-                    SetMessage(PartialFailureMessage, true);
-                }
-                else if (showSuccessMessage)
-                {
-                    SetMessage(RefreshSuccessMessage, true);
+                    SetMessage("ローカルDBから日程を再読み込みしました。", true);
                 }
 
                 UpdateEmptyState();
@@ -193,25 +145,6 @@ namespace OneRugbyNavi2
             }
             catch
             {
-                var cache = await ScheduleCacheStore.LoadAsync();
-                if (cache != null && (cache.Div1.Count > 0 || cache.Div2.Count > 0 || cache.Div3.Count > 0))
-                {
-                    _vm.SetItems(cache.Div1, cache.Div2, cache.Div3);
-                    _vm.SetSource(_vm.CurrentDivision);
-                    ApplyTeamFilterForCurrentDivision(null, allowFavoriteFallback: true);
-                    _lastUpdatedAt = cache.LastUpdated;
-                    _isShowingCache = true;
-                    cacheLabel.Text = ShowingCacheMessage;
-                    cachePanel.IsVisible = true;
-                    UpdateLastUpdatedLabel();
-                    RefreshPickers(preserveSelection: true);
-                    SetMessage(FetchFailedMessage, true);
-                    UpdateEmptyState();
-                    UpdateNextMatchCard();
-                    UpdateFilterSummaryUi();
-                    return;
-                }
-
                 _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
                 _vm.SetSource(_vm.CurrentDivision);
                 RefreshPickers(preserveSelection: false);
