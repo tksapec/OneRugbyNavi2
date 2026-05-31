@@ -571,26 +571,5 @@ namespace OneRugbyNavi2
             return true;
         }
     }
-
-    internal static class ViewExtensions
-    {
-        public static T Apply<T>(this T view, Action<T> configure) where T : BindableObject
-        {
-            configure(view);
-            return view;
-        }
-
-        public static T Column<T>(this T view, int column) where T : BindableObject
-        {
-            Grid.SetColumn(view, column);
-            return view;
-        }
-
-        public static T Row<T>(this T view, int row) where T : BindableObject
-        {
-            Grid.SetRow(view, row);
-            return view;
-        }
-    }
 }
 

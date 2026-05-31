@@ -26,7 +26,7 @@ namespace OneRugbyNavi2
         private MatchItem? _nextMatch;
         private string? _lastMessage;
         private string _favoriteTeam = "";
-        private DateTimeOffset? _lastUpdatedAt;
+        private string _databaseBuildTimestampText = "-";
 
         public MainPage()
         {
@@ -92,6 +92,7 @@ namespace OneRugbyNavi2
                 var selectedVenue = _vm.VenueFilter;
                 var selectedPeriod = _vm.PeriodFilter;
                 var fetchResult = await AppServices.Database.GetScheduleAsync();
+                _databaseBuildTimestampText = await AppServices.Database.GetBuildTimestampTextAsync();
 
                 var div1 = fetchResult.Div1;
                 var div2 = fetchResult.Div2;
@@ -106,7 +107,6 @@ namespace OneRugbyNavi2
                     _vm.VenueFilter = null;
                     RefreshPickers(preserveSelection: false);
 
-                    _lastUpdatedAt = null;
                     UpdateLastUpdatedLabel();
                     SetMessage(EmptyDatabaseScheduleMessage, true);
                     UpdateEmptyState();
@@ -130,8 +130,6 @@ namespace OneRugbyNavi2
                 _vm.ApplyFilters();
                 RefreshPickers(preserveSelection: true);
 
-                _lastUpdatedAt = DateTimeOffset.Now;
-
                 UpdateLastUpdatedLabel();
 
                 if (showSuccessMessage)
@@ -148,6 +146,8 @@ namespace OneRugbyNavi2
                 _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
                 _vm.SetSource(_vm.CurrentDivision);
                 RefreshPickers(preserveSelection: false);
+                _databaseBuildTimestampText = "-";
+                UpdateLastUpdatedLabel();
                 SetMessage(FetchFailedMessage, true);
                 UpdateEmptyState();
                 UpdateNextMatchCard();
@@ -380,7 +380,7 @@ namespace OneRugbyNavi2
 
         private async void OnInfoClicked(object sender, EventArgs e)
         {
-            var lastUpdated = _lastUpdatedAt?.ToLocalTime().ToString("yyyy/MM/dd HH:mm") ?? "-";
+            var lastUpdated = _databaseBuildTimestampText;
             var cacheState = _isShowingCache ? "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u4E2D" : "\u6700\u65B0\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u4E2D";
             string body =
 "One Rugby Navi2 \u306F JAPAN RUGBY LEAGUE ONE \u516C\u5F0F\u30B5\u30A4\u30C8\u306E\u516C\u958B\u60C5\u5831\u3092\u3082\u3068\u306B\u3001\u65E5\u7A0B\u3068\u7D50\u679C\u3092\u8868\u793A\u3057\u307E\u3059\u3002\n\n" +
@@ -424,9 +424,7 @@ $"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)
 
         private void UpdateLastUpdatedLabel()
         {
-            lastUpdatedLabel.Text = _lastUpdatedAt.HasValue
-                ? $"\u6700\u7D42\u66F4\u65B0: {_lastUpdatedAt.Value.ToLocalTime():yyyy/MM/dd HH:mm}"
-                : "\u6700\u7D42\u66F4\u65B0: -";
+            lastUpdatedLabel.Text = $"最終更新: {_databaseBuildTimestampText}";
         }
 
         private void UpdateFilterPanelUi()

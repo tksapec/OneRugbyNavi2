@@ -4,6 +4,8 @@ namespace OneRugbyNavi2;
 
 public sealed class TeamListPage : ContentPage
 {
+    private const bool ShowUpdatePreparationButton = false;
+
     private readonly ObservableCollection<TeamCard> _teams = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
     private readonly ActivityIndicator _busy = new() { Color = PageStyles.Blue };
@@ -95,7 +97,8 @@ public sealed class TeamListPage : ContentPage
             TextColor = Colors.White,
             Padding = new Thickness(14, 6),
             CornerRadius = 12,
-            FontSize = 13
+            FontSize = 13,
+            IsVisible = ShowUpdatePreparationButton
         };
         update.SetBinding(BindableObject.BindingContextProperty, ".");
         update.Clicked += OnUpdateClicked;

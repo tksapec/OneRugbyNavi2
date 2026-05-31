@@ -47,7 +47,16 @@ public sealed class LeagueOneDatabase
             await CountAsync(connection, "players"),
             await CountAsync(connection, "matches"),
             await CountAsync(connection, "asset_files"),
-            await ReadSettingAsync(connection, "generated_at") ?? await ReadSettingAsync(connection, "last_generated_at") ?? "");
+            await ReadBuildTimestampSettingAsync(connection) ?? "");
+    }
+
+    public async Task<string> GetBuildTimestampTextAsync()
+    {
+        await InitializeAsync();
+        await using var connection = CreateConnection();
+        await connection.OpenAsync();
+
+        return FormatSettingTimestamp(await ReadBuildTimestampSettingAsync(connection));
     }
 
     public async Task<IReadOnlyList<TeamCard>> GetTeamsAsync()
@@ -351,6 +360,25 @@ public sealed class LeagueOneDatabase
         command.CommandText = "SELECT value FROM app_settings WHERE key = $key";
         command.Parameters.AddWithValue("$key", key);
         return (await command.ExecuteScalarAsync()) as string;
+    }
+
+    private static async Task<string?> ReadBuildTimestampSettingAsync(SqliteConnection connection)
+    {
+        return await ReadSettingAsync(connection, "last_full_build_at")
+            ?? await ReadSettingAsync(connection, "generated_at")
+            ?? await ReadSettingAsync(connection, "last_generated_at");
+    }
+
+    private static string FormatSettingTimestamp(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return "-";
+        }
+
+        return DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out var timestamp)
+            ? timestamp.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+            : value.Trim();
     }
 
     private static SqliteConnection CreateConnection() => new($"Data Source={DatabasePath}");
