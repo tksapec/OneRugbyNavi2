@@ -46,4 +46,12 @@ public static class PageStyles
         BackgroundColor = Color.FromArgb("#EDF3FF"),
         Padding = new Thickness(8, 4)
     };
+
+    public static Picker Picker(string title) => new()
+    {
+        Title = title,
+        TextColor = Navy,
+        TitleColor = Muted,
+        BackgroundColor = Colors.White
+    };
 }

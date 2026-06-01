@@ -20,6 +20,7 @@ public sealed class TeamCard
 public sealed class PlayerCard
 {
     public int Id { get; init; }
+    public int? TeamId { get; init; }
     public string LeagueOnePlayerId { get; init; } = "";
     public string NameJa { get; init; } = "";
     public string NameEn { get; init; } = "";
@@ -46,9 +47,14 @@ public sealed class PlayerCard
 public sealed class RankingRow
 {
     public int Rank { get; init; }
+    public int? PlayerId { get; init; }
     public string Title { get; init; } = "";
     public string Subtitle { get; init; } = "";
     public string ValueText { get; init; } = "";
+    public string? LocalAssetPath { get; init; }
+    public ImageSource? PhotoSource => AssetImageResolver.CreateImageSource(LocalAssetPath);
+    public string Initials => OneRugbyNavi2.Initials.FromText(Title);
+    public bool IsPlayer => PlayerId.HasValue;
 }
 
 public sealed class TeamUpdateResult

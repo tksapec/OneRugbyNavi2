@@ -12,6 +12,7 @@ namespace OneRugbyNavi2
 
         private const string FetchFailedMessage = "\u65E5\u7A0B\u3092\u53D6\u5F97\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u901A\u4FE1\u72B6\u614B\u3092\u78BA\u8A8D\u3057\u3066\u518D\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002";
         private const string EmptyDatabaseScheduleMessage = "同梱DBに表示可能な日程がありません。日程データを含むseed DBに差し替えてください。";
+        private const string FetchedOfficialScheduleMessage = "同梱DBに日程がないため、公式サイトから日程を取得しました。";
         private const string PartialFailureMessage = "\u4E00\u90E8\u306EDivision\u306E\u53D6\u5F97\u307E\u305F\u306F\u7D50\u679C\u88DC\u5B8C\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u8868\u793A\u3067\u304D\u308B\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059\u3002";
         private const string RefreshSuccessMessage = "\u6700\u65B0\u30C7\u30FC\u30BF\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F\u3002";
         private const string ShowingCacheMessage = "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059";
@@ -93,6 +94,7 @@ namespace OneRugbyNavi2
                 var selectedPeriod = _vm.PeriodFilter;
                 var fetchResult = await AppServices.Database.GetScheduleAsync();
                 _databaseBuildTimestampText = await AppServices.Database.GetBuildTimestampTextAsync();
+                var usedOfficialFallback = false;
 
                 var div1 = fetchResult.Div1;
                 var div2 = fetchResult.Div2;
@@ -101,18 +103,29 @@ namespace OneRugbyNavi2
 
                 if (div1.Count == 0 && div2.Count == 0 && div3.Count == 0)
                 {
-                    _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
-                    _vm.SetSource(currentDivision);
-                    _vm.TeamFilter = null;
-                    _vm.VenueFilter = null;
-                    RefreshPickers(preserveSelection: false);
+                    fetchResult = await ScheduleFetcher.FetchAllAsync();
+                    div1 = fetchResult.Div1;
+                    div2 = fetchResult.Div2;
+                    div3 = fetchResult.Div3;
+                    usedOfficialFallback = true;
 
-                    UpdateLastUpdatedLabel();
-                    SetMessage(EmptyDatabaseScheduleMessage, true);
-                    UpdateEmptyState();
-                    UpdateNextMatchCard();
-                    UpdateFilterSummaryUi();
-                    return;
+                    if (div1.Count == 0 && div2.Count == 0 && div3.Count == 0)
+                    {
+                        _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
+                        _vm.SetSource(currentDivision);
+                        _vm.TeamFilter = null;
+                        _vm.VenueFilter = null;
+                        RefreshPickers(preserveSelection: false);
+
+                        UpdateLastUpdatedLabel();
+                        SetMessage(FetchFailedMessage, true);
+                        UpdateEmptyState();
+                        UpdateNextMatchCard();
+                        UpdateFilterSummaryUi();
+                        return;
+                    }
+
+                    SetMessage(FetchedOfficialScheduleMessage, true);
                 }
 
                 _vm.SetItems(div1, div2, div3);
@@ -132,7 +145,7 @@ namespace OneRugbyNavi2
 
                 UpdateLastUpdatedLabel();
 
-                if (showSuccessMessage)
+                if (showSuccessMessage && !usedOfficialFallback)
                 {
                     SetMessage("ローカルDBから日程を再読み込みしました。", true);
                 }

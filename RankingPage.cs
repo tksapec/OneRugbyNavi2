@@ -5,7 +5,8 @@ namespace OneRugbyNavi2;
 public sealed class RankingPage : ContentPage
 {
     private readonly ObservableCollection<RankingRow> _rows = new();
-    private readonly Picker _rankingPicker = new() { Title = "ランキング" };
+    private readonly Picker _rankingPicker = PageStyles.Picker("ランキング");
+    private readonly Picker _directionPicker = PageStyles.Picker("並び順");
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
 
     public RankingPage()
@@ -17,10 +18,27 @@ public sealed class RankingPage : ContentPage
         _rankingPicker.SelectedIndex = 0;
         _rankingPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
 
+        _directionPicker.ItemsSource = new[] { "降順", "昇順" };
+        _directionPicker.SelectedIndex = 0;
+        _directionPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
+
         var list = new CollectionView
         {
             ItemsSource = _rows,
+            SelectionMode = SelectionMode.Single,
             ItemTemplate = new DataTemplate(CreateRankingCard)
+        };
+        list.SelectionChanged += async (_, e) =>
+        {
+            if (e.CurrentSelection.FirstOrDefault() is RankingRow { PlayerId: int playerId })
+            {
+                list.SelectedItem = null;
+                await Navigation.PushAsync(new PlayerDetailPage(playerId));
+            }
+            else
+            {
+                list.SelectedItem = null;
+            }
         };
 
         Content = new Grid
@@ -35,7 +53,17 @@ public sealed class RankingPage : ContentPage
             Children =
             {
                 PageStyles.Title("ランキング"),
-                _rankingPicker.Row(1).Margin(new Thickness(16, 0, 16, 8)),
+                new Grid
+                {
+                    ColumnDefinitions =
+                    {
+                        new ColumnDefinition(GridLength.Star),
+                        new ColumnDefinition(GridLength.Star)
+                    },
+                    Margin = new Thickness(16, 0, 16, 8),
+                    ColumnSpacing = 8,
+                    Children = { _rankingPicker.Column(0), _directionPicker.Column(1) }
+                }.Row(1),
                 _status.Row(2).Margin(new Thickness(16, 0, 16, 8)),
                 list.Row(3)
             }
@@ -56,7 +84,10 @@ public sealed class RankingPage : ContentPage
         try
         {
             _rows.Clear();
-            foreach (var row in await AppServices.Database.GetRankingAsync(RankingKey()))
+            var isSchoolCount = RankingKey() == "school_count";
+            _directionPicker.IsEnabled = !isSchoolCount;
+
+            foreach (var row in await AppServices.Database.GetRankingAsync(RankingKey(), _directionPicker.SelectedIndex == 0))
             {
                 _rows.Add(row);
             }
@@ -90,6 +121,25 @@ public sealed class RankingPage : ContentPage
         };
         rank.SetBinding(Label.TextProperty, nameof(RankingRow.Rank));
 
+        var photo = new Image { WidthRequest = 52, HeightRequest = 52, Aspect = Aspect.AspectFill };
+        photo.SetBinding(Image.SourceProperty, nameof(RankingRow.PhotoSource));
+
+        var badge = new Label
+        {
+            WidthRequest = 52,
+            HeightRequest = 52,
+            HorizontalTextAlignment = TextAlignment.Center,
+            VerticalTextAlignment = TextAlignment.Center,
+            BackgroundColor = Color.FromArgb("#EDF3FF"),
+            TextColor = PageStyles.Blue,
+            FontAttributes = FontAttributes.Bold
+        };
+        badge.SetBinding(Label.TextProperty, nameof(RankingRow.Initials));
+
+        var photoLayer = new Grid { WidthRequest = 52, HeightRequest = 52 };
+        photoLayer.Children.Add(badge);
+        photoLayer.Children.Add(photo);
+
         var title = new Label { FontSize = 16, FontAttributes = FontAttributes.Bold, TextColor = PageStyles.Navy };
         title.SetBinding(Label.TextProperty, nameof(RankingRow.Title));
 
@@ -104,6 +154,7 @@ public sealed class RankingPage : ContentPage
             ColumnDefinitions =
             {
                 new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Auto),
                 new ColumnDefinition(GridLength.Star),
                 new ColumnDefinition(GridLength.Auto)
             },
@@ -111,8 +162,9 @@ public sealed class RankingPage : ContentPage
             Children =
             {
                 rank.Column(0),
-                new VerticalStackLayout { Children = { title, subtitle } }.Column(1),
-                value.Column(2).CenterVertical()
+                photoLayer.Column(1),
+                new VerticalStackLayout { Children = { title, subtitle } }.Column(2),
+                value.Column(3).CenterVertical()
             }
         });
     }

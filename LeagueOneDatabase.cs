@@ -95,7 +95,12 @@ public sealed class LeagueOneDatabase
         return results;
     }
 
-    public async Task<IReadOnlyList<PlayerCard>> GetPlayersAsync(string? keyword = null, string sort = "name")
+    public async Task<IReadOnlyList<PlayerCard>> GetPlayersAsync(
+        string? keyword = null,
+        string sort = "name",
+        int? teamId = null,
+        string? position = null,
+        string? schoolKeyword = null)
     {
         await InitializeAsync();
         var results = new List<PlayerCard>();
@@ -103,20 +108,44 @@ public sealed class LeagueOneDatabase
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
 
-        var where = "";
+        var filters = new List<string>();
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             command.Parameters.AddWithValue("$keyword", $"%{keyword.Trim()}%");
             command.Parameters.AddWithValue("$normalizedKeyword", $"%{SearchNormalizer.Normalize(keyword)}%");
-            where = """
-                WHERE p.name_ja LIKE $keyword
-                   OR p.name_en LIKE $keyword
-                   OR t.team_name LIKE $keyword
-                   OR psr.position_code LIKE $keyword
-                   OR psr.school_team_history_text LIKE $keyword
-                   OR psr.school_team_history_search_text LIKE $normalizedKeyword
-                """;
+            filters.Add("""
+                (p.name_ja LIKE $keyword
+                 OR p.name_en LIKE $keyword
+                 OR t.team_name LIKE $keyword
+                 OR psr.position_code LIKE $keyword
+                 OR psr.school_team_history_text LIKE $keyword
+                 OR psr.school_team_history_search_text LIKE $normalizedKeyword)
+                """);
         }
+
+        if (teamId.HasValue)
+        {
+            command.Parameters.AddWithValue("$teamId", teamId.Value);
+            filters.Add("psr.team_id = $teamId");
+        }
+
+        if (!string.IsNullOrWhiteSpace(position))
+        {
+            command.Parameters.AddWithValue("$position", position.Trim());
+            filters.Add("psr.position_code = $position");
+        }
+
+        if (!string.IsNullOrWhiteSpace(schoolKeyword))
+        {
+            command.Parameters.AddWithValue("$schoolKeyword", $"%{schoolKeyword.Trim()}%");
+            command.Parameters.AddWithValue("$normalizedSchoolKeyword", $"%{SearchNormalizer.Normalize(schoolKeyword)}%");
+            filters.Add("""
+                (psr.school_team_history_text LIKE $schoolKeyword
+                 OR psr.school_team_history_search_text LIKE $normalizedSchoolKeyword)
+                """);
+        }
+
+        var where = filters.Count == 0 ? "" : $"WHERE {string.Join(" AND ", filters)}";
 
         var orderBy = sort switch
         {
@@ -130,7 +159,7 @@ public sealed class LeagueOneDatabase
         };
 
         command.CommandText = $"""
-            SELECT p.id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
+            SELECT p.id, psr.team_id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
                    COALESCE(t.team_name, ''), COALESCE(psr.position_code, ''),
                    psr.height_cm, psr.weight_kg, COALESCE(p.birth_date, ''),
                    psr.age_calculated, COALESCE(psr.registration_category, ''),
@@ -238,7 +267,7 @@ public sealed class LeagueOneDatabase
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();
         command.CommandText = """
-            SELECT p.id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
+            SELECT p.id, psr.team_id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
                    COALESCE(t.team_name, ''), COALESCE(psr.position_code, ''),
                    psr.height_cm, psr.weight_kg, COALESCE(p.birth_date, ''),
                    psr.age_calculated, COALESCE(psr.registration_category, ''),
@@ -256,7 +285,30 @@ public sealed class LeagueOneDatabase
         return await reader.ReadAsync() ? ReadPlayer(reader) : null;
     }
 
-    public async Task<IReadOnlyList<RankingRow>> GetRankingAsync(string rankingType)
+    public async Task<IReadOnlyList<string>> GetPlayerPositionsAsync()
+    {
+        await InitializeAsync();
+        var results = new List<string>();
+        await using var connection = CreateConnection();
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = """
+            SELECT DISTINCT position_code
+            FROM player_season_registrations
+            WHERE COALESCE(position_code, '') <> ''
+            ORDER BY position_code
+            """;
+
+        await using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            results.Add(reader.GetString(0));
+        }
+
+        return results;
+    }
+
+    public async Task<IReadOnlyList<RankingRow>> GetRankingAsync(string rankingType, bool descending = true)
     {
         await InitializeAsync();
         await using var connection = CreateConnection();
@@ -271,10 +323,10 @@ public sealed class LeagueOneDatabase
                 ORDER BY player_count DESC, candidate_text
                 LIMIT 50
                 """,
-            "weight" => PlayerRankingSql("psr.weight_kg", "kg"),
-            "age" => PlayerRankingSql("psr.age_calculated", "歳"),
-            "caps" => PlayerRankingSql("psr.league_one_caps", "Caps"),
-            _ => PlayerRankingSql("psr.height_cm", "cm")
+            "weight" => PlayerRankingSql("psr.weight_kg", "kg", descending),
+            "age" => PlayerRankingSql("psr.age_calculated", "豁ｳ", descending),
+            "caps" => PlayerRankingSql("psr.league_one_caps", "Caps", descending),
+            _ => PlayerRankingSql("psr.height_cm", "cm", descending)
         };
 
         var rows = new List<RankingRow>();
@@ -297,9 +349,11 @@ public sealed class LeagueOneDatabase
                 rows.Add(new RankingRow
                 {
                     Rank = rank++,
-                    Title = reader.GetString(0),
-                    Subtitle = reader.GetString(1),
-                    ValueText = reader.GetString(2)
+                    PlayerId = reader.GetInt32(0),
+                    Title = reader.GetString(1),
+                    Subtitle = reader.GetString(2),
+                    ValueText = reader.GetString(3),
+                    LocalAssetPath = reader.IsDBNull(4) ? null : reader.GetString(4)
                 });
             }
         }
@@ -318,33 +372,36 @@ public sealed class LeagueOneDatabase
         return Convert.ToInt32(await command.ExecuteScalarAsync());
     }
 
-    private static string PlayerRankingSql(string column, string unit) => $"""
-        SELECT p.name_ja, COALESCE(t.team_name, ''), CAST({column} AS TEXT) || '{unit}'
+    private static string PlayerRankingSql(string column, string unit, bool descending) => $"""
+        SELECT p.id, p.name_ja, COALESCE(t.team_name, '') || ' / ' || COALESCE(psr.position_code, ''),
+               CAST({column} AS TEXT) || '{unit}', af.local_path
         FROM players p
         JOIN player_season_registrations psr ON psr.player_id = p.id
         LEFT JOIN teams t ON t.id = psr.team_id
+        LEFT JOIN asset_files af ON af.id = psr.photo_asset_id
         WHERE {column} IS NOT NULL
-        ORDER BY {column} DESC, p.name_ja
+        ORDER BY {column} {(descending ? "DESC" : "ASC")}, p.name_ja
         LIMIT 50
         """;
 
     private static PlayerCard ReadPlayer(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt32(0),
-        LeagueOnePlayerId = reader.GetString(1),
-        NameJa = reader.GetString(2),
-        NameEn = reader.GetString(3),
-        TeamName = reader.GetString(4),
-        PositionCode = reader.GetString(5),
-        HeightCm = reader.IsDBNull(6) ? null : reader.GetInt32(6),
-        WeightKg = reader.IsDBNull(7) ? null : reader.GetInt32(7),
-        BirthDate = reader.GetString(8),
-        AgeCalculated = reader.IsDBNull(9) ? null : reader.GetInt32(9),
-        RegistrationCategory = reader.GetString(10),
-        LeagueOneCaps = reader.IsDBNull(11) ? null : reader.GetInt32(11),
-        SchoolTeamHistoryText = reader.GetString(12),
-        ProfileUrl = reader.GetString(13),
-        LocalAssetPath = reader.IsDBNull(14) ? null : reader.GetString(14)
+        TeamId = reader.IsDBNull(1) ? null : reader.GetInt32(1),
+        LeagueOnePlayerId = reader.GetString(2),
+        NameJa = reader.GetString(3),
+        NameEn = reader.GetString(4),
+        TeamName = reader.GetString(5),
+        PositionCode = reader.GetString(6),
+        HeightCm = reader.IsDBNull(7) ? null : reader.GetInt32(7),
+        WeightKg = reader.IsDBNull(8) ? null : reader.GetInt32(8),
+        BirthDate = reader.GetString(9),
+        AgeCalculated = reader.IsDBNull(10) ? null : reader.GetInt32(10),
+        RegistrationCategory = reader.GetString(11),
+        LeagueOneCaps = reader.IsDBNull(12) ? null : reader.GetInt32(12),
+        SchoolTeamHistoryText = reader.GetString(13),
+        ProfileUrl = reader.GetString(14),
+        LocalAssetPath = reader.IsDBNull(15) ? null : reader.GetString(15)
     };
 
     private static async Task<int> CountAsync(SqliteConnection connection, string table)

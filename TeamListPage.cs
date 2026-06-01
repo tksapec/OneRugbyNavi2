@@ -4,7 +4,7 @@ namespace OneRugbyNavi2;
 
 public sealed class TeamListPage : ContentPage
 {
-    private const bool ShowUpdatePreparationButton = false;
+    private const bool ShowUpdatePreparationButton = true;
 
     private readonly ObservableCollection<TeamCard> _teams = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
@@ -120,7 +120,18 @@ public sealed class TeamListPage : ContentPage
             }
         };
 
-        return PageStyles.Card(row);
+        var card = PageStyles.Card(row);
+        var tap = new TapGestureRecognizer();
+        tap.Tapped += async (_, _) =>
+        {
+            if (card.BindingContext is TeamCard team)
+            {
+                await Navigation.PushAsync(new PlayerDirectoryPage(team.Id, team.TeamName));
+            }
+        };
+        card.SetBinding(BindableObject.BindingContextProperty, ".");
+        card.GestureRecognizers.Add(tap);
+        return card;
     }
 
     private async void OnUpdateClicked(object? sender, EventArgs e)

@@ -5,8 +5,8 @@ namespace OneRugbyNavi2;
 public sealed class SchoolSearchPage : ContentPage
 {
     private readonly ObservableCollection<PlayerCard> _players = new();
-    private readonly Entry _keyword = new() { Placeholder = "佐賀工業" };
-    private readonly Picker _sortPicker = new() { Title = "並び替え" };
+    private readonly Entry _keyword = new() { Placeholder = "出身校・チーム歴で検索" };
+    private readonly Picker _sortPicker = PageStyles.Picker("並び替え");
     private readonly Label _status = PageStyles.MutedLabel("検索語を入力してください");
 
     public SchoolSearchPage()
@@ -64,6 +64,7 @@ public sealed class SchoolSearchPage : ContentPage
                         new ColumnDefinition(GridLength.Auto)
                     },
                     Margin = new Thickness(16, 0, 16, 8),
+                    ColumnSpacing = 8,
                     Children = { _keyword.Column(0), search.Column(1) }
                 }.Row(1),
                 _sortPicker.Row(2).Margin(new Thickness(16, 0, 16, 8)),
@@ -86,7 +87,7 @@ public sealed class SchoolSearchPage : ContentPage
         try
         {
             _players.Clear();
-            foreach (var player in await AppServices.Database.GetPlayersAsync(keyword, SortKey()))
+            foreach (var player in await AppServices.Database.GetPlayersAsync(sort: SortKey(), schoolKeyword: keyword))
             {
                 _players.Add(player);
             }
