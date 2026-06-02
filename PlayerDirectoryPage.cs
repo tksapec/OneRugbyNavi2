@@ -7,8 +7,8 @@ public sealed class PlayerDirectoryPage : ContentPage
     private readonly ObservableCollection<PlayerCard> _players = new();
     private readonly List<TeamCard> _teamOptions = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
-    private readonly Entry _keyword = new() { Placeholder = "名前・チーム・ポジション・出身校で検索" };
-    private readonly Entry _schoolKeyword = new() { Placeholder = "出身校・チーム歴で検索" };
+    private readonly Entry _keyword = PageStyles.Entry("名前・チーム・ポジション・出身校で検索");
+    private readonly Entry _schoolKeyword = PageStyles.Entry("出身校・チーム歴で検索");
     private readonly Picker _sortPicker = PageStyles.Picker("並び替え");
     private readonly Picker _teamPicker = PageStyles.Picker("チーム");
     private readonly Picker _positionPicker = PageStyles.Picker("ポジション");

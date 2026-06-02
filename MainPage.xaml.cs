@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 
@@ -10,9 +11,9 @@ namespace OneRugbyNavi2
     {
         private readonly ScheduleViewModel _vm = new();
 
-        private const string FetchFailedMessage = "\u65E5\u7A0B\u3092\u53D6\u5F97\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u901A\u4FE1\u72B6\u614B\u3092\u78BA\u8A8D\u3057\u3066\u518D\u5EA6\u304A\u8A66\u3057\u304F\u3060\u3055\u3044\u3002";
-        private const string EmptyDatabaseScheduleMessage = "同梱DBに表示可能な日程がありません。日程データを含むseed DBに差し替えてください。";
-        private const string FetchedOfficialScheduleMessage = "同梱DBに日程がないため、公式サイトから日程を取得しました。";
+        private const string FetchFailedMessage = "試合日程を取得できませんでした。通信状態を確認してください。";
+        private const string FetchedOfficialScheduleMessage = "Webから最新の試合日程を取得しました。";
+        private const string ShowingScheduleCacheMessage = "通信に失敗したため、前回取得した試合日程を表示しています。";
         private const string PartialFailureMessage = "\u4E00\u90E8\u306EDivision\u306E\u53D6\u5F97\u307E\u305F\u306F\u7D50\u679C\u88DC\u5B8C\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u8868\u793A\u3067\u304D\u308B\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059\u3002";
         private const string RefreshSuccessMessage = "\u6700\u65B0\u30C7\u30FC\u30BF\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F\u3002";
         private const string ShowingCacheMessage = "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059";
@@ -28,6 +29,7 @@ namespace OneRugbyNavi2
         private string? _lastMessage;
         private string _favoriteTeam = "";
         private string _databaseBuildTimestampText = "-";
+        private CancellationTokenSource? _messageHideCts;
 
         public MainPage()
         {
@@ -92,31 +94,39 @@ namespace OneRugbyNavi2
                 var selectedTeam = _vm.TeamFilter;
                 var selectedVenue = _vm.VenueFilter;
                 var selectedPeriod = _vm.PeriodFilter;
-                var fetchResult = await AppServices.Database.GetScheduleAsync();
-                _databaseBuildTimestampText = await AppServices.Database.GetBuildTimestampTextAsync();
-                var usedOfficialFallback = false;
-
-                var div1 = fetchResult.Div1;
-                var div2 = fetchResult.Div2;
-                var div3 = fetchResult.Div3;
-                _isShowingCache = false;
-
-                if (div1.Count == 0 && div2.Count == 0 && div3.Count == 0)
+                ScheduleFetcher.FetchAllResult? fetchResult = null;
+                try
                 {
                     fetchResult = await ScheduleFetcher.FetchAllAsync();
-                    div1 = fetchResult.Div1;
-                    div2 = fetchResult.Div2;
-                    div3 = fetchResult.Div3;
-                    usedOfficialFallback = true;
+                }
+                catch
+                {
+                    fetchResult = null;
+                }
 
-                    if (div1.Count == 0 && div2.Count == 0 && div3.Count == 0)
+                IReadOnlyCollection<ScheduleFetcher.Item> div1 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div1;
+                IReadOnlyCollection<ScheduleFetcher.Item> div2 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div2;
+                IReadOnlyCollection<ScheduleFetcher.Item> div3 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div3;
+                _isShowingCache = false;
+
+                if (HasScheduleItems(div1, div2, div3))
+                {
+                    var fetchedAt = DateTimeOffset.Now;
+                    await ScheduleCacheStore.SaveAsync(div1, div2, div3, fetchedAt);
+                    _databaseBuildTimestampText = fetchedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
+                    SetMessage(FetchedOfficialScheduleMessage, true, autoHide: true);
+                }
+                else
+                {
+                    var cache = await ScheduleCacheStore.LoadAsync();
+                    if (cache == null || !HasScheduleItems(cache.Div1, cache.Div2, cache.Div3))
                     {
                         _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
                         _vm.SetSource(currentDivision);
                         _vm.TeamFilter = null;
                         _vm.VenueFilter = null;
                         RefreshPickers(preserveSelection: false);
-
+                        _databaseBuildTimestampText = "-";
                         UpdateLastUpdatedLabel();
                         SetMessage(FetchFailedMessage, true);
                         UpdateEmptyState();
@@ -125,7 +135,12 @@ namespace OneRugbyNavi2
                         return;
                     }
 
-                    SetMessage(FetchedOfficialScheduleMessage, true);
+                    div1 = cache.Div1;
+                    div2 = cache.Div2;
+                    div3 = cache.Div3;
+                    _isShowingCache = true;
+                    _databaseBuildTimestampText = cache.LastUpdated.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
+                    SetMessage(ShowingScheduleCacheMessage, true, autoHide: true);
                 }
 
                 _vm.SetItems(div1, div2, div3);
@@ -144,11 +159,6 @@ namespace OneRugbyNavi2
                 RefreshPickers(preserveSelection: true);
 
                 UpdateLastUpdatedLabel();
-
-                if (showSuccessMessage && !usedOfficialFallback)
-                {
-                    SetMessage("ローカルDBから日程を再読み込みしました。", true);
-                }
 
                 UpdateEmptyState();
                 UpdateNextMatchCard();
@@ -428,11 +438,39 @@ $"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)
             loadingPanel.IsVisible = isLoading;
         }
 
-        private void SetMessage(string message, bool visible)
+        private void SetMessage(string message, bool visible, bool autoHide = false)
         {
+            _messageHideCts?.Cancel();
             _lastMessage = visible ? message : null;
             messageLabel.Text = message;
             messagePanel.IsVisible = visible && !string.IsNullOrWhiteSpace(message);
+
+            if (autoHide && messagePanel.IsVisible)
+            {
+                _messageHideCts = new CancellationTokenSource();
+                _ = HideMessageAfterDelayAsync(_messageHideCts.Token);
+            }
+        }
+
+        private async Task HideMessageAfterDelayAsync(CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(4), token);
+                if (!token.IsCancellationRequested)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        _lastMessage = null;
+                        messageLabel.Text = "";
+                        messagePanel.IsVisible = false;
+                        UpdateEmptyState();
+                    });
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
         }
 
         private void UpdateLastUpdatedLabel()
@@ -479,6 +517,14 @@ $"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)
                 ScheduleViewModel.DateRangeFilter.Past => "\u904E\u53BB\u306E\u8A66\u5408",
                 _ => "\u3059\u3079\u3066"
             };
+        }
+
+        private static bool HasScheduleItems(
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div1,
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div2,
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div3)
+        {
+            return div1.Count > 0 || div2.Count > 0 || div3.Count > 0;
         }
 
         private void UpdateEmptyState()

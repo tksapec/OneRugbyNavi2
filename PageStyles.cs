@@ -54,4 +54,12 @@ public static class PageStyles
         TitleColor = Muted,
         BackgroundColor = Colors.White
     };
+
+    public static Entry Entry(string placeholder) => new()
+    {
+        Placeholder = placeholder,
+        TextColor = Navy,
+        PlaceholderColor = Muted,
+        BackgroundColor = Colors.White
+    };
 }

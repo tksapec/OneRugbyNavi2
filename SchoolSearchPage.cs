@@ -5,7 +5,7 @@ namespace OneRugbyNavi2;
 public sealed class SchoolSearchPage : ContentPage
 {
     private readonly ObservableCollection<PlayerCard> _players = new();
-    private readonly Entry _keyword = new() { Placeholder = "出身校・チーム歴で検索" };
+    private readonly Entry _keyword = PageStyles.Entry("出身校・チーム歴で検索");
     private readonly Picker _sortPicker = PageStyles.Picker("並び替え");
     private readonly Label _status = PageStyles.MutedLabel("検索語を入力してください");
 
