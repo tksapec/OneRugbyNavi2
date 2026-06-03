@@ -73,6 +73,20 @@
                         Clicked="OnInfoClicked" />
             </Grid>
 
+            <Border Stroke="{StaticResource CardStroke}"
+                    BackgroundColor="White"
+                    Padding="10,4">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="14" />
+                </Border.StrokeShape>
+                <Picker x:Name="seasonPicker"
+                        Title="シーズン"
+                        TextColor="{StaticResource LeagueNavy}"
+                        TitleColor="{StaticResource MutedText}"
+                        BackgroundColor="Transparent"
+                        SelectedIndexChanged="OnSeasonChanged" />
+            </Border>
+
             <HorizontalStackLayout x:Name="loadingPanel"
                                    Spacing="8"
                                    VerticalOptions="Center"
@@ -205,24 +219,35 @@
         </Border>
 
         <Grid Grid.Row="2"
-              ColumnDefinitions="*,*,*"
+              ColumnDefinitions="*,*,*,*,*"
               Padding="4"
               BackgroundColor="#E9EEF7"
               ColumnSpacing="4">
             <Button x:Name="btnDiv1"
-                    Text="Div1"
+                    Text="D1"
                     Style="{StaticResource SegmentButton}"
                     Clicked="OnDiv1Clicked" />
             <Button x:Name="btnDiv2"
-                    Text="Div2"
+                    Text="D2"
                     Grid.Column="1"
                     Style="{StaticResource SegmentButton}"
                     Clicked="OnDiv2Clicked" />
             <Button x:Name="btnDiv3"
-                    Text="Div3"
+                    Text="D3"
                     Grid.Column="2"
                     Style="{StaticResource SegmentButton}"
                     Clicked="OnDiv3Clicked" />
+            <Button x:Name="btnReplacement"
+                    Text="入替戦"
+                    Grid.Column="3"
+                    Style="{StaticResource SegmentButton}"
+                    Clicked="OnReplacementClicked" />
+            <Button x:Name="btnOther"
+                    Text="その他"
+                    Grid.Column="4"
+                    Style="{StaticResource SegmentButton}"
+                    IsVisible="False"
+                    Clicked="OnOtherClicked" />
         </Grid>
 
         <VerticalStackLayout Grid.Row="3" Spacing="10">

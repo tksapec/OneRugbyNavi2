@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -8,6 +8,12 @@ namespace OneRugbyNavi2
 {
     public class ScheduleViewModel
     {
+        public const string CategoryDiv1 = "D1";
+        public const string CategoryDiv2 = "D2";
+        public const string CategoryDiv3 = "D3";
+        public const string CategoryReplacement = "Replacement";
+        public const string CategoryOther = "Other";
+
         public enum DateRangeFilter
         {
             All,
@@ -18,6 +24,17 @@ namespace OneRugbyNavi2
         public ObservableCollection<MatchItem> ItemsDiv1 { get; } = new();
         public ObservableCollection<MatchItem> ItemsDiv2 { get; } = new();
         public ObservableCollection<MatchItem> ItemsDiv3 { get; } = new();
+        public ObservableCollection<MatchItem> ItemsReplacement { get; } = new();
+        public ObservableCollection<MatchItem> ItemsOther { get; } = new();
+
+        private readonly Dictionary<string, ObservableCollection<MatchItem>> _itemsByCategory = new(StringComparer.Ordinal)
+        {
+            [CategoryDiv1] = new ObservableCollection<MatchItem>(),
+            [CategoryDiv2] = new ObservableCollection<MatchItem>(),
+            [CategoryDiv3] = new ObservableCollection<MatchItem>(),
+            [CategoryReplacement] = new ObservableCollection<MatchItem>(),
+            [CategoryOther] = new ObservableCollection<MatchItem>()
+        };
 
         private ObservableCollection<MatchItem>? _currentSource;
 
@@ -27,29 +44,58 @@ namespace OneRugbyNavi2
         public string? VenueFilter { get; set; }
         public DateRangeFilter PeriodFilter { get; set; } = DateRangeFilter.All;
         public int CurrentDivision { get; private set; } = 1;
+        public string CurrentCategory { get; private set; } = CategoryDiv1;
 
         public void SetItems(
             IReadOnlyCollection<ScheduleFetcher.Item> div1,
             IReadOnlyCollection<ScheduleFetcher.Item> div2,
             IReadOnlyCollection<ScheduleFetcher.Item> div3)
         {
-            ReplaceItems(ItemsDiv1, div1);
-            ReplaceItems(ItemsDiv2, div2);
-            ReplaceItems(ItemsDiv3, div3);
-            SetSource(CurrentDivision);
+            SetItems(div1, div2, div3, Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
+        }
+
+        public void SetItems(
+            IReadOnlyCollection<ScheduleFetcher.Item> div1,
+            IReadOnlyCollection<ScheduleFetcher.Item> div2,
+            IReadOnlyCollection<ScheduleFetcher.Item> div3,
+            IReadOnlyCollection<ScheduleFetcher.Item> replacement,
+            IReadOnlyCollection<ScheduleFetcher.Item> other)
+        {
+            ReplaceItems(CategoryDiv1, div1);
+            ReplaceItems(CategoryDiv2, div2);
+            ReplaceItems(CategoryDiv3, div3);
+            ReplaceItems(CategoryReplacement, replacement);
+            ReplaceItems(CategoryOther, other);
+
+            SyncLegacyCollections();
+            SetSource(CurrentCategory);
         }
 
         public void SetSource(int div)
         {
-            CurrentDivision = div;
-            _currentSource = div switch
-            {
-                1 => ItemsDiv1,
-                2 => ItemsDiv2,
-                _ => ItemsDiv3
-            };
+            SetSource(DivisionToCategory(div));
+        }
+
+        public void SetSource(string category)
+        {
+            CurrentCategory = NormalizeCategoryCode(category);
+            CurrentDivision = CategoryToDivision(CurrentCategory);
+            _currentSource = _itemsByCategory.TryGetValue(CurrentCategory, out var source)
+                ? source
+                : _itemsByCategory[CategoryOther];
 
             ApplyFilters();
+        }
+
+        public IReadOnlyList<string> GetVisibleCategories()
+        {
+            var categories = new List<string> { CategoryDiv1, CategoryDiv2, CategoryDiv3, CategoryReplacement };
+            if (GetCategoryItemCount(CategoryOther) > 0)
+            {
+                categories.Add(CategoryOther);
+            }
+
+            return categories;
         }
 
         public void ApplyFilters()
@@ -96,12 +142,12 @@ namespace OneRugbyNavi2
 
         public int GetDivisionItemCount(int division)
         {
-            return division switch
-            {
-                1 => ItemsDiv1.Count,
-                2 => ItemsDiv2.Count,
-                _ => ItemsDiv3.Count
-            };
+            return GetCategoryItemCount(DivisionToCategory(division));
+        }
+
+        public int GetCategoryItemCount(string category)
+        {
+            return _itemsByCategory.TryGetValue(NormalizeCategoryCode(category), out var source) ? source.Count : 0;
         }
 
         public MatchItem? GetNextMatch(string? preferredTeam = null)
@@ -174,10 +220,23 @@ namespace OneRugbyNavi2
             return venues;
         }
 
-        private static void ReplaceItems(
-            ObservableCollection<MatchItem> target,
+        public static string GetCategoryLabel(string category)
+        {
+            return NormalizeCategoryCode(category) switch
+            {
+                CategoryDiv1 => "D1",
+                CategoryDiv2 => "D2",
+                CategoryDiv3 => "D3",
+                CategoryReplacement => "入替戦",
+                _ => "その他"
+            };
+        }
+
+        private void ReplaceItems(
+            string category,
             IReadOnlyCollection<ScheduleFetcher.Item> source)
         {
+            var target = _itemsByCategory[NormalizeCategoryCode(category)];
             target.Clear();
             foreach (var item in source)
             {
@@ -185,9 +244,32 @@ namespace OneRugbyNavi2
             }
         }
 
+        private void SyncLegacyCollections()
+        {
+            CopyCollection(ItemsDiv1, _itemsByCategory[CategoryDiv1]);
+            CopyCollection(ItemsDiv2, _itemsByCategory[CategoryDiv2]);
+            CopyCollection(ItemsDiv3, _itemsByCategory[CategoryDiv3]);
+            CopyCollection(ItemsReplacement, _itemsByCategory[CategoryReplacement]);
+            CopyCollection(ItemsOther, _itemsByCategory[CategoryOther]);
+        }
+
+        private static void CopyCollection(ObservableCollection<MatchItem> target, IEnumerable<MatchItem> source)
+        {
+            target.Clear();
+            foreach (var item in source)
+            {
+                target.Add(item);
+            }
+        }
+
         private static MatchItem ToMatch(ScheduleFetcher.Item it) => new()
         {
-            Division = it.Division,
+            SeasonKey = it.SeasonKey,
+            SeasonLabel = it.SeasonLabel,
+            SeasonStartYear = it.SeasonStartYear,
+            CategoryCode = NormalizeCategoryCode(it.CategoryCode),
+            CategoryLabel = string.IsNullOrWhiteSpace(it.CategoryLabel) ? GetCategoryLabel(it.CategoryCode) : it.CategoryLabel,
+            Division = string.IsNullOrWhiteSpace(it.Division) ? GetCategoryLabel(it.CategoryCode) : it.Division,
             Section = it.Round,
             MatchDate = it.Date,
             KickoffTime = it.Kickoff,
@@ -200,8 +282,12 @@ namespace OneRugbyNavi2
             HomeScore = it.HomeScore,
             AwayScore = it.AwayScore,
             MatchStatus = it.Status,
+            MatchId = it.MatchId,
+            MatchCode = it.MatchCode,
             MatchInfoUrl = it.MatchInfoUrl,
+            PreviewUrl = it.PreviewUrl,
             ReportUrl = it.ReportUrl,
+            BroadcastText = it.BroadcastText,
             HomeLogoPath = TeamLogoResolver.GetLogoPath(it.Home),
             AwayLogoPath = TeamLogoResolver.GetLogoPath(it.Away),
             HomeBadgeText = TeamLogoResolver.GetBadgeText(it.Home),
@@ -211,7 +297,7 @@ namespace OneRugbyNavi2
         public static bool TryGetMatchDate(MatchItem match, out DateTime date)
         {
             date = default;
-            var parsed = Regex.Match(match.MatchDate, @"(?<month>\d{1,2})\u6708(?<day>\d{1,2})\u65E5");
+            var parsed = Regex.Match(match.MatchDate, @"(?<month>\d{1,2})月(?<day>\d{1,2})日");
             if (!parsed.Success)
             {
                 return false;
@@ -219,7 +305,8 @@ namespace OneRugbyNavi2
 
             int month = int.Parse(parsed.Groups["month"].Value);
             int day = int.Parse(parsed.Groups["day"].Value);
-            int year = month >= 9 ? ScheduleFetcher.SeasonYear : ScheduleFetcher.SeasonYear + 1;
+            var seasonStartYear = match.SeasonStartYear > 0 ? match.SeasonStartYear : ScheduleFetcher.SeasonYear;
+            int year = month >= 9 ? seasonStartYear : seasonStartYear + 1;
             try
             {
                 date = new DateTime(year, month, day);
@@ -304,6 +391,58 @@ namespace OneRugbyNavi2
                 .ThenBy(item => item.HasDate && (item.Date > today || (item.Date == today && !item.Match.IsCompleted)) ? item.Date.Ticks : -item.Date.Ticks)
                 .Select(item => item.Match);
         }
+
+        private static string DivisionToCategory(int division)
+        {
+            return division switch
+            {
+                1 => CategoryDiv1,
+                2 => CategoryDiv2,
+                3 => CategoryDiv3,
+                4 => CategoryReplacement,
+                _ => CategoryOther
+            };
+        }
+
+        private static int CategoryToDivision(string category)
+        {
+            return NormalizeCategoryCode(category) switch
+            {
+                CategoryDiv1 => 1,
+                CategoryDiv2 => 2,
+                CategoryDiv3 => 3,
+                CategoryReplacement => 4,
+                _ => 5
+            };
+        }
+
+        public static string NormalizeCategoryCode(string category)
+        {
+            if (string.Equals(category, CategoryDiv1, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(category, "DIV1", StringComparison.OrdinalIgnoreCase))
+            {
+                return CategoryDiv1;
+            }
+
+            if (string.Equals(category, CategoryDiv2, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(category, "DIV2", StringComparison.OrdinalIgnoreCase))
+            {
+                return CategoryDiv2;
+            }
+
+            if (string.Equals(category, CategoryDiv3, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(category, "DIV3", StringComparison.OrdinalIgnoreCase))
+            {
+                return CategoryDiv3;
+            }
+
+            if (string.Equals(category, CategoryReplacement, StringComparison.OrdinalIgnoreCase) ||
+                category.Contains("入替", StringComparison.Ordinal))
+            {
+                return CategoryReplacement;
+            }
+
+            return CategoryOther;
+        }
     }
 }
-

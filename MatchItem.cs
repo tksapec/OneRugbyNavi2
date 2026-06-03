@@ -4,6 +4,11 @@ namespace OneRugbyNavi2
 {
     public class MatchItem
     {
+        public string SeasonKey { get; set; } = "";
+        public string SeasonLabel { get; set; } = "";
+        public int SeasonStartYear { get; set; } = ScheduleFetcher.SeasonYear;
+        public string CategoryCode { get; set; } = "";
+        public string CategoryLabel { get; set; } = "";
         public string Division { get; set; } = "";
         public string Section { get; set; } = "";
         public string MatchDate { get; set; } = "";
@@ -17,8 +22,12 @@ namespace OneRugbyNavi2
         public int? HomeScore { get; set; }
         public int? AwayScore { get; set; }
         public string MatchStatus { get; set; } = "";
+        public string MatchId { get; set; } = "";
+        public string MatchCode { get; set; } = "";
         public string MatchInfoUrl { get; set; } = "";
+        public string PreviewUrl { get; set; } = "";
         public string ReportUrl { get; set; } = "";
+        public string BroadcastText { get; set; } = "";
         public string? HomeLogoPath { get; set; }
         public string? AwayLogoPath { get; set; }
         public string HomeBadgeText { get; set; } = "";

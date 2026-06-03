@@ -190,7 +190,10 @@ namespace OneRugbyNavi2
                 {
                     SectionTitle("\u8A66\u5408\u60C5\u5831"),
                     Row("Division", _match.Division),
+                    Row("シーズン", _match.SeasonLabel),
+                    Row("カテゴリ", _match.CategoryLabel),
                     Row("\u7BC0", _match.Section),
+                    Row("試合コード", _match.MatchCode),
                     Row("\u30AB\u30F3\u30D5\u30A1\u30EC\u30F3\u30B9", _match.Conference),
                     Row("\u8A66\u5408\u65E5", _match.MatchDate),
                     Row("\u30AD\u30C3\u30AF\u30AA\u30D5\u6642\u523B", _match.KickoffTime),
@@ -199,7 +202,8 @@ namespace OneRugbyNavi2
                     Row("\u30B9\u30B3\u30A2", _match.ScoreText),
                     Row("\u8A66\u5408\u72B6\u614B", _match.StatusText),
                     Row("\u90FD\u9053\u5E9C\u770C", _match.Prefecture),
-                    Row("\u4F1A\u5834", _match.VenueDisplayName)
+                    Row("\u4F1A\u5834", _match.VenueDisplayName),
+                    Row("放送・配信", _match.BroadcastText)
                 }
             };
 
@@ -220,6 +224,11 @@ namespace OneRugbyNavi2
             if (!string.IsNullOrWhiteSpace(_match.MatchInfoUrl))
             {
                 buttons.Children.Add(ActionButton("\u516C\u5F0F Match Info \u3092\u958B\u304F", async () => await OpenWebAsync(_match.MatchInfoUrl)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(_match.PreviewUrl))
+            {
+                buttons.Children.Add(ActionButton("公式 Preview を開く", async () => await OpenWebAsync(_match.PreviewUrl)));
             }
 
             if (!string.IsNullOrWhiteSpace(_match.ReportUrl))
@@ -526,6 +535,7 @@ namespace OneRugbyNavi2
                 _match.Division,
                 _match.Section,
                 _match.StatusText,
+                _match.BroadcastText,
                 officialUrl
             }.Where(line => !string.IsNullOrWhiteSpace(line)));
         }
@@ -549,6 +559,11 @@ namespace OneRugbyNavi2
             if (!string.IsNullOrWhiteSpace(officialUrl))
             {
                 lines.Add($"\u516C\u5F0F\u60C5\u5831: {officialUrl}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(_match.BroadcastText))
+            {
+                lines.Add($"放送・配信: {_match.BroadcastText}");
             }
 
             return string.Join(Environment.NewLine, lines.Where(line => !string.IsNullOrWhiteSpace(line)));

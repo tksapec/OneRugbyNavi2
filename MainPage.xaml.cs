@@ -11,8 +11,8 @@ namespace OneRugbyNavi2
     {
         private readonly ScheduleViewModel _vm = new();
 
-        private const string FetchFailedMessage = "試合日程を取得できませんでした。通信状態を確認してください。";
-        private const string FetchedOfficialScheduleMessage = "Webから最新の試合日程を取得しました。";
+        private const string FetchFailedMessage = "試合日程を取得できませんでした。通信状態または公式サイトの構造を確認してください。";
+        private const string FetchedOfficialScheduleMessage = "Webから最新の日程を取得しました。";
         private const string ShowingScheduleCacheMessage = "通信に失敗したため、前回取得した試合日程を表示しています。";
         private const string PartialFailureMessage = "\u4E00\u90E8\u306EDivision\u306E\u53D6\u5F97\u307E\u305F\u306F\u7D50\u679C\u88DC\u5B8C\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u8868\u793A\u3067\u304D\u308B\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059\u3002";
         private const string RefreshSuccessMessage = "\u6700\u65B0\u30C7\u30FC\u30BF\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F\u3002";
@@ -29,6 +29,9 @@ namespace OneRugbyNavi2
         private string? _lastMessage;
         private string _favoriteTeam = "";
         private string _databaseBuildTimestampText = "-";
+        private string _selectedSeasonKey = "";
+        private string _selectedSeasonLabel = "";
+        private readonly System.Collections.Generic.List<ScheduleFetcher.SeasonOption> _seasonOptions = new();
         private CancellationTokenSource? _messageHideCts;
 
         public MainPage()
@@ -90,14 +93,14 @@ namespace OneRugbyNavi2
 
             try
             {
-                var currentDivision = _vm.CurrentDivision;
+                var currentCategory = _vm.CurrentCategory;
                 var selectedTeam = _vm.TeamFilter;
                 var selectedVenue = _vm.VenueFilter;
                 var selectedPeriod = _vm.PeriodFilter;
                 ScheduleFetcher.FetchAllResult? fetchResult = null;
                 try
                 {
-                    fetchResult = await ScheduleFetcher.FetchAllAsync();
+                    fetchResult = await ScheduleFetcher.FetchSeasonAsync(string.IsNullOrWhiteSpace(_selectedSeasonKey) ? null : _selectedSeasonKey);
                 }
                 catch
                 {
@@ -107,22 +110,37 @@ namespace OneRugbyNavi2
                 IReadOnlyCollection<ScheduleFetcher.Item> div1 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div1;
                 IReadOnlyCollection<ScheduleFetcher.Item> div2 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div2;
                 IReadOnlyCollection<ScheduleFetcher.Item> div3 = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Div3;
+                IReadOnlyCollection<ScheduleFetcher.Item> replacement = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Replacement;
+                IReadOnlyCollection<ScheduleFetcher.Item> other = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Other;
                 _isShowingCache = false;
 
-                if (HasScheduleItems(div1, div2, div3))
+                if (fetchResult != null && fetchResult.Seasons.Count > 0)
                 {
-                    var fetchedAt = DateTimeOffset.Now;
-                    await ScheduleCacheStore.SaveAsync(div1, div2, div3, fetchedAt);
+                    UpdateSeasonOptions(fetchResult.Seasons, fetchResult.SeasonKey, fetchResult.SeasonLabel);
+                }
+
+                if (HasScheduleItems(div1, div2, div3, replacement, other))
+                {
+                    var fetchedAt = fetchResult?.FetchedAt ?? DateTimeOffset.Now;
+                    _selectedSeasonKey = fetchResult?.SeasonKey ?? _selectedSeasonKey;
+                    _selectedSeasonLabel = fetchResult?.SeasonLabel ?? _selectedSeasonLabel;
+                    await ScheduleCacheStore.SaveAsync(_selectedSeasonKey, _selectedSeasonLabel, div1, div2, div3, replacement, other, fetchedAt);
                     _databaseBuildTimestampText = fetchedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
                     SetMessage(FetchedOfficialScheduleMessage, true, autoHide: true);
                 }
                 else
                 {
-                    var cache = await ScheduleCacheStore.LoadAsync();
-                    if (cache == null || !HasScheduleItems(cache.Div1, cache.Div2, cache.Div3))
+                    EnsureDefaultSeasonSelection();
+                    var cache = await ScheduleCacheStore.LoadAsync(_selectedSeasonKey, _selectedSeasonLabel);
+                    if (cache == null || !HasScheduleItems(cache.Div1, cache.Div2, cache.Div3, cache.Replacement, cache.Other))
                     {
-                        _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
-                        _vm.SetSource(currentDivision);
+                        _vm.SetItems(
+                            Array.Empty<ScheduleFetcher.Item>(),
+                            Array.Empty<ScheduleFetcher.Item>(),
+                            Array.Empty<ScheduleFetcher.Item>(),
+                            Array.Empty<ScheduleFetcher.Item>(),
+                            Array.Empty<ScheduleFetcher.Item>());
+                        _vm.SetSource(currentCategory);
                         _vm.TeamFilter = null;
                         _vm.VenueFilter = null;
                         RefreshPickers(preserveSelection: false);
@@ -138,13 +156,21 @@ namespace OneRugbyNavi2
                     div1 = cache.Div1;
                     div2 = cache.Div2;
                     div3 = cache.Div3;
+                    replacement = cache.Replacement;
+                    other = cache.Other;
                     _isShowingCache = true;
+                    _selectedSeasonKey = cache.SeasonKey;
+                    _selectedSeasonLabel = cache.SeasonLabel;
                     _databaseBuildTimestampText = cache.LastUpdated.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
                     SetMessage(ShowingScheduleCacheMessage, true, autoHide: true);
                 }
 
-                _vm.SetItems(div1, div2, div3);
-                _vm.SetSource(currentDivision);
+                _vm.SetItems(div1, div2, div3, replacement, other);
+                _vm.SetSource(currentCategory);
+                if (_vm.GetCurrentDivisionItemCount() == 0)
+                {
+                    _vm.SetSource(ScheduleViewModel.CategoryDiv1);
+                }
 
                 bool canPreserveVenue = !string.IsNullOrWhiteSpace(selectedVenue) &&
                     _vm.GetVenuesForPicker().Contains(selectedVenue);
@@ -156,6 +182,7 @@ namespace OneRugbyNavi2
                 _vm.VenueFilter = canPreserveVenue ? selectedVenue : null;
                 _vm.PeriodFilter = selectedPeriod;
                 _vm.ApplyFilters();
+                RefreshCategoryTabs();
                 RefreshPickers(preserveSelection: true);
 
                 UpdateLastUpdatedLabel();
@@ -166,8 +193,13 @@ namespace OneRugbyNavi2
             }
             catch
             {
-                _vm.SetItems(Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
-                _vm.SetSource(_vm.CurrentDivision);
+                _vm.SetItems(
+                    Array.Empty<ScheduleFetcher.Item>(),
+                    Array.Empty<ScheduleFetcher.Item>(),
+                    Array.Empty<ScheduleFetcher.Item>(),
+                    Array.Empty<ScheduleFetcher.Item>(),
+                    Array.Empty<ScheduleFetcher.Item>());
+                _vm.SetSource(_vm.CurrentCategory);
                 RefreshPickers(preserveSelection: false);
                 _databaseBuildTimestampText = "-";
                 UpdateLastUpdatedLabel();
@@ -185,34 +217,35 @@ namespace OneRugbyNavi2
 
         private void OnDiv1Clicked(object sender, EventArgs e)
         {
-            _vm.SetSource(1);
-            NormalizeManualTeamSelection(_vm.TeamFilter);
-            ApplyTeamFilterForCurrentDivision(_teamFilterManuallySelected ? _vm.TeamFilter : null, allowFavoriteFallback: !_teamFilterManuallySelected);
-            UpdateTabVisual(1);
-            RefreshPickers(preserveSelection: true);
-            UpdateEmptyState();
-            UpdateNextMatchCard();
-            UpdateFilterSummaryUi();
+            SelectCategory(ScheduleViewModel.CategoryDiv1);
         }
 
         private void OnDiv2Clicked(object sender, EventArgs e)
         {
-            _vm.SetSource(2);
-            NormalizeManualTeamSelection(_vm.TeamFilter);
-            ApplyTeamFilterForCurrentDivision(_teamFilterManuallySelected ? _vm.TeamFilter : null, allowFavoriteFallback: !_teamFilterManuallySelected);
-            UpdateTabVisual(2);
-            RefreshPickers(preserveSelection: true);
-            UpdateEmptyState();
-            UpdateNextMatchCard();
-            UpdateFilterSummaryUi();
+            SelectCategory(ScheduleViewModel.CategoryDiv2);
         }
 
         private void OnDiv3Clicked(object sender, EventArgs e)
         {
-            _vm.SetSource(3);
+            SelectCategory(ScheduleViewModel.CategoryDiv3);
+        }
+
+        private void OnReplacementClicked(object sender, EventArgs e)
+        {
+            SelectCategory(ScheduleViewModel.CategoryReplacement);
+        }
+
+        private void OnOtherClicked(object sender, EventArgs e)
+        {
+            SelectCategory(ScheduleViewModel.CategoryOther);
+        }
+
+        private void SelectCategory(string category)
+        {
+            _vm.SetSource(category);
             NormalizeManualTeamSelection(_vm.TeamFilter);
             ApplyTeamFilterForCurrentDivision(_teamFilterManuallySelected ? _vm.TeamFilter : null, allowFavoriteFallback: !_teamFilterManuallySelected);
-            UpdateTabVisual(3);
+            UpdateTabVisual(_vm.CurrentCategory);
             RefreshPickers(preserveSelection: true);
             UpdateEmptyState();
             UpdateNextMatchCard();
@@ -221,9 +254,24 @@ namespace OneRugbyNavi2
 
         private void UpdateTabVisual(int active)
         {
-            ApplyTabVisual(btnDiv1, active == 1);
-            ApplyTabVisual(btnDiv2, active == 2);
-            ApplyTabVisual(btnDiv3, active == 3);
+            UpdateTabVisual(active switch
+            {
+                1 => ScheduleViewModel.CategoryDiv1,
+                2 => ScheduleViewModel.CategoryDiv2,
+                3 => ScheduleViewModel.CategoryDiv3,
+                4 => ScheduleViewModel.CategoryReplacement,
+                _ => ScheduleViewModel.CategoryOther
+            });
+        }
+
+        private void UpdateTabVisual(string active)
+        {
+            var normalized = ScheduleViewModel.NormalizeCategoryCode(active);
+            ApplyTabVisual(btnDiv1, normalized == ScheduleViewModel.CategoryDiv1);
+            ApplyTabVisual(btnDiv2, normalized == ScheduleViewModel.CategoryDiv2);
+            ApplyTabVisual(btnDiv3, normalized == ScheduleViewModel.CategoryDiv3);
+            ApplyTabVisual(btnReplacement, normalized == ScheduleViewModel.CategoryReplacement);
+            ApplyTabVisual(btnOther, normalized == ScheduleViewModel.CategoryOther);
         }
 
         private static void ApplyTabVisual(Button button, bool active)
@@ -231,6 +279,82 @@ namespace OneRugbyNavi2
             button.BackgroundColor = active ? Color.FromArgb("#0057B8") : Colors.Transparent;
             button.TextColor = active ? Colors.White : Color.FromArgb("#26364F");
             button.Opacity = active ? 1.0 : 0.85;
+        }
+
+        private async void OnSeasonChanged(object sender, EventArgs e)
+        {
+            if (_suppressPickerEvents || seasonPicker.SelectedIndex < 0 || seasonPicker.SelectedIndex >= _seasonOptions.Count)
+            {
+                return;
+            }
+
+            var selected = _seasonOptions[seasonPicker.SelectedIndex];
+            if (string.Equals(_selectedSeasonKey, selected.SeasonKey, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _selectedSeasonKey = selected.SeasonKey;
+            _selectedSeasonLabel = selected.SeasonLabel;
+            _teamFilterManuallySelected = false;
+            await RefreshDataAsync(showSuccessMessage: true);
+        }
+
+        private void UpdateSeasonOptions(
+            System.Collections.Generic.IReadOnlyList<ScheduleFetcher.SeasonOption> seasons,
+            string selectedSeasonKey,
+            string selectedSeasonLabel)
+        {
+            _seasonOptions.Clear();
+            _seasonOptions.AddRange(seasons);
+            _selectedSeasonKey = selectedSeasonKey;
+            _selectedSeasonLabel = selectedSeasonLabel;
+
+            _suppressPickerEvents = true;
+            seasonPicker.ItemsSource = _seasonOptions.Select(season => season.SeasonLabel).ToArray();
+            seasonPicker.SelectedIndex = Math.Max(0, _seasonOptions.FindIndex(season => string.Equals(season.SeasonKey, selectedSeasonKey, StringComparison.Ordinal)));
+            _suppressPickerEvents = false;
+        }
+
+        private void EnsureDefaultSeasonSelection()
+        {
+            if (!string.IsNullOrWhiteSpace(_selectedSeasonKey))
+            {
+                return;
+            }
+
+            _selectedSeasonKey = ScheduleFetcher.SeasonYear.ToString();
+            _selectedSeasonLabel = "2025-26シーズン";
+            if (_seasonOptions.Count == 0)
+            {
+                _seasonOptions.Add(new ScheduleFetcher.SeasonOption
+                {
+                    SeasonKey = _selectedSeasonKey,
+                    SeasonLabel = _selectedSeasonLabel
+                });
+
+                _suppressPickerEvents = true;
+                seasonPicker.ItemsSource = _seasonOptions.Select(season => season.SeasonLabel).ToArray();
+                seasonPicker.SelectedIndex = 0;
+                _suppressPickerEvents = false;
+            }
+        }
+
+        private void RefreshCategoryTabs()
+        {
+            btnReplacement.IsVisible = _vm.GetCategoryItemCount(ScheduleViewModel.CategoryReplacement) > 0;
+            btnOther.IsVisible = _vm.GetCategoryItemCount(ScheduleViewModel.CategoryOther) > 0;
+            if (!btnReplacement.IsVisible && _vm.CurrentCategory == ScheduleViewModel.CategoryReplacement)
+            {
+                _vm.SetSource(ScheduleViewModel.CategoryDiv1);
+            }
+
+            if (!btnOther.IsVisible && _vm.CurrentCategory == ScheduleViewModel.CategoryOther)
+            {
+                _vm.SetSource(ScheduleViewModel.CategoryDiv1);
+            }
+
+            UpdateTabVisual(_vm.CurrentCategory);
         }
 
         private void RefreshPickers(bool preserveSelection)
@@ -412,8 +536,8 @@ namespace OneRugbyNavi2
 "\u901A\u4FE1\u306B\u5931\u6557\u3057\u305F\u5834\u5408\u306F\u3001\u4FDD\u5B58\u6E08\u307F\u306E\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059\u3002\n" +
 $"\u6700\u7D42\u66F4\u65B0: {lastUpdated}\n" +
 $"\u8868\u793A\u72B6\u614B: {cacheState}\n" +
-$"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)}\u4EF6 / Div3: {_vm.GetDivisionItemCount(3)}\u4EF6\n\n" +
-"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: 2025-26\n" +
+$"D1: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv1)}\u4EF6 / D2: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv2)}\u4EF6 / D3: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv3)}\u4EF6 / 入替戦: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryReplacement)}件 / その他: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryOther)}件\n\n" +
+$"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: {_selectedSeasonLabel}\n" +
 "\u53D6\u5F97\u5143: JAPAN RUGBY LEAGUE ONE \u516C\u5F0F\u30B5\u30A4\u30C8\n\n" +
 "\u4F7F\u7528\u30E9\u30A4\u30D6\u30E9\u30EA\u3068\u30E9\u30A4\u30BB\u30F3\u30B9\u306E\u8A73\u7D30\u306F\u914D\u5E03\u7269\u5185\u306E LICENSES.txt \u3092\u53C2\u7167\u3057\u3066\u304F\u3060\u3055\u3044\u3002";
 
@@ -475,7 +599,8 @@ $"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)
 
         private void UpdateLastUpdatedLabel()
         {
-            lastUpdatedLabel.Text = $"最終更新: {_databaseBuildTimestampText}";
+            var season = string.IsNullOrWhiteSpace(_selectedSeasonLabel) ? "" : $" / {_selectedSeasonLabel}";
+            lastUpdatedLabel.Text = $"最終更新: {_databaseBuildTimestampText}{season}";
         }
 
         private void UpdateFilterPanelUi()
@@ -522,9 +647,11 @@ $"Div1: {_vm.GetDivisionItemCount(1)}\u4EF6 / Div2: {_vm.GetDivisionItemCount(2)
         private static bool HasScheduleItems(
             System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div1,
             System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div2,
-            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div3)
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> div3,
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> replacement,
+            System.Collections.Generic.IReadOnlyCollection<ScheduleFetcher.Item> other)
         {
-            return div1.Count > 0 || div2.Count > 0 || div3.Count > 0;
+            return div1.Count > 0 || div2.Count > 0 || div3.Count > 0 || replacement.Count > 0 || other.Count > 0;
         }
 
         private void UpdateEmptyState()
