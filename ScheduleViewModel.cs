@@ -305,7 +305,12 @@ namespace OneRugbyNavi2
 
             int month = int.Parse(parsed.Groups["month"].Value);
             int day = int.Parse(parsed.Groups["day"].Value);
-            var seasonStartYear = match.SeasonStartYear > 0 ? match.SeasonStartYear : ScheduleFetcher.SeasonYear;
+            if (match.SeasonStartYear <= 0)
+            {
+                return false;
+            }
+
+            var seasonStartYear = match.SeasonStartYear;
             int year = month >= 9 ? seasonStartYear : seasonStartYear + 1;
             try
             {

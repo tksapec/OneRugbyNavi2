@@ -4,11 +4,14 @@ namespace OneRugbyNavi2;
 
 public sealed class PlayerDirectoryPage : ContentPage
 {
+    private const string AllTeamsLabel = "チーム: すべて";
+    private const string AllPositionsLabel = "ポジション: すべて";
+
     private readonly ObservableCollection<PlayerCard> _players = new();
     private readonly List<TeamCard> _teamOptions = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
     private readonly Entry _keyword = PageStyles.Entry("名前・チーム・ポジション・出身校で検索");
-    private readonly Entry _schoolKeyword = PageStyles.Entry("出身校・チーム歴で検索");
+    private readonly Entry _schoolKeyword = PageStyles.Entry("出身校で検索");
     private readonly Picker _sortPicker = PageStyles.Picker("並び替え");
     private readonly Picker _teamPicker = PageStyles.Picker("チーム");
     private readonly Picker _positionPicker = PageStyles.Picker("ポジション");
@@ -23,8 +26,9 @@ public sealed class PlayerDirectoryPage : ContentPage
         _initialTeamName = initialTeamName;
         Title = string.IsNullOrWhiteSpace(initialTeamName) ? "選手" : $"{initialTeamName} 選手";
         BackgroundColor = PageStyles.Background;
+        Shell.SetNavBarIsVisible(this, false);
 
-        _sortPicker.ItemsSource = new[] { "名前", "チーム", "ポジション", "身長", "体重", "年齢", "キャップ数" };
+        _sortPicker.ItemsSource = new[] { "並び替え: 名前", "並び替え: チーム", "並び替え: ポジション", "並び替え: 身長", "並び替え: 体重", "並び替え: 年齢", "並び替え: キャップ数" };
         _sortPicker.SelectedIndex = 0;
         _sortPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
         _teamPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
@@ -145,10 +149,14 @@ public sealed class PlayerDirectoryPage : ContentPage
         _filtersLoaded = true;
         _teamOptions.Clear();
         _teamOptions.AddRange(await AppServices.Database.GetTeamsAsync());
-        _teamPicker.ItemsSource = new[] { "すべて" }.Concat(_teamOptions.Select(team => team.TeamName)).ToArray();
+        _teamPicker.ItemsSource = new[] { AllTeamsLabel }
+            .Concat(_teamOptions.Select(team => $"チーム: {team.TeamName}"))
+            .ToArray();
 
         var positions = await AppServices.Database.GetPlayerPositionsAsync();
-        _positionPicker.ItemsSource = new[] { "すべて" }.Concat(positions).ToArray();
+        _positionPicker.ItemsSource = new[] { AllPositionsLabel }
+            .Concat(positions.Select(position => $"ポジション: {position}"))
+            .ToArray();
 
         _teamPicker.SelectedIndex = GetInitialTeamIndex();
         _positionPicker.SelectedIndex = 0;
@@ -176,7 +184,7 @@ public sealed class PlayerDirectoryPage : ContentPage
         {
             _players.Clear();
             var teamId = SelectedTeamId();
-            var position = SelectedPickerValue(_positionPicker);
+            var position = SelectedPosition();
             foreach (var player in await AppServices.Database.GetPlayersAsync(
                 _keyword.Text,
                 SortKey(),
@@ -206,10 +214,27 @@ public sealed class PlayerDirectoryPage : ContentPage
         return index >= 0 && index < _teamOptions.Count ? _teamOptions[index].Id : null;
     }
 
-    private static string? SelectedPickerValue(Picker picker)
+    private string? SelectedPosition()
     {
-        var value = picker.SelectedItem as string;
-        return string.IsNullOrWhiteSpace(value) || value == "すべて" ? null : value;
+        if (_positionPicker.SelectedIndex <= 0)
+        {
+            return null;
+        }
+
+        var value = _positionPicker.SelectedItem as string;
+        return StripPickerPrefix(value, "ポジション:");
+    }
+
+    private static string? StripPickerPrefix(string? value, string prefix)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return value.StartsWith(prefix, StringComparison.Ordinal)
+            ? value[prefix.Length..].Trim()
+            : value.Trim();
     }
 
     private string SortKey() => _sortPicker.SelectedIndex switch

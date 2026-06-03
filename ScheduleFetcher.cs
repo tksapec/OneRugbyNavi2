@@ -12,7 +12,6 @@ namespace OneRugbyNavi2
 {
     public static class ScheduleFetcher
     {
-        public const int SeasonYear = 2025;
         private const string ScheduleBaseUrl = "https://league-one.jp/schedule/";
 
         public sealed class SeasonOption
@@ -31,7 +30,7 @@ namespace OneRugbyNavi2
         {
             public string SeasonKey { get; set; } = "";
             public string SeasonLabel { get; set; } = "";
-            public int SeasonStartYear { get; set; } = SeasonYear;
+            public int SeasonStartYear { get; set; }
             public string CategoryCode { get; set; } = "";
             public string CategoryLabel { get; set; } = "";
             public string Division { get; set; } = "";
@@ -197,7 +196,7 @@ namespace OneRugbyNavi2
                 return selected;
             }
 
-            var key = string.IsNullOrWhiteSpace(requestedKey) ? SeasonYear.ToString() : requestedKey.Trim();
+            var key = string.IsNullOrWhiteSpace(requestedKey) ? CurrentSeasonStartYear().ToString() : requestedKey.Trim();
             return new SeasonOption
             {
                 SeasonKey = key,
@@ -484,7 +483,7 @@ namespace OneRugbyNavi2
 
         private static int ParseSeasonStartYear(string seasonKey)
         {
-            return int.TryParse(seasonKey, out var year) ? year : SeasonYear;
+            return int.TryParse(seasonKey, out var year) ? year : 0;
         }
 
         private static string ToSeasonLabel(string seasonKey)
@@ -495,6 +494,12 @@ namespace OneRugbyNavi2
             }
 
             return year == 2021 ? "2022シーズン" : $"{year}-{(year + 1) % 100:00}シーズン";
+        }
+
+        private static int CurrentSeasonStartYear()
+        {
+            var today = DateTime.Today;
+            return today.Month >= 9 ? today.Year : today.Year - 1;
         }
 
         private static string ToAbsoluteUrl(string? href)

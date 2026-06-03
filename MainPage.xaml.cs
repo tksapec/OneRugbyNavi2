@@ -323,19 +323,14 @@ namespace OneRugbyNavi2
                 return;
             }
 
-            _selectedSeasonKey = ScheduleFetcher.SeasonYear.ToString();
-            _selectedSeasonLabel = "2025-26シーズン";
+            var firstSeason = _seasonOptions.FirstOrDefault();
+            _selectedSeasonKey = firstSeason?.SeasonKey ?? "";
+            _selectedSeasonLabel = firstSeason?.SeasonLabel ?? "";
             if (_seasonOptions.Count == 0)
             {
-                _seasonOptions.Add(new ScheduleFetcher.SeasonOption
-                {
-                    SeasonKey = _selectedSeasonKey,
-                    SeasonLabel = _selectedSeasonLabel
-                });
-
                 _suppressPickerEvents = true;
-                seasonPicker.ItemsSource = _seasonOptions.Select(season => season.SeasonLabel).ToArray();
-                seasonPicker.SelectedIndex = 0;
+                seasonPicker.ItemsSource = Array.Empty<string>();
+                seasonPicker.SelectedIndex = -1;
                 _suppressPickerEvents = false;
             }
         }

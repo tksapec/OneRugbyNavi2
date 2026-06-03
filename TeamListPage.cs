@@ -4,7 +4,7 @@ namespace OneRugbyNavi2;
 
 public sealed class TeamListPage : ContentPage
 {
-    private const bool ShowUpdatePreparationButton = true;
+    private const bool ShowUpdatePreparationButton = false;
 
     private readonly ObservableCollection<TeamCard> _teams = new();
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
@@ -14,6 +14,7 @@ public sealed class TeamListPage : ContentPage
     {
         Title = "チーム";
         BackgroundColor = PageStyles.Background;
+        Shell.SetNavBarIsVisible(this, false);
 
         var list = new CollectionView
         {
@@ -143,7 +144,7 @@ public sealed class TeamListPage : ContentPage
 
         var confirmed = await DisplayAlert(
             "確認",
-            $"{team.TeamName} の更新準備確認を行います。\n\n実更新は未実装です。現在は一時DB方式の準備確認のみ行います。",
+            $"{team.TeamName} の更新準備確認を行います。\n\n実更新は未実装です。DB更新は行いません。現在は一時DB方式の準備確認のみ行います。",
             "確認する",
             "キャンセル");
 
@@ -159,14 +160,14 @@ public sealed class TeamListPage : ContentPage
             var progress = new Progress<string>(message => _status.Text = message);
             var result = await AppServices.TeamUpdater.UpdateTeamAsync(team, progress);
             await DisplayAlert(
-                "更新結果",
-                $"更新対象チーム: {result.TeamName}\n確認済み選手数: {result.UpdatedPlayers}\n新規選手数: {result.NewPlayers}\n削除/未掲載候補: {result.MissingCandidates}\n画像更新数: {result.UpdatedImages}\n取得失敗件数: {result.FailedPages}\n確認日時: {result.UpdatedAt:yyyy-MM-dd HH:mm}\n\n実更新は未実装です。現在は一時DB方式の準備確認のみ行います。\n\n{result.Message}",
+                "更新準備確認結果",
+                $"対象チーム: {result.TeamName}\n確認済み選手数: {result.UpdatedPlayers}\n新規選手数: {result.NewPlayers}\n削除/未掲載候補: {result.MissingCandidates}\n画像更新数: {result.UpdatedImages}\n取得失敗件数: {result.FailedPages}\n確認日時: {result.UpdatedAt:yyyy-MM-dd HH:mm}\n\n実更新は未実装です。DB更新は行いません。現在は一時DB方式の準備確認のみ行います。\n\n{result.Message}",
                 "OK");
             await LoadAsync();
         }
         catch (Exception ex)
         {
-            await DisplayAlert("更新失敗", ex.Message, "OK");
+            await DisplayAlert("更新準備確認失敗", ex.Message, "OK");
         }
         finally
         {

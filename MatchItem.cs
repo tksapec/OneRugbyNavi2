@@ -6,7 +6,7 @@ namespace OneRugbyNavi2
     {
         public string SeasonKey { get; set; } = "";
         public string SeasonLabel { get; set; } = "";
-        public int SeasonStartYear { get; set; } = ScheduleFetcher.SeasonYear;
+        public int SeasonStartYear { get; set; }
         public string CategoryCode { get; set; } = "";
         public string CategoryLabel { get; set; } = "";
         public string Division { get; set; } = "";

@@ -58,7 +58,7 @@ public sealed class PlayerDetailPage : ContentPage
                             Label("年齢", player.AgeText),
                             Label("登録区分", player.RegistrationCategory),
                             Label("リーグワンキャップ数", player.CapsText),
-                            Label("出身校・チーム歴", player.SchoolTeamHistoryText),
+                            Label("出身校", player.SchoolTeamHistoryText),
                             Label("公式ページ", player.ProfileUrl)
                         }
                     })

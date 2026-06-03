@@ -324,7 +324,7 @@ public sealed class LeagueOneDatabase
                 LIMIT 50
                 """,
             "weight" => PlayerRankingSql("psr.weight_kg", "kg", descending),
-            "age" => PlayerRankingSql("psr.age_calculated", "豁ｳ", descending),
+            "age" => PlayerRankingSql("psr.age_calculated", "歳", descending),
             "caps" => PlayerRankingSql("psr.league_one_caps", "Caps", descending),
             _ => PlayerRankingSql("psr.height_cm", "cm", descending)
         };

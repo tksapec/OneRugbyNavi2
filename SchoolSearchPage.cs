@@ -5,7 +5,7 @@ namespace OneRugbyNavi2;
 public sealed class SchoolSearchPage : ContentPage
 {
     private readonly ObservableCollection<PlayerCard> _players = new();
-    private readonly Entry _keyword = PageStyles.Entry("出身校・チーム歴で検索");
+    private readonly Entry _keyword = PageStyles.Entry("出身校で検索");
     private readonly Picker _sortPicker = PageStyles.Picker("並び替え");
     private readonly Label _status = PageStyles.MutedLabel("検索語を入力してください");
 
@@ -13,8 +13,9 @@ public sealed class SchoolSearchPage : ContentPage
     {
         Title = "出身校";
         BackgroundColor = PageStyles.Background;
+        Shell.SetNavBarIsVisible(this, false);
 
-        _sortPicker.ItemsSource = new[] { "名前", "チーム", "ポジション", "身長", "体重", "年齢", "キャップ数" };
+        _sortPicker.ItemsSource = new[] { "並び替え: 名前", "並び替え: チーム", "並び替え: ポジション", "並び替え: 身長", "並び替え: 体重", "並び替え: 年齢", "並び替え: キャップ数" };
         _sortPicker.SelectedIndex = 1;
         _sortPicker.SelectedIndexChanged += async (_, _) => await SearchAsync();
 
@@ -55,7 +56,7 @@ public sealed class SchoolSearchPage : ContentPage
             },
             Children =
             {
-                PageStyles.Title("出身校・チーム歴検索"),
+                PageStyles.Title("出身校検索"),
                 new Grid
                 {
                     ColumnDefinitions =

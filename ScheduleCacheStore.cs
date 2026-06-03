@@ -51,7 +51,7 @@ namespace OneRugbyNavi2
             IReadOnlyCollection<ScheduleFetcher.Item> div3,
             DateTimeOffset lastUpdated)
         {
-            var seasonKey = div1.Concat(div2).Concat(div3).FirstOrDefault()?.SeasonKey ?? ScheduleFetcher.SeasonYear.ToString();
+            var seasonKey = div1.Concat(div2).Concat(div3).FirstOrDefault()?.SeasonKey ?? "";
             var seasonLabel = div1.Concat(div2).Concat(div3).FirstOrDefault()?.SeasonLabel ?? "";
             return SaveAsync(seasonKey, seasonLabel, div1, div2, div3, Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>(), lastUpdated);
         }
@@ -84,7 +84,7 @@ namespace OneRugbyNavi2
             await File.WriteAllTextAsync(GetCachePath(seasonKey, seasonLabel), json);
         }
 
-        public static Task<ScheduleCacheData?> LoadAsync() => LoadAsync(ScheduleFetcher.SeasonYear.ToString(), "");
+        public static Task<ScheduleCacheData?> LoadAsync() => LoadAsync("", "");
 
         public static async Task<ScheduleCacheData?> LoadAsync(string seasonKey, string seasonLabel)
         {
@@ -135,7 +135,7 @@ namespace OneRugbyNavi2
         {
             try
             {
-                foreach (var file in Directory.EnumerateFiles(FileSystem.AppDataDirectory, "schedule_cache_*.json"))
+                foreach (var file in Directory.EnumerateFiles(FileSystem.AppDataDirectory, "schedule-cache-*.json"))
                 {
                     File.Delete(file);
                 }
@@ -153,7 +153,7 @@ namespace OneRugbyNavi2
             var token = !string.IsNullOrWhiteSpace(seasonLabel)
                 ? seasonLabel.Replace("シーズン", "", StringComparison.Ordinal)
                 : seasonKey;
-            return Path.Combine(FileSystem.AppDataDirectory, $"schedule_cache_{SafeFileToken(token)}.json");
+            return Path.Combine(FileSystem.AppDataDirectory, $"schedule-cache-{SafeFileToken(token)}.json");
         }
 
         private static string SafeFileToken(string value)

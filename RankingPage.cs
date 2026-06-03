@@ -5,7 +5,7 @@ namespace OneRugbyNavi2;
 public sealed class RankingPage : ContentPage
 {
     private readonly ObservableCollection<RankingRow> _rows = new();
-    private readonly Picker _rankingPicker = PageStyles.Picker("ランキング");
+    private readonly Picker _rankingPicker = PageStyles.Picker("並び替え");
     private readonly Picker _directionPicker = PageStyles.Picker("並び順");
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
 
@@ -13,12 +13,13 @@ public sealed class RankingPage : ContentPage
     {
         Title = "ランキング";
         BackgroundColor = PageStyles.Background;
+        Shell.SetNavBarIsVisible(this, false);
 
-        _rankingPicker.ItemsSource = new[] { "身長順", "体重順", "年齢順", "キャップ数順", "出身校候補人数順" };
+        _rankingPicker.ItemsSource = new[] { "並び替え: 身長", "並び替え: 体重", "並び替え: 年齢", "並び替え: キャップ数", "並び替え: 出身校候補人数" };
         _rankingPicker.SelectedIndex = 0;
         _rankingPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
 
-        _directionPicker.ItemsSource = new[] { "降順", "昇順" };
+        _directionPicker.ItemsSource = new[] { "並び順: 降順", "並び順: 昇順" };
         _directionPicker.SelectedIndex = 0;
         _directionPicker.SelectedIndexChanged += async (_, _) => await LoadAsync();
 
