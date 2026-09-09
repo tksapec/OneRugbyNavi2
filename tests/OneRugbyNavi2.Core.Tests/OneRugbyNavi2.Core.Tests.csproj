@@ -22,5 +22,8 @@
     <Compile Include="../../LeagueOneSyncModels.cs" Link="Production/LeagueOneSyncModels.cs" />
     <Compile Include="../../LeagueOneSeasonDetector.cs" Link="Production/LeagueOneSeasonDetector.cs" />
     <Compile Include="../../TeamCatalogParser.cs" Link="Production/TeamCatalogParser.cs" />
+    <Compile Include="../../TeamIndexParser.cs" Link="Production/TeamIndexParser.cs" />
+    <Compile Include="../../TeamRosterParser.cs" Link="Production/TeamRosterParser.cs" />
+    <Compile Include="../../PlayerProfileParser.cs" Link="Production/PlayerProfileParser.cs" />
   </ItemGroup>
 </Project>
