@@ -1,4 +1,5 @@
 using OneRugbyNavi2;
+using Xunit;
 
 namespace OneRugbyNavi2.Core.Tests;
 
