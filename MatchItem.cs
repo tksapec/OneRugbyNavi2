@@ -28,6 +28,7 @@ namespace OneRugbyNavi2
         public string PreviewUrl { get; set; } = "";
         public string ReportUrl { get; set; } = "";
         public string BroadcastText { get; set; } = "";
+        public string SourceUrl { get; set; } = "";
         public string? HomeLogoPath { get; set; }
         public string? AwayLogoPath { get; set; }
         public string HomeBadgeText { get; set; } = "";
@@ -80,4 +81,3 @@ namespace OneRugbyNavi2
         };
     }
 }
-
