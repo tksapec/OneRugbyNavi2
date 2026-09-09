@@ -50,17 +50,51 @@ public sealed class TeamListPage : ContentPage
         try
         {
             _teams.Clear();
-            foreach (var team in await AppServices.Database.GetTeamsAsync())
+            var storedTeams = await AppServices.Database.GetTeamsAsync();
+            var displayTeams = SeasonCatalog.CurrentSeasonStartYear == 2026
+                ? Build2026SeasonTeams(storedTeams)
+                : storedTeams;
+
+            foreach (var team in displayTeams)
             {
                 _teams.Add(team);
             }
 
-            _status.Text = $"{_teams.Count}チーム";
+            _status.Text = SeasonCatalog.CurrentSeasonStartYear == 2026
+                ? $"2026-27: {_teams.Count}チーム / 選手情報は同梱DBの収録時点"
+                : $"{_teams.Count}チーム";
         }
         catch (Exception ex)
         {
             _status.Text = $"読み込みに失敗しました: {ex.Message}";
         }
+    }
+
+    private static IReadOnlyList<TeamCard> Build2026SeasonTeams(IReadOnlyList<TeamCard> storedTeams)
+    {
+        var sourceByCurrentName = storedTeams
+            .GroupBy(team => SeasonCatalog.NormalizeTeamName(team.TeamName, 2026), StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
+        var result = new List<TeamCard>(SeasonCatalog.Teams2026.Count);
+
+        foreach (var official in SeasonCatalog.Teams2026)
+        {
+            sourceByCurrentName.TryGetValue(official.TeamName, out var source);
+            var discardLegacyLogo = source != null && SeasonCatalog.HasChangedBranding(source.TeamName);
+            result.Add(new TeamCard
+            {
+                Id = source?.Id ?? 0,
+                LeagueOneTeamId = source?.LeagueOneTeamId ?? "",
+                TeamName = official.TeamName,
+                ShortName = !string.IsNullOrWhiteSpace(official.ShortName) ? official.ShortName : source?.ShortName ?? "",
+                DivisionCode = official.DivisionCode,
+                AreaText = !string.IsNullOrWhiteSpace(official.AreaText) ? official.AreaText : source?.AreaText ?? "",
+                TeamUrl = source?.TeamUrl ?? "",
+                LocalAssetPath = discardLegacyLogo ? null : source?.LocalAssetPath
+            });
+        }
+
+        return result;
     }
 
     private View CreateTeamCard()
@@ -74,7 +108,7 @@ public sealed class TeamListPage : ContentPage
             HeightRequest = 56,
             HorizontalTextAlignment = TextAlignment.Center,
             VerticalTextAlignment = TextAlignment.Center,
-            BackgroundColor = Color.FromArgb("#EDF3FF"),
+            BackgroundColor = PageStyles.ChipBackground,
             TextColor = PageStyles.Blue,
             FontAttributes = FontAttributes.Bold,
             FontSize = 12
@@ -125,10 +159,21 @@ public sealed class TeamListPage : ContentPage
         var tap = new TapGestureRecognizer();
         tap.Tapped += async (_, _) =>
         {
-            if (card.BindingContext is TeamCard team)
+            if (card.BindingContext is not TeamCard team)
             {
-                await Navigation.PushAsync(new PlayerDirectoryPage(team.Id, team.TeamName));
+                return;
             }
+
+            if (team.Id <= 0)
+            {
+                await DisplayAlert(
+                    "選手データ未収録",
+                    $"{team.TeamName} は2026-27シーズンの新規チームです。現在の同梱DBには選手データがまだ収録されていません。",
+                    "OK");
+                return;
+            }
+
+            await Navigation.PushAsync(new PlayerDirectoryPage(team.Id, team.TeamName));
         };
         card.SetBinding(BindableObject.BindingContextProperty, ".");
         card.GestureRecognizers.Add(tap);
