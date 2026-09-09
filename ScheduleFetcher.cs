@@ -52,6 +52,7 @@ namespace OneRugbyNavi2
             public string ReportUrl { get; set; } = "";
             public string BroadcastText { get; set; } = "";
             public List<BroadcastLink> BroadcastLinks { get; set; } = new();
+            public string SourceUrl { get; set; } = "";
         }
 
         public sealed class FetchAllResult
@@ -97,6 +98,14 @@ namespace OneRugbyNavi2
             public string Label { get; init; } = "";
         }
 
+        private sealed class DivisionFetchResult
+        {
+            public string Division { get; init; } = "";
+            public string SourceUrl { get; init; } = "";
+            public List<Item> Items { get; init; } = new();
+            public string? Error { get; init; }
+        }
+
         private static readonly HttpClient Http = new()
         {
             Timeout = TimeSpan.FromSeconds(30)
@@ -106,65 +115,277 @@ namespace OneRugbyNavi2
 
         public static async Task<FetchAllResult> FetchSeasonAsync(string? seasonKey)
         {
-            var url = string.IsNullOrWhiteSpace(seasonKey)
-                ? ScheduleBaseUrl
-                : $"{ScheduleBaseUrl}?year={Uri.EscapeDataString(seasonKey)}";
-            var html = await Http.GetStringAsync(url);
-            var doc = new HtmlDocument();
-            doc.LoadHtml(html);
+            var requestedKey = string.IsNullOrWhiteSpace(seasonKey)
+                ? SeasonCatalog.CurrentSeasonKey
+                : seasonKey.Trim();
+            var detailUrl = $"{ScheduleBaseUrl}?year={Uri.EscapeDataString(requestedKey)}";
 
-            var seasons = ParseSeasons(doc);
-            var selectedSeason = SelectSeason(seasons, seasonKey);
-            var categories = ParseCategories(doc);
-
-            var div1 = new List<Item>();
-            var div2 = new List<Item>();
-            var div3 = new List<Item>();
+            var seasons = new List<SeasonOption>();
+            var detailedDiv1 = new List<Item>();
+            var detailedDiv2 = new List<Item>();
+            var detailedDiv3 = new List<Item>();
             var replacement = new List<Item>();
             var other = new List<Item>();
+            string? detailError = null;
 
-            foreach (var category in categories)
+            try
             {
-                var items = ParseCategory(doc, category, selectedSeason);
-                switch (category.Code)
+                var html = await Http.GetStringAsync(detailUrl);
+                var doc = new HtmlDocument();
+                doc.LoadHtml(html);
+
+                seasons = ParseSeasons(doc);
+                var selectedSeason = SelectSeason(seasons, requestedKey);
+                var categories = ParseCategories(doc);
+
+                foreach (var category in categories)
                 {
-                    case "D1":
-                        div1.AddRange(items);
-                        break;
-                    case "D2":
-                        div2.AddRange(items);
-                        break;
-                    case "D3":
-                        div3.AddRange(items);
-                        break;
-                    case "Replacement":
-                        replacement.AddRange(items);
-                        break;
-                    default:
-                        other.AddRange(items);
-                        break;
+                    var items = ParseCategory(doc, category, selectedSeason, detailUrl);
+                    switch (category.Code)
+                    {
+                        case "D1":
+                            detailedDiv1.AddRange(items);
+                            break;
+                        case "D2":
+                            detailedDiv2.AddRange(items);
+                            break;
+                        case "D3":
+                            detailedDiv3.AddRange(items);
+                            break;
+                        case "Replacement":
+                            replacement.AddRange(items);
+                            break;
+                        default:
+                            other.AddRange(items);
+                            break;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                detailError = ex.Message;
+            }
+
+            EnsureSeasonOption(seasons, requestedKey);
+            var selected = SelectSeason(seasons, requestedKey);
+
+            var tableTasks = new[]
+            {
+                FetchScheduleTableAsync(selected, "D1"),
+                FetchScheduleTableAsync(selected, "D2"),
+                FetchScheduleTableAsync(selected, "D3")
+            };
+            var tableResults = await Task.WhenAll(tableTasks);
+
+            var tableDiv1 = tableResults.First(result => result.Division == "D1");
+            var tableDiv2 = tableResults.First(result => result.Division == "D2");
+            var tableDiv3 = tableResults.First(result => result.Division == "D3");
+
+            var div1 = MergeRegularSeason(tableDiv1.Items, detailedDiv1);
+            var div2 = MergeRegularSeason(tableDiv2.Items, detailedDiv2);
+            var div3 = MergeRegularSeason(tableDiv3.Items, detailedDiv3);
 
 #if DEBUG
-            Debug.WriteLine($"Schedule page rows D1={div1.Count}, D2={div2.Count}, D3={div3.Count}, Replacement={replacement.Count}, Other={other.Count}");
+            Debug.WriteLine($"Schedule rows season={selected.SeasonKey} D1={div1.Count}, D2={div2.Count}, D3={div3.Count}, Replacement={replacement.Count}, Other={other.Count}");
 #endif
+
+            var hasRegularData = div1.Count + div2.Count + div3.Count > 0;
+            var hasAnyData = hasRegularData || replacement.Count + other.Count > 0;
 
             return new FetchAllResult
             {
                 Seasons = seasons,
-                SeasonKey = selectedSeason.SeasonKey,
-                SeasonLabel = selectedSeason.SeasonLabel,
+                SeasonKey = selected.SeasonKey,
+                SeasonLabel = selected.SeasonLabel,
                 FetchedAt = DateTimeOffset.Now,
                 Div1 = div1,
                 Div2 = div2,
                 Div3 = div3,
-                Replacement = replacement,
-                Other = other,
-                ResultsError = div1.Count + div2.Count + div3.Count + replacement.Count + other.Count == 0
-                    ? "No schedule cards were found on the official schedule page. The HTML structure may have changed, or parsing may have failed."
+                Replacement = Deduplicate(replacement),
+                Other = Deduplicate(other),
+                Div1Error = div1.Count == 0 ? tableDiv1.Error : null,
+                Div2Error = div2.Count == 0 ? tableDiv2.Error : null,
+                Div3Error = div3.Count == 0 ? tableDiv3.Error : null,
+                ResultsError = !hasAnyData
+                    ? detailError ?? "No schedule data was found on the official League One pages."
                     : null
             };
+        }
+
+        private static async Task<DivisionFetchResult> FetchScheduleTableAsync(SeasonOption season, string division)
+        {
+            var sourceUrl = SeasonCatalog.ScheduleTableUrl(season.SeasonKey, division.ToLowerInvariant());
+            if (string.IsNullOrWhiteSpace(sourceUrl))
+            {
+                return new DivisionFetchResult
+                {
+                    Division = division,
+                    SourceUrl = sourceUrl,
+                    Error = "Invalid schedule-table URL."
+                };
+            }
+
+            try
+            {
+                var html = await Http.GetStringAsync(sourceUrl);
+                var items = ScheduleTableParser.Parse(html, season.SeasonKey, division, sourceUrl);
+                return new DivisionFetchResult
+                {
+                    Division = division,
+                    SourceUrl = sourceUrl,
+                    Items = items,
+                    Error = items.Count == 0 ? "No annual schedule rows were found." : null
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DivisionFetchResult
+                {
+                    Division = division,
+                    SourceUrl = sourceUrl,
+                    Error = ex.Message
+                };
+            }
+        }
+
+        private static List<Item> MergeRegularSeason(IEnumerable<Item> annualItems, IEnumerable<Item> detailItems)
+        {
+            var result = annualItems.ToList();
+            foreach (var detail in detailItems)
+            {
+                NormalizeTeamNames(detail);
+                var existing = result.FirstOrDefault(item => IsSameFixture(item, detail));
+                if (existing == null)
+                {
+                    result.Add(detail);
+                    continue;
+                }
+
+                ApplyLiveDetails(existing, detail);
+            }
+
+            return Deduplicate(result);
+        }
+
+        private static void NormalizeTeamNames(Item item)
+        {
+            item.Home = SeasonCatalog.NormalizeTeamName(item.Home, item.SeasonStartYear);
+            item.Away = SeasonCatalog.NormalizeTeamName(item.Away, item.SeasonStartYear);
+        }
+
+        private static bool IsSameFixture(Item left, Item right)
+        {
+            if (!string.IsNullOrWhiteSpace(left.MatchId) &&
+                !string.IsNullOrWhiteSpace(right.MatchId) &&
+                string.Equals(left.MatchId, right.MatchId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            if (!string.Equals(left.Home, right.Home, StringComparison.Ordinal) ||
+                !string.Equals(left.Away, right.Away, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            var leftDate = NormalizeDateKey(left.Date);
+            var rightDate = NormalizeDateKey(right.Date);
+            if (!string.IsNullOrWhiteSpace(leftDate) &&
+                !string.IsNullOrWhiteSpace(rightDate) &&
+                string.Equals(leftDate, rightDate, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            return !string.IsNullOrWhiteSpace(left.Round) &&
+                   string.Equals(left.Round, right.Round, StringComparison.Ordinal);
+        }
+
+        private static void ApplyLiveDetails(Item target, Item detail)
+        {
+            if (ShouldUseIncomingDate(target.Date, detail.Date)) target.Date = detail.Date;
+            if (!string.IsNullOrWhiteSpace(detail.Round)) target.Round = detail.Round;
+            if (ShouldUseIncomingValue(target.Kickoff, detail.Kickoff)) target.Kickoff = detail.Kickoff;
+            if (!string.IsNullOrWhiteSpace(detail.Conference)) target.Conference = detail.Conference;
+            if (ShouldUseIncomingValue(target.Pref, detail.Pref)) target.Pref = detail.Pref;
+            if (ShouldUseIncomingValue(target.Venue, detail.Venue)) target.Venue = detail.Venue;
+            if (detail.HomeScore.HasValue) target.HomeScore = detail.HomeScore;
+            if (detail.AwayScore.HasValue) target.AwayScore = detail.AwayScore;
+            if (!string.IsNullOrWhiteSpace(detail.Status)) target.Status = detail.Status;
+            if (!string.IsNullOrWhiteSpace(detail.MatchId)) target.MatchId = detail.MatchId;
+            if (!string.IsNullOrWhiteSpace(detail.MatchCode)) target.MatchCode = detail.MatchCode;
+            if (!string.IsNullOrWhiteSpace(detail.MatchInfoUrl)) target.MatchInfoUrl = detail.MatchInfoUrl;
+            if (!string.IsNullOrWhiteSpace(detail.PreviewUrl)) target.PreviewUrl = detail.PreviewUrl;
+            if (!string.IsNullOrWhiteSpace(detail.ReportUrl)) target.ReportUrl = detail.ReportUrl;
+            if (!string.IsNullOrWhiteSpace(detail.BroadcastText)) target.BroadcastText = detail.BroadcastText;
+            if (detail.BroadcastLinks.Count > 0) target.BroadcastLinks = detail.BroadcastLinks;
+
+            if (target.HomeScore.HasValue && target.AwayScore.HasValue &&
+                (string.IsNullOrWhiteSpace(target.Status) || string.Equals(target.Status, "試合前", StringComparison.Ordinal)))
+            {
+                target.Status = "試合終了";
+            }
+        }
+
+        private static bool ShouldUseIncomingDate(string currentValue, string incomingValue)
+        {
+            if (string.IsNullOrWhiteSpace(incomingValue))
+            {
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(currentValue))
+            {
+                return true;
+            }
+
+            var currentAmbiguous = IsAmbiguousDate(currentValue);
+            var incomingAmbiguous = IsAmbiguousDate(incomingValue);
+            return currentAmbiguous && !incomingAmbiguous;
+        }
+
+        private static bool ShouldUseIncomingValue(string currentValue, string incomingValue)
+        {
+            if (string.IsNullOrWhiteSpace(incomingValue))
+            {
+                return false;
+            }
+
+            return string.IsNullOrWhiteSpace(currentValue) ||
+                   string.Equals(currentValue, "未定", StringComparison.Ordinal) ||
+                   !string.Equals(incomingValue, "未定", StringComparison.Ordinal);
+        }
+
+        private static bool IsAmbiguousDate(string value)
+        {
+            var normalized = Clean(value);
+            return normalized.Contains("or", StringComparison.OrdinalIgnoreCase) ||
+                   Regex.Matches(normalized, @"\d{1,2}月").Count > 1;
+        }
+
+        private static string NormalizeDateKey(string value)
+        {
+            var normalized = Clean(value)
+                .Replace("（", "(", StringComparison.Ordinal)
+                .Replace("）", ")", StringComparison.Ordinal);
+            return Regex.Replace(normalized, @"\([^)]*\)", "")
+                .Replace(" ", "", StringComparison.Ordinal);
+        }
+
+        private static List<Item> Deduplicate(IEnumerable<Item> items)
+        {
+            var result = new List<Item>();
+            foreach (var item in items)
+            {
+                if (result.Any(existing => IsSameFixture(existing, item)))
+                {
+                    continue;
+                }
+
+                result.Add(item);
+            }
+
+            return result;
         }
 
         private static List<SeasonOption> ParseSeasons(HtmlDocument doc)
@@ -182,25 +403,42 @@ namespace OneRugbyNavi2
                     SeasonLabel = Clean(option.InnerText)
                 })
                 .Where(option => !string.IsNullOrWhiteSpace(option.SeasonKey) && !string.IsNullOrWhiteSpace(option.SeasonLabel))
+                .GroupBy(option => option.SeasonKey, StringComparer.Ordinal)
+                .Select(group => group.First())
                 .ToList();
+        }
+
+        private static void EnsureSeasonOption(List<SeasonOption> seasons, string seasonKey)
+        {
+            if (seasons.Any(season => string.Equals(season.SeasonKey, seasonKey, StringComparison.Ordinal)))
+            {
+                return;
+            }
+
+            seasons.Insert(0, new SeasonOption
+            {
+                SeasonKey = seasonKey,
+                SeasonLabel = SeasonCatalog.ToSeasonLabel(seasonKey)
+            });
         }
 
         private static SeasonOption SelectSeason(IReadOnlyList<SeasonOption> seasons, string? requestedKey)
         {
             var selected = !string.IsNullOrWhiteSpace(requestedKey)
                 ? seasons.FirstOrDefault(season => string.Equals(season.SeasonKey, requestedKey, StringComparison.Ordinal))
-                : seasons.FirstOrDefault();
+                : seasons.FirstOrDefault(season => string.Equals(season.SeasonKey, SeasonCatalog.CurrentSeasonKey, StringComparison.Ordinal))
+                  ?? seasons.FirstOrDefault();
 
             if (selected != null)
             {
                 return selected;
             }
 
-            var key = string.IsNullOrWhiteSpace(requestedKey) ? CurrentSeasonStartYear().ToString() : requestedKey.Trim();
+            var key = string.IsNullOrWhiteSpace(requestedKey) ? SeasonCatalog.CurrentSeasonKey : requestedKey.Trim();
             return new SeasonOption
             {
                 SeasonKey = key,
-                SeasonLabel = ToSeasonLabel(key)
+                SeasonLabel = SeasonCatalog.ToSeasonLabel(key)
             };
         }
 
@@ -271,7 +509,7 @@ namespace OneRugbyNavi2
             return ($"Other{index}", string.IsNullOrWhiteSpace(text) ? "その他" : text);
         }
 
-        private static List<Item> ParseCategory(HtmlDocument doc, CategoryDefinition category, SeasonOption season)
+        private static List<Item> ParseCategory(HtmlDocument doc, CategoryDefinition category, SeasonOption season, string sourceUrl)
         {
             var tab = doc.DocumentNode.SelectSingleNode($"//div[@id='{category.TabId}']");
             var cards = tab?.SelectNodes(".//div[contains(concat(' ', normalize-space(@class), ' '), ' c-schedule ')]");
@@ -283,7 +521,7 @@ namespace OneRugbyNavi2
 
             foreach (var card in cards)
             {
-                var item = ParseScheduleCard(card, category, season);
+                var item = ParseScheduleCard(card, category, season, sourceUrl);
                 if (item != null)
                 {
                     list.Add(item);
@@ -293,7 +531,7 @@ namespace OneRugbyNavi2
             return list;
         }
 
-        private static Item? ParseScheduleCard(HtmlNode card, CategoryDefinition category, SeasonOption season)
+        private static Item? ParseScheduleCard(HtmlNode card, CategoryDefinition category, SeasonOption season, string sourceUrl)
         {
             var titleText = Clean(card.SelectSingleNode(".//div[contains(@class,'ttl-wrap')]//h3")?.InnerText);
             var placeText = Clean(card.SelectSingleNode(".//p[contains(@class,'place')]")?.InnerText);
@@ -318,21 +556,22 @@ namespace OneRugbyNavi2
             var awayScore = ParseNullableScore(Clean(awayNode.SelectSingleNode(".//p[contains(@class,'score')]")?.InnerText));
             var (pref, venue) = SplitPlace(placeText);
             var broadcastLinks = ParseBroadcastLinks(card);
+            var seasonStartYear = SeasonCatalog.ParseSeasonStartYear(season.SeasonKey);
 
             return new Item
             {
                 SeasonKey = season.SeasonKey,
                 SeasonLabel = season.SeasonLabel,
-                SeasonStartYear = ParseSeasonStartYear(season.SeasonKey),
+                SeasonStartYear = seasonStartYear,
                 CategoryCode = category.Code,
                 CategoryLabel = category.Label,
                 Division = category.Label,
                 Round = ParseRoundFromTitle(titleText),
                 Date = MergeDate(ToJapaneseDate(dateText), BracketDow(dow)),
                 Kickoff = kickoff,
-                Conference = ParseConferenceFromTitle(titleText),
-                Home = GetTeamName(homeNode),
-                Away = GetTeamName(awayNode),
+                Conference = seasonStartYear >= 2026 && category.Code == "D1" ? "" : ParseConferenceFromTitle(titleText),
+                Home = SeasonCatalog.NormalizeTeamName(GetTeamName(homeNode), seasonStartYear),
+                Away = SeasonCatalog.NormalizeTeamName(GetTeamName(awayNode), seasonStartYear),
                 Pref = pref,
                 Venue = venue,
                 HomeScore = homeScore,
@@ -344,7 +583,8 @@ namespace OneRugbyNavi2
                 PreviewUrl = ToAbsoluteUrl(previewAnchor?.GetAttributeValue("href", "")),
                 ReportUrl = ToAbsoluteUrl(reportAnchor?.GetAttributeValue("href", "")),
                 BroadcastText = string.Join(" / ", broadcastLinks.Select(link => link.Text).Where(text => !string.IsNullOrWhiteSpace(text)).Distinct()),
-                BroadcastLinks = broadcastLinks
+                BroadcastLinks = broadcastLinks,
+                SourceUrl = sourceUrl
             };
         }
 
@@ -481,27 +721,6 @@ namespace OneRugbyNavi2
             return $"{int.Parse(match.Groups["month"].Value)}月{int.Parse(match.Groups["day"].Value)}日";
         }
 
-        private static int ParseSeasonStartYear(string seasonKey)
-        {
-            return int.TryParse(seasonKey, out var year) ? year : 0;
-        }
-
-        private static string ToSeasonLabel(string seasonKey)
-        {
-            if (!int.TryParse(seasonKey, out var year))
-            {
-                return seasonKey;
-            }
-
-            return year == 2021 ? "2022シーズン" : $"{year}-{(year + 1) % 100:00}シーズン";
-        }
-
-        private static int CurrentSeasonStartYear()
-        {
-            var today = DateTime.Today;
-            return today.Month >= 9 ? today.Year : today.Year - 1;
-        }
-
         private static string ToAbsoluteUrl(string? href)
         {
             href = Clean(href);
@@ -549,11 +768,11 @@ namespace OneRugbyNavi2
             return $"({dow})";
         }
 
-        private static string Clean(string? s)
+        private static string Clean(string? value)
         {
-            if (string.IsNullOrWhiteSpace(s)) return "";
+            if (string.IsNullOrWhiteSpace(value)) return "";
 
-            return NormalizeSpaces(HtmlEntity.DeEntitize(s)
+            return NormalizeSpaces(HtmlEntity.DeEntitize(value)
                 .Replace("\u00A0", " ", StringComparison.Ordinal)
                 .Replace("\r", " ", StringComparison.Ordinal)
                 .Replace("\n", " ", StringComparison.Ordinal));
