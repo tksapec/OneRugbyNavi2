@@ -123,8 +123,7 @@ namespace OneRugbyNavi2
             if (PeriodFilter != DateRangeFilter.All)
             {
                 var today = DateTime.Today;
-                query = query.Where(m =>
-                    TryMatchPeriod(m, today, PeriodFilter));
+                query = query.Where(m => TryMatchPeriod(m, today, PeriodFilter));
             }
 
             var list = SortMatches(query, DateTime.Today, PeriodFilter).ToList();
@@ -262,41 +261,66 @@ namespace OneRugbyNavi2
             }
         }
 
-        private static MatchItem ToMatch(ScheduleFetcher.Item it) => new()
+        private static MatchItem ToMatch(ScheduleFetcher.Item item)
         {
-            SeasonKey = it.SeasonKey,
-            SeasonLabel = it.SeasonLabel,
-            SeasonStartYear = it.SeasonStartYear,
-            CategoryCode = NormalizeCategoryCode(it.CategoryCode),
-            CategoryLabel = string.IsNullOrWhiteSpace(it.CategoryLabel) ? GetCategoryLabel(it.CategoryCode) : it.CategoryLabel,
-            Division = string.IsNullOrWhiteSpace(it.Division) ? GetCategoryLabel(it.CategoryCode) : it.Division,
-            Section = it.Round,
-            MatchDate = it.Date,
-            KickoffTime = it.Kickoff,
-            Conference = it.Conference,
-            HomeTeam = it.Home,
-            AwayTeam = it.Away,
-            Prefecture = it.Pref,
-            Venue = it.Venue,
-            VenueDisplayName = VenueNameResolver.Resolve(it.Pref, it.Venue),
-            HomeScore = it.HomeScore,
-            AwayScore = it.AwayScore,
-            MatchStatus = it.Status,
-            MatchId = it.MatchId,
-            MatchCode = it.MatchCode,
-            MatchInfoUrl = it.MatchInfoUrl,
-            PreviewUrl = it.PreviewUrl,
-            ReportUrl = it.ReportUrl,
-            BroadcastText = it.BroadcastText,
-            HomeLogoPath = TeamLogoResolver.GetLogoPath(it.Home),
-            AwayLogoPath = TeamLogoResolver.GetLogoPath(it.Away),
-            HomeBadgeText = TeamLogoResolver.GetBadgeText(it.Home),
-            AwayBadgeText = TeamLogoResolver.GetBadgeText(it.Away)
-        };
+            var categorySource = !string.IsNullOrWhiteSpace(item.CategoryCode)
+                ? item.CategoryCode
+                : item.Division;
+            var category = NormalizeCategoryCode(categorySource);
+            var seasonStartYear = item.SeasonStartYear > 0
+                ? item.SeasonStartYear
+                : InferSeasonStartYear(item.Date);
+            var seasonKey = !string.IsNullOrWhiteSpace(item.SeasonKey)
+                ? item.SeasonKey
+                : seasonStartYear > 0 ? seasonStartYear.ToString() : "";
+            var seasonLabel = !string.IsNullOrWhiteSpace(item.SeasonLabel)
+                ? item.SeasonLabel
+                : SeasonCatalog.ToSeasonLabel(seasonKey);
+            var home = SeasonCatalog.NormalizeTeamName(item.Home, seasonStartYear);
+            var away = SeasonCatalog.NormalizeTeamName(item.Away, seasonStartYear);
+
+            return new MatchItem
+            {
+                SeasonKey = seasonKey,
+                SeasonLabel = seasonLabel,
+                SeasonStartYear = seasonStartYear,
+                CategoryCode = category,
+                CategoryLabel = string.IsNullOrWhiteSpace(item.CategoryLabel) ? GetCategoryLabel(category) : item.CategoryLabel,
+                Division = string.IsNullOrWhiteSpace(item.Division) ? GetCategoryLabel(category) : item.Division,
+                Section = item.Round,
+                MatchDate = item.Date,
+                KickoffTime = item.Kickoff,
+                Conference = seasonStartYear >= 2026 && category == CategoryDiv1 ? "" : item.Conference,
+                HomeTeam = home,
+                AwayTeam = away,
+                Prefecture = item.Pref,
+                Venue = item.Venue,
+                VenueDisplayName = VenueNameResolver.Resolve(item.Pref, item.Venue),
+                HomeScore = item.HomeScore,
+                AwayScore = item.AwayScore,
+                MatchStatus = item.Status,
+                MatchId = item.MatchId,
+                MatchCode = item.MatchCode,
+                MatchInfoUrl = item.MatchInfoUrl,
+                PreviewUrl = item.PreviewUrl,
+                ReportUrl = item.ReportUrl,
+                BroadcastText = item.BroadcastText,
+                SourceUrl = item.SourceUrl,
+                HomeLogoPath = TeamLogoResolver.GetLogoPath(home),
+                AwayLogoPath = TeamLogoResolver.GetLogoPath(away),
+                HomeBadgeText = TeamLogoResolver.GetBadgeText(home),
+                AwayBadgeText = TeamLogoResolver.GetBadgeText(away)
+            };
+        }
 
         public static bool TryGetMatchDate(MatchItem match, out DateTime date)
         {
             date = default;
+            if (string.IsNullOrWhiteSpace(match.MatchDate) || IsAmbiguousDateText(match.MatchDate))
+            {
+                return false;
+            }
+
             var parsed = Regex.Match(match.MatchDate, @"(?<month>\d{1,2})月(?<day>\d{1,2})日");
             if (!parsed.Success)
             {
@@ -397,6 +421,35 @@ namespace OneRugbyNavi2
                 .Select(item => item.Match);
         }
 
+        private static bool IsAmbiguousDateText(string value)
+        {
+            return value.Contains("or", StringComparison.OrdinalIgnoreCase) ||
+                   Regex.Matches(value, @"\d{1,2}月").Count > 1;
+        }
+
+        private static int InferSeasonStartYear(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || IsAmbiguousDateText(value))
+            {
+                return 0;
+            }
+
+            if (DateTime.TryParse(value, out var fullDate))
+            {
+                return SeasonCatalog.GetSeasonStartYear(fullDate);
+            }
+
+            var yearMatch = Regex.Match(value, @"(?<year>20\d{2})[-/.年](?<month>\d{1,2})");
+            if (yearMatch.Success &&
+                int.TryParse(yearMatch.Groups["year"].Value, out var year) &&
+                int.TryParse(yearMatch.Groups["month"].Value, out var month))
+            {
+                return month >= 9 ? year : year - 1;
+            }
+
+            return 0;
+        }
+
         private static string DivisionToCategory(int division)
         {
             return division switch
@@ -423,26 +476,30 @@ namespace OneRugbyNavi2
 
         public static string NormalizeCategoryCode(string category)
         {
-            if (string.Equals(category, CategoryDiv1, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(category, "DIV1", StringComparison.OrdinalIgnoreCase))
+            var value = category ?? "";
+            if (string.Equals(value, CategoryDiv1, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIV1", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIVISION 1", StringComparison.OrdinalIgnoreCase))
             {
                 return CategoryDiv1;
             }
 
-            if (string.Equals(category, CategoryDiv2, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(category, "DIV2", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(value, CategoryDiv2, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIV2", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIVISION 2", StringComparison.OrdinalIgnoreCase))
             {
                 return CategoryDiv2;
             }
 
-            if (string.Equals(category, CategoryDiv3, StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(category, "DIV3", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(value, CategoryDiv3, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIV3", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(value, "DIVISION 3", StringComparison.OrdinalIgnoreCase))
             {
                 return CategoryDiv3;
             }
 
-            if (string.Equals(category, CategoryReplacement, StringComparison.OrdinalIgnoreCase) ||
-                category.Contains("入替", StringComparison.Ordinal))
+            if (string.Equals(value, CategoryReplacement, StringComparison.OrdinalIgnoreCase) ||
+                value.Contains("入替", StringComparison.Ordinal))
             {
                 return CategoryReplacement;
             }
