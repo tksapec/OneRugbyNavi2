@@ -4,7 +4,14 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:OneRugbyNavi2"
-    Title="One Rugby Navi2">
+    Title="One Rugby Navi2"
+    Shell.BackgroundColor="{StaticResource AppSurface}"
+    Shell.ForegroundColor="{StaticResource AppNavy}"
+    Shell.TitleColor="{StaticResource AppNavy}"
+    Shell.TabBarBackgroundColor="{StaticResource AppSurface}"
+    Shell.TabBarForegroundColor="{StaticResource Primary}"
+    Shell.TabBarTitleColor="{StaticResource Primary}"
+    Shell.TabBarUnselectedColor="{StaticResource AppMuted}">
 
     <TabBar>
         <ShellContent
@@ -18,16 +25,6 @@
             Route="TeamListPage" />
 
         <ShellContent
-            Title="選手"
-            ContentTemplate="{DataTemplate local:PlayerDirectoryPage}"
-            Route="PlayerDirectoryPage" />
-
-        <ShellContent
-            Title="出身校"
-            ContentTemplate="{DataTemplate local:SchoolSearchPage}"
-            Route="SchoolSearchPage" />
-
-        <ShellContent
             Title="ランキング"
             ContentTemplate="{DataTemplate local:RankingPage}"
             Route="RankingPage" />
@@ -39,4 +36,3 @@
     </TabBar>
 
 </Shell>
-

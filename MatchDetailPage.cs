@@ -11,10 +11,6 @@ namespace OneRugbyNavi2
 {
     public sealed class MatchDetailPage : ContentPage
     {
-        private const string LeagueBlue = "#0057B8";
-        private const string LeagueNavy = "#10233F";
-        private const string Surface = "#F5F7FB";
-        private const string CardStroke = "#E5EAF3";
         private const string FavoriteTeamKey = "FavoriteTeam";
 
         private readonly MatchItem _match;
@@ -22,7 +18,7 @@ namespace OneRugbyNavi2
         public MatchDetailPage(MatchItem match)
         {
             _match = match;
-            BackgroundColor = Color.FromArgb(Surface);
+            BackgroundColor = PageStyles.Background;
             Shell.SetNavBarIsVisible(this, false);
 
             var root = new Grid
@@ -57,7 +53,7 @@ namespace OneRugbyNavi2
         {
             return new Border
             {
-                BackgroundColor = Colors.White,
+                BackgroundColor = PageStyles.Surface,
                 StrokeThickness = 0,
                 Padding = new Thickness(12, 14, 16, 12),
                 Content = new Grid
@@ -75,7 +71,7 @@ namespace OneRugbyNavi2
                             Text = "\u2190",
                             FontSize = 22,
                             FontAttributes = FontAttributes.Bold,
-                            TextColor = Color.FromArgb(LeagueNavy),
+                            TextColor = PageStyles.Navy,
                             BackgroundColor = Colors.Transparent,
                             Padding = new Thickness(8, 0),
                             WidthRequest = 44,
@@ -92,13 +88,13 @@ namespace OneRugbyNavi2
                                     Text = "\u8A66\u5408\u8A73\u7D30",
                                     FontSize = 20,
                                     FontAttributes = FontAttributes.Bold,
-                                    TextColor = Color.FromArgb(LeagueNavy)
+                                    TextColor = PageStyles.Navy
                                 },
                                 new Label
                                 {
                                     Text = $"{_match.Division}  {_match.Section}".Trim(),
                                     FontSize = 12,
-                                    TextColor = Color.FromArgb("#667085")
+                                    TextColor = PageStyles.Muted
                                 }
                             }
                         }.Column(1)
@@ -147,7 +143,7 @@ namespace OneRugbyNavi2
                                     Text = _match.ScoreText,
                                     FontSize = 26,
                                     FontAttributes = FontAttributes.Bold,
-                                    TextColor = Color.FromArgb(LeagueBlue),
+                                    TextColor = PageStyles.Blue,
                                     HorizontalTextAlignment = TextAlignment.Center,
                                     VerticalTextAlignment = TextAlignment.Center
                                 }.Column(1),
@@ -164,14 +160,14 @@ namespace OneRugbyNavi2
                                     Text = $"{_match.MatchDate}  {_match.KickoffTime}".Trim(),
                                     FontSize = 16,
                                     FontAttributes = FontAttributes.Bold,
-                                    TextColor = Color.FromArgb(LeagueNavy),
+                                    TextColor = PageStyles.Navy,
                                     HorizontalTextAlignment = TextAlignment.Center
                                 },
                                 new Label
                                 {
                                     Text = _match.VenueCompact,
                                     FontSize = 13,
-                                    TextColor = Color.FromArgb("#667085"),
+                                    TextColor = PageStyles.Muted,
                                     HorizontalTextAlignment = TextAlignment.Center,
                                     LineBreakMode = LineBreakMode.WordWrap
                                 }
@@ -212,55 +208,84 @@ namespace OneRugbyNavi2
 
         private View BuildActionSection()
         {
-            var buttons = new VerticalStackLayout
-            {
-                Spacing = 10,
-                Children =
-                {
-                    SectionTitle("\u30A2\u30AF\u30B7\u30E7\u30F3")
-                }
-            };
+            var content = new VerticalStackLayout { Spacing = 14 };
+            var officialLinks = new VerticalStackLayout { Spacing = 8 };
+            var hasOfficialLinks = false;
 
             if (!string.IsNullOrWhiteSpace(_match.MatchInfoUrl))
             {
-                buttons.Children.Add(ActionButton("\u516C\u5F0F Match Info \u3092\u958B\u304F", async () => await OpenWebAsync(_match.MatchInfoUrl)));
+                officialLinks.Children.Add(ActionButton("試合情報を開く", async () => await OpenWebAsync(_match.MatchInfoUrl)));
+                hasOfficialLinks = true;
             }
 
             if (!string.IsNullOrWhiteSpace(_match.PreviewUrl))
             {
-                buttons.Children.Add(ActionButton("公式 Preview を開く", async () => await OpenWebAsync(_match.PreviewUrl)));
+                officialLinks.Children.Add(ActionButton("公式プレビューを開く", async () => await OpenWebAsync(_match.PreviewUrl)));
+                hasOfficialLinks = true;
             }
 
             if (!string.IsNullOrWhiteSpace(_match.ReportUrl))
             {
-                buttons.Children.Add(ActionButton("\u516C\u5F0F Report \u3092\u958B\u304F", async () => await OpenWebAsync(_match.ReportUrl)));
+                officialLinks.Children.Add(ActionButton("公式レポートを開く", async () => await OpenWebAsync(_match.ReportUrl)));
+                hasOfficialLinks = true;
+            }
+
+            if (hasOfficialLinks)
+            {
+                content.Children.Add(SectionTitle("公式リンク"));
+                content.Children.Add(officialLinks);
+            }
+
+            var quickActions = new Grid
+            {
+                ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Star) },
+                ColumnSpacing = 8,
+                RowSpacing = 8
+            };
+            void AddQuickAction(string text, Func<System.Threading.Tasks.Task> action)
+            {
+                var index = quickActions.Children.Count;
+                var row = index / 2;
+                if (row >= quickActions.RowDefinitions.Count)
+                {
+                    quickActions.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+                }
+
+                var button = ActionButton(text, action);
+                button.MinimumHeightRequest = 52;
+                button.FontSize = 12;
+                Grid.SetColumn(button, index % 2);
+                Grid.SetRow(button, row);
+                quickActions.Children.Add(button);
             }
 
             if (!string.IsNullOrWhiteSpace(_match.VenueDisplayName))
             {
-                buttons.Children.Add(ActionButton("\u5730\u56F3\u3067\u958B\u304F", OpenMapAsync));
+                AddQuickAction("地図", OpenMapAsync);
             }
 
             if (ScheduleViewModel.TryGetMatchStart(_match, out _))
             {
-                buttons.Children.Add(ActionButton("\u30AB\u30EC\u30F3\u30C0\u30FC\u306B\u8FFD\u52A0", AddToCalendarAsync));
+                AddQuickAction("カレンダー", AddToCalendarAsync);
             }
 
             if (!string.IsNullOrWhiteSpace(_match.HomeTeam))
             {
-                buttons.Children.Add(ActionButton("\u30DB\u30FC\u30E0\u30C1\u30FC\u30E0\u3092\u304A\u6C17\u306B\u5165\u308A\u306B\u3059\u308B", async () => await SaveFavoriteTeamAsync(_match.HomeTeam)));
+                AddQuickAction("ホームをお気に入り", async () => await SaveFavoriteTeamAsync(_match.HomeTeam));
             }
 
             if (!string.IsNullOrWhiteSpace(_match.AwayTeam))
             {
-                buttons.Children.Add(ActionButton("\u30D3\u30B8\u30BF\u30FC\u30C1\u30FC\u30E0\u3092\u304A\u6C17\u306B\u5165\u308A\u306B\u3059\u308B", async () => await SaveFavoriteTeamAsync(_match.AwayTeam)));
+                AddQuickAction("ビジターをお気に入り", async () => await SaveFavoriteTeamAsync(_match.AwayTeam));
             }
 
-            buttons.Children.Add(ActionButton("\u5171\u6709", ShareAsync));
-            buttons.Children.Add(ActionButton("\u9806\u4F4D\u8868", async () => await OpenWebAsync("https://league-one.jp/standings/")));
-            buttons.Children.Add(ActionButton("\u500B\u4EBA\u30E9\u30F3\u30AD\u30F3\u30B0", async () => await OpenWebAsync("https://league-one.jp/ranking/")));
+            AddQuickAction("共有", ShareAsync);
+            AddQuickAction("順位表", async () => await OpenWebAsync("https://league-one.jp/standings/"));
+            AddQuickAction("公式ランキング", async () => await Shell.Current.GoToAsync("//RankingPage"));
 
-            return Card(buttons);
+            content.Children.Add(SectionTitle("その他の操作"));
+            content.Children.Add(quickActions);
+            return Card(content);
         }
 
         private static Border Card(View content)
@@ -268,8 +293,8 @@ namespace OneRugbyNavi2
             return new Border
             {
                 Padding = 16,
-                BackgroundColor = Colors.White,
-                Stroke = Color.FromArgb(CardStroke),
+                BackgroundColor = PageStyles.Surface,
+                Stroke = PageStyles.Stroke,
                 StrokeThickness = 1,
                 StrokeShape = new RoundRectangle { CornerRadius = 18 },
                 Content = content
@@ -283,7 +308,7 @@ namespace OneRugbyNavi2
                 Text = text,
                 FontSize = 18,
                 FontAttributes = FontAttributes.Bold,
-                TextColor = Color.FromArgb(LeagueNavy)
+                TextColor = PageStyles.Navy
             };
         }
 
@@ -292,7 +317,7 @@ namespace OneRugbyNavi2
             return new Border
             {
                 Padding = new Thickness(10, 4),
-                BackgroundColor = Color.FromArgb("#EAF3FF"),
+                BackgroundColor = PageStyles.InformationBackground,
                 StrokeThickness = 0,
                 StrokeShape = new RoundRectangle { CornerRadius = 10 },
                 Content = new Label
@@ -300,7 +325,7 @@ namespace OneRugbyNavi2
                     Text = string.IsNullOrWhiteSpace(text) ? "-" : text,
                     FontSize = 12,
                     FontAttributes = FontAttributes.Bold,
-                    TextColor = Color.FromArgb(LeagueBlue)
+                    TextColor = PageStyles.Blue
                 }
             };
         }
@@ -320,13 +345,13 @@ namespace OneRugbyNavi2
                     {
                         Text = label,
                         FontAttributes = FontAttributes.Bold,
-                        TextColor = Color.FromArgb("#475467"),
+                        TextColor = PageStyles.Muted,
                         LineBreakMode = LineBreakMode.WordWrap
                     },
                     new Label
                     {
                         Text = string.IsNullOrWhiteSpace(value) ? "-" : value,
-                        TextColor = Color.FromArgb(LeagueNavy),
+                        TextColor = PageStyles.Navy,
                         LineBreakMode = LineBreakMode.WordWrap
                     }.Column(1)
                 }
@@ -335,20 +360,13 @@ namespace OneRugbyNavi2
 
         private static Button ActionButton(string text, Func<System.Threading.Tasks.Task> action)
         {
-            var button = new Button
-            {
-                Text = text,
-                BackgroundColor = Color.FromArgb("#EDF3FF"),
-                TextColor = Color.FromArgb(LeagueBlue),
-                FontAttributes = FontAttributes.Bold,
-                CornerRadius = 14,
-                MinimumHeightRequest = 48
-            };
+            var button = PageStyles.SecondaryButton(text);
+            button.MinimumHeightRequest = 48;
             button.Clicked += async (_, _) => await action();
             return button;
         }
 
-        private static View BuildTeamBlock(string teamName, string? logoPath, bool hasLogo, string badgeText, TextAlignment textAlignment)
+        private View BuildTeamBlock(string teamName, string? logoPath, bool hasLogo, string badgeText, TextAlignment textAlignment)
         {
             var layout = new VerticalStackLayout
             {
@@ -356,13 +374,18 @@ namespace OneRugbyNavi2
                 HorizontalOptions = textAlignment == TextAlignment.End ? LayoutOptions.End : LayoutOptions.Start
             };
 
-            layout.Children.Add(BuildTeamMark(logoPath, hasLogo, badgeText));
+            var mark = BuildTeamMark(logoPath, hasLogo, badgeText);
+            var tap = new TapGestureRecognizer();
+            tap.Tapped += async (_, _) => await TeamOfficialPageNavigator.OpenAsync(this, teamName);
+            mark.GestureRecognizers.Add(tap);
+            SemanticProperties.SetHint(mark, "タップすると公式チームページを開きます");
+            layout.Children.Add(mark);
             layout.Children.Add(new Label
             {
                 Text = string.IsNullOrWhiteSpace(teamName) ? "-" : teamName,
                 FontSize = 17,
                 FontAttributes = FontAttributes.Bold,
-                TextColor = Color.FromArgb(LeagueNavy),
+                TextColor = PageStyles.Navy,
                 HorizontalTextAlignment = textAlignment,
                 LineBreakMode = LineBreakMode.WordWrap
             });
@@ -377,8 +400,8 @@ namespace OneRugbyNavi2
                 WidthRequest = 60,
                 HeightRequest = 60,
                 Padding = 8,
-                BackgroundColor = Color.FromArgb("#F5F7FB"),
-                Stroke = Color.FromArgb(CardStroke),
+                BackgroundColor = PageStyles.Background,
+                Stroke = PageStyles.Stroke,
                 StrokeThickness = 1,
                 StrokeShape = new RoundRectangle { CornerRadius = 30 },
                 HorizontalOptions = LayoutOptions.Center,
@@ -395,7 +418,7 @@ namespace OneRugbyNavi2
                         Text = string.IsNullOrWhiteSpace(badgeText) ? "?" : badgeText,
                         FontSize = 18,
                         FontAttributes = FontAttributes.Bold,
-                        TextColor = Color.FromArgb(LeagueBlue),
+                        TextColor = PageStyles.Blue,
                         HorizontalTextAlignment = TextAlignment.Center,
                         VerticalTextAlignment = TextAlignment.Center
                     }
@@ -587,4 +610,3 @@ namespace OneRugbyNavi2
         }
     }
 }
-

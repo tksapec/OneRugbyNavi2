@@ -25,7 +25,6 @@ namespace OneRugbyNavi2
         private bool _isShowingCache;
         private bool _isFilterExpanded;
         private bool _teamFilterManuallySelected;
-        private MatchItem? _nextMatch;
         private string? _lastMessage;
         private string _favoriteTeam = "";
         private string _databaseBuildTimestampText = "-";
@@ -38,12 +37,15 @@ namespace OneRugbyNavi2
         {
             InitializeComponent();
 
+            UpdateSeasonTitle();
+
             list.ItemsSource = _vm.FilteredItems;
             periodPicker.ItemsSource = new[] { "\u3059\u3079\u3066", "\u4ECA\u5F8C\u306E\u8A66\u5408", "\u904E\u53BB\u306E\u8A66\u5408" };
             periodPicker.SelectedIndex = 0;
             LoadFavoriteTeam();
             UpdateFavoriteUi();
             UpdateTabVisual(1);
+            RefreshCategoryTabs();
             UpdateEmptyState();
             UpdateFilterPanelUi();
             UpdateFilterSummaryUi();
@@ -62,8 +64,8 @@ namespace OneRugbyNavi2
                 {
                     ApplyTeamFilterForCurrentDivision(null, allowFavoriteFallback: true);
                     RefreshPickers(preserveSelection: true);
+                    ScrollScheduleToStart();
                     UpdateEmptyState();
-                    UpdateNextMatchCard();
                     UpdateFilterSummaryUi();
                 }
 
@@ -126,7 +128,10 @@ namespace OneRugbyNavi2
                     _selectedSeasonLabel = fetchResult?.SeasonLabel ?? _selectedSeasonLabel;
                     await ScheduleCacheStore.SaveAsync(_selectedSeasonKey, _selectedSeasonLabel, div1, div2, div3, replacement, other, fetchedAt);
                     _databaseBuildTimestampText = fetchedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
-                    SetMessage(FetchedOfficialScheduleMessage, true, autoHide: true);
+                    var statusMessage = fetchResult?.DataConsistencyWarning is { Length: > 0 } warning
+                        ? $"{FetchedOfficialScheduleMessage}\n{warning}"
+                        : FetchedOfficialScheduleMessage;
+                    SetMessage(statusMessage, true, autoHide: fetchResult?.DataConsistencyWarning is null);
                 }
                 else
                 {
@@ -148,8 +153,7 @@ namespace OneRugbyNavi2
                         UpdateLastUpdatedLabel();
                         SetMessage(FetchFailedMessage, true);
                         UpdateEmptyState();
-                        UpdateNextMatchCard();
-                        UpdateFilterSummaryUi();
+                            UpdateFilterSummaryUi();
                         return;
                     }
 
@@ -161,6 +165,7 @@ namespace OneRugbyNavi2
                     _isShowingCache = true;
                     _selectedSeasonKey = cache.SeasonKey;
                     _selectedSeasonLabel = cache.SeasonLabel;
+                    UpdateSeasonTitle();
                     _databaseBuildTimestampText = cache.LastUpdated.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
                     SetMessage(ShowingScheduleCacheMessage, true, autoHide: true);
                 }
@@ -184,11 +189,11 @@ namespace OneRugbyNavi2
                 _vm.ApplyFilters();
                 RefreshCategoryTabs();
                 RefreshPickers(preserveSelection: true);
+                ScrollScheduleToStart();
 
                 UpdateLastUpdatedLabel();
 
                 UpdateEmptyState();
-                UpdateNextMatchCard();
                 UpdateFilterSummaryUi();
             }
             catch
@@ -205,7 +210,6 @@ namespace OneRugbyNavi2
                 UpdateLastUpdatedLabel();
                 SetMessage(FetchFailedMessage, true);
                 UpdateEmptyState();
-                UpdateNextMatchCard();
                 UpdateFilterSummaryUi();
             }
             finally
@@ -247,8 +251,8 @@ namespace OneRugbyNavi2
             ApplyTeamFilterForCurrentDivision(_teamFilterManuallySelected ? _vm.TeamFilter : null, allowFavoriteFallback: !_teamFilterManuallySelected);
             UpdateTabVisual(_vm.CurrentCategory);
             RefreshPickers(preserveSelection: true);
+            ScrollScheduleToStart();
             UpdateEmptyState();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
         }
 
@@ -276,8 +280,8 @@ namespace OneRugbyNavi2
 
         private static void ApplyTabVisual(Button button, bool active)
         {
-            button.BackgroundColor = active ? Color.FromArgb("#0057B8") : Colors.Transparent;
-            button.TextColor = active ? Colors.White : Color.FromArgb("#26364F");
+            button.BackgroundColor = active ? PageStyles.Blue : Colors.Transparent;
+            button.TextColor = active ? Colors.White : PageStyles.Navy;
             button.Opacity = active ? 1.0 : 0.85;
         }
 
@@ -296,6 +300,7 @@ namespace OneRugbyNavi2
 
             _selectedSeasonKey = selected.SeasonKey;
             _selectedSeasonLabel = selected.SeasonLabel;
+            UpdateSeasonTitle();
             _teamFilterManuallySelected = false;
             await RefreshDataAsync(showSuccessMessage: true);
         }
@@ -309,6 +314,7 @@ namespace OneRugbyNavi2
             _seasonOptions.AddRange(seasons);
             _selectedSeasonKey = selectedSeasonKey;
             _selectedSeasonLabel = selectedSeasonLabel;
+            UpdateSeasonTitle();
 
             _suppressPickerEvents = true;
             seasonPicker.ItemsSource = _seasonOptions.Select(season => season.SeasonLabel).ToArray();
@@ -326,6 +332,7 @@ namespace OneRugbyNavi2
             var firstSeason = _seasonOptions.FirstOrDefault();
             _selectedSeasonKey = firstSeason?.SeasonKey ?? "";
             _selectedSeasonLabel = firstSeason?.SeasonLabel ?? "";
+            UpdateSeasonTitle();
             if (_seasonOptions.Count == 0)
             {
                 _suppressPickerEvents = true;
@@ -335,10 +342,29 @@ namespace OneRugbyNavi2
             }
         }
 
+        private void UpdateSeasonTitle()
+        {
+            var key = string.IsNullOrWhiteSpace(_selectedSeasonKey)
+                ? SeasonCatalog.CurrentSeasonKey
+                : _selectedSeasonKey;
+            var label = SeasonCatalog.ToSeasonUiLabel(key);
+            seasonTitleLabel.Text = string.IsNullOrWhiteSpace(label) ? "Season" : label;
+        }
+
         private void RefreshCategoryTabs()
         {
             btnReplacement.IsVisible = _vm.GetCategoryItemCount(ScheduleViewModel.CategoryReplacement) > 0;
             btnOther.IsVisible = _vm.GetCategoryItemCount(ScheduleViewModel.CategoryOther) > 0;
+            var visibleButtons = new[] { btnDiv1, btnDiv2, btnDiv3, btnReplacement, btnOther }
+                .Where(button => button.IsVisible)
+                .ToArray();
+            divisionTabsGrid.ColumnDefinitions.Clear();
+            for (var index = 0; index < visibleButtons.Length; index++)
+            {
+                divisionTabsGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+                Grid.SetColumn(visibleButtons[index], index);
+            }
+
             if (!btnReplacement.IsVisible && _vm.CurrentCategory == ScheduleViewModel.CategoryReplacement)
             {
                 _vm.SetSource(ScheduleViewModel.CategoryDiv1);
@@ -389,8 +415,8 @@ namespace OneRugbyNavi2
             _vm.TeamFilter = string.IsNullOrWhiteSpace(value) ? null : value;
             _teamFilterManuallySelected = !string.IsNullOrWhiteSpace(_vm.TeamFilter);
             _vm.ApplyFilters();
+            ScrollScheduleToStart();
             UpdateEmptyState();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
         }
 
@@ -404,8 +430,8 @@ namespace OneRugbyNavi2
             var value = venuePicker.SelectedItem as string;
             _vm.VenueFilter = string.IsNullOrWhiteSpace(value) ? null : value;
             _vm.ApplyFilters();
+            ScrollScheduleToStart();
             UpdateEmptyState();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
         }
 
@@ -418,8 +444,8 @@ namespace OneRugbyNavi2
 
             _vm.PeriodFilter = (ScheduleViewModel.DateRangeFilter)periodPicker.SelectedIndex;
             _vm.ApplyFilters();
+            ScrollScheduleToStart();
             UpdateEmptyState();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
         }
 
@@ -431,8 +457,8 @@ namespace OneRugbyNavi2
             _teamFilterManuallySelected = false;
             _vm.ApplyFilters();
             RefreshPickers(preserveSelection: true);
+            ScrollScheduleToStart();
             UpdateEmptyState();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
         }
 
@@ -460,20 +486,19 @@ namespace OneRugbyNavi2
             }
         }
 
-        private async void OnNextMatchTapped(object sender, TappedEventArgs e)
+        private async void OnHomeTeamLogoClicked(object sender, EventArgs e)
         {
-            if (_nextMatch == null)
+            if (sender is BindableObject { BindingContext: MatchItem match })
             {
-                return;
+                await TeamOfficialPageNavigator.OpenAsync(this, match.HomeTeam);
             }
+        }
 
-            try
+        private async void OnAwayTeamLogoClicked(object sender, EventArgs e)
+        {
+            if (sender is BindableObject { BindingContext: MatchItem match })
             {
-                await NavigateToMatchAsync(_nextMatch);
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlert("\u78BA\u8A8D", $"\u8A66\u5408\u8A73\u7D30\u3092\u958B\u3051\u307E\u305B\u3093\u3067\u3057\u305F\u3002\n{ex.Message}", "OK");
+                await TeamOfficialPageNavigator.OpenAsync(this, match.AwayTeam);
             }
         }
 
@@ -494,7 +519,6 @@ namespace OneRugbyNavi2
                 Preferences.Remove(FavoriteTeamKey);
                 _favoriteTeam = "";
                 UpdateFavoriteUi();
-                UpdateNextMatchCard();
                 UpdateFilterSummaryUi();
                 await DisplayAlert("\u5B8C\u4E86", "\u304A\u6C17\u306B\u5165\u308A\u3092\u89E3\u9664\u3057\u307E\u3057\u305F\u3002", "OK");
                 return;
@@ -510,7 +534,6 @@ namespace OneRugbyNavi2
             Preferences.Set(FavoriteTeamKey, team);
             _favoriteTeam = team;
             UpdateFavoriteUi();
-            UpdateNextMatchCard();
             UpdateFilterSummaryUi();
             await DisplayAlert("\u5B8C\u4E86", $"\u304A\u6C17\u306B\u5165\u308A\u306B\u767B\u9332\u3057\u307E\u3057\u305F\u3002\n{team}", "OK");
         }
@@ -522,34 +545,76 @@ namespace OneRugbyNavi2
 
         private async void OnInfoClicked(object sender, EventArgs e)
         {
-            var lastUpdated = _databaseBuildTimestampText;
-            var cacheState = _isShowingCache ? "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u4E2D" : "\u6700\u65B0\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u4E2D";
-            string body =
-"One Rugby Navi2 \u306F JAPAN RUGBY LEAGUE ONE \u516C\u5F0F\u30B5\u30A4\u30C8\u306E\u516C\u958B\u60C5\u5831\u3092\u3082\u3068\u306B\u3001\u65E5\u7A0B\u3068\u7D50\u679C\u3092\u8868\u793A\u3057\u307E\u3059\u3002\n\n" +
-"\u672C\u30A2\u30D7\u30EA\u306F\u516C\u5F0F\u30A2\u30D7\u30EA\u3067\u306F\u3042\u308A\u307E\u305B\u3093\u3002\n" +
-"\u004A\u0041\u0050\u0041\u004E \u0052\u0055\u0047\u0042\u0059 \u004C\u0045\u0041\u0047\u0055\u0045 \u004F\u004E\u0045 \u304A\u3088\u3073\u5404\u30C1\u30FC\u30E0\u3068\u306F\u95A2\u4FC2\u3042\u308A\u307E\u305B\u3093\u3002\n\n" +
-"\u901A\u4FE1\u306B\u5931\u6557\u3057\u305F\u5834\u5408\u306F\u3001\u4FDD\u5B58\u6E08\u307F\u306E\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059\u3002\n" +
-$"\u6700\u7D42\u66F4\u65B0: {lastUpdated}\n" +
-$"\u8868\u793A\u72B6\u614B: {cacheState}\n" +
-$"D1: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv1)}\u4EF6 / D2: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv2)}\u4EF6 / D3: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv3)}\u4EF6 / 入替戦: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryReplacement)}件 / その他: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryOther)}件\n\n" +
-$"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: {_selectedSeasonLabel}\n" +
-"\u53D6\u5F97\u5143: JAPAN RUGBY LEAGUE ONE \u516C\u5F0F\u30B5\u30A4\u30C8\n\n" +
-"\u4F7F\u7528\u30E9\u30A4\u30D6\u30E9\u30EA\u3068\u30E9\u30A4\u30BB\u30F3\u30B9\u306E\u8A73\u7D30\u306F\u914D\u5E03\u7269\u5185\u306E LICENSES.txt \u3092\u53C2\u7167\u3057\u3066\u304F\u3060\u3055\u3044\u3002";
+            menuOverlay.IsVisible = true;
+            Shell.SetTabBarIsVisible(this, false);
+        }
 
-            await DisplayAlert("\u60C5\u5831", body, "OK");
-            var action = await DisplayActionSheet("\u64CD\u4F5C", "\u9589\u3058\u308B", null, "\u9806\u4F4D\u8868", "\u500B\u4EBA\u30E9\u30F3\u30AD\u30F3\u30B0", "\u30AD\u30E3\u30C3\u30B7\u30E5\u524A\u9664");
-            if (action == "\u9806\u4F4D\u8868")
+        private void CloseMenuOverlay()
+        {
+            if (!menuOverlay.IsVisible)
             {
-                await OpenWebAsync("https://league-one.jp/standings/");
+                return;
             }
-            else if (action == "\u500B\u4EBA\u30E9\u30F3\u30AD\u30F3\u30B0")
+
+            menuOverlay.IsVisible = false;
+            Shell.SetTabBarIsVisible(this, true);
+        }
+
+        private void OnMenuBackdropTapped(object sender, TappedEventArgs e) => CloseMenuOverlay();
+
+        private void OnMenuCloseClicked(object sender, EventArgs e) => CloseMenuOverlay();
+
+        protected override bool OnBackButtonPressed()
+        {
+            if (menuOverlay.IsVisible)
             {
-                await OpenWebAsync("https://league-one.jp/ranking/");
+                CloseMenuOverlay();
+                return true;
             }
-            else if (action == "\u30AD\u30E3\u30C3\u30B7\u30E5\u524A\u9664")
-            {
-                await DeleteCacheAsync();
-            }
+
+            return base.OnBackButtonPressed();
+        }
+
+        private async void OnMenuStatusClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            var cacheState = _isShowingCache ? "前回取得データを表示中" : "最新取得データを表示中";
+            var body =
+                $"対象シーズン: {_selectedSeasonLabel}\n" +
+                $"表示状態: {cacheState}\n" +
+                $"最終更新: {_databaseBuildTimestampText}\n\n" +
+                $"D1: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv1)}件 / " +
+                $"D2: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv2)}件 / " +
+                $"D3: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv3)}件 / " +
+                $"入替戦: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryReplacement)}件 / " +
+                $"その他: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryOther)}件\n\n" +
+                "取得元: JAPAN RUGBY LEAGUE ONE公式サイト\n" +
+                "使用ライブラリとライセンスの詳細は、配布物内のLICENSES.txtを参照してください。";
+            await DisplayAlert("更新状況", body, "OK");
+        }
+
+        private async void OnMenuStandingsClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            await OpenWebAsync("https://league-one.jp/standings/");
+        }
+
+        private async void OnMenuRankingClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            await Shell.Current.GoToAsync("//RankingPage");
+        }
+
+        private async void OnMenuAboutClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            await Shell.Current.GoToAsync("//InfoPage");
+        }
+
+        private async void OnMenuClearCacheClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            await DeleteCacheAsync();
         }
 
         private void SetLoading(bool isLoading)
@@ -679,28 +744,12 @@ $"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: {_selectedSeasonLabel}\n" +
             emptyStatePanel.IsVisible = true;
         }
 
-        private void UpdateNextMatchCard()
+        private void ScrollScheduleToStart()
         {
-            _nextMatch = _vm.GetNextMatch(_favoriteTeam);
-            if (_nextMatch == null)
+            if (_vm.FilteredItems.FirstOrDefault() is { } first)
             {
-                nextMetaLabel.Text = "";
-                nextHomeLabel.Text = "\u4ECA\u5F8C\u306E\u8A66\u5408\u306F\u3042\u308A\u307E\u305B\u3093";
-                nextAwayLabel.Text = "";
-                nextScoreLabel.Text = "";
-                nextKickoffLabel.Text = "";
-                nextDateLabel.Text = "\u6761\u4EF6\u3092\u5909\u3048\u308B\u3068\u8868\u793A\u3067\u304D\u308B\u5834\u5408\u304C\u3042\u308A\u307E\u3059";
-                nextVenueLabel.Text = "";
-                return;
+                list.ScrollTo(first, position: ScrollToPosition.Start, animate: false);
             }
-
-            nextMetaLabel.Text = $"{_nextMatch.Division}  {_nextMatch.Section}";
-            nextHomeLabel.Text = _nextMatch.HomeTeam;
-            nextAwayLabel.Text = _nextMatch.AwayTeam;
-            nextScoreLabel.Text = "vs";
-            nextKickoffLabel.Text = "";
-            nextDateLabel.Text = $"{_nextMatch.MatchDate}  {_nextMatch.KickoffTime}".Trim();
-            nextVenueLabel.Text = _nextMatch.VenueCompact;
         }
 
         private void LoadFavoriteTeam()
@@ -718,32 +767,42 @@ $"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: {_selectedSeasonLabel}\n" +
                 return;
             }
 
-            favoriteTeamLabel.Text = $"\u304A\u6C17\u306B\u5165\u308A: {_favoriteTeam}";
+            var displayFavorite = FindCurrentTeamAlias(_favoriteTeam) ?? _favoriteTeam;
+            favoriteTeamLabel.Text = $"\u304A\u6C17\u306B\u5165\u308A: {displayFavorite}";
             favoriteButton.Text = "\u304A\u6C17\u306B\u5165\u308A\u89E3\u9664";
-            favoriteChipLabel.Text = $"\u2605 {_favoriteTeam}";
+            favoriteChipLabel.Text = $"\u2605 {displayFavorite}";
         }
 
         private void ApplyTeamFilterForCurrentDivision(string? preferredTeam, bool allowFavoriteFallback)
         {
             var teams = _vm.GetTeamsForPicker();
-            if (!string.IsNullOrWhiteSpace(preferredTeam) && teams.Contains(preferredTeam))
+            var matchingPreferred = FindCurrentTeamAlias(preferredTeam, teams);
+            if (!string.IsNullOrWhiteSpace(matchingPreferred))
             {
-                _vm.TeamFilter = preferredTeam;
+                _vm.TeamFilter = matchingPreferred;
                 _vm.ApplyFilters();
                 return;
             }
 
-            if (allowFavoriteFallback &&
-                !string.IsNullOrWhiteSpace(_favoriteTeam) &&
-                teams.Contains(_favoriteTeam))
+            var matchingFavorite = allowFavoriteFallback ? FindCurrentTeamAlias(_favoriteTeam, teams) : null;
+            if (!string.IsNullOrWhiteSpace(matchingFavorite))
             {
-                _vm.TeamFilter = _favoriteTeam;
+                _vm.TeamFilter = matchingFavorite;
                 _vm.ApplyFilters();
                 return;
             }
 
             _vm.TeamFilter = null;
             _vm.ApplyFilters();
+        }
+
+        private string? FindCurrentTeamAlias(string? name, System.Collections.Generic.IReadOnlyList<string>? teams = null)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return null;
+            teams ??= _vm.GetTeamsForPicker();
+            var seasonYear = SeasonCatalog.ParseSeasonStartYear(_selectedSeasonKey);
+            if (seasonYear <= 0) seasonYear = SeasonCatalog.CurrentSeasonStartYear;
+            return teams.FirstOrDefault(team => SeasonCatalog.AreSameTeamName(team, name, seasonYear));
         }
 
         private void NormalizeManualTeamSelection(string? preferredTeam)
@@ -845,4 +904,3 @@ $"\u5BFE\u8C61\u30B7\u30FC\u30BA\u30F3: {_selectedSeasonLabel}\n" +
         }
     }
 }
-

@@ -8,6 +8,7 @@ public sealed class InfoPage : ContentPage
     {
         Title = "情報";
         BackgroundColor = PageStyles.Background;
+        Shell.SetNavBarIsVisible(this, false);
         Content = new ScrollView
         {
             Content = new VerticalStackLayout
@@ -15,7 +16,7 @@ public sealed class InfoPage : ContentPage
                 Children =
                 {
                     PageStyles.Title("One Rugby Navi2"),
-                    _body
+                    _body.Margin(new Thickness(0, 0, 0, 12))
                 }
             }
         };
@@ -40,7 +41,6 @@ public sealed class InfoPage : ContentPage
                 {
                     Line("DB", AppServices.Database.GetDatabasePath()),
                     Line("チーム", $"{summary.Teams}件"),
-                    Line("選手", $"{summary.Players}件"),
                     Line("試合", $"{summary.Matches}件"),
                     Line("画像/asset", $"{summary.Assets}件"),
                     Line("生成日時", string.IsNullOrWhiteSpace(summary.GeneratedAt) ? "-" : summary.GeneratedAt)
@@ -49,9 +49,10 @@ public sealed class InfoPage : ContentPage
 
             _body.Children.Add(PageStyles.Card(new Label
             {
-                Text = "起動時は同梱DBをAppDataへ初回コピーし、以後はローカルDBを優先表示します。全件一括更新は行わず、チーム画面からチーム単位で更新します。",
+                Text = "リーグワン公式サイトの公開情報をもとに、日程・試合結果・チーム情報・公式ランキングを表示します。起動時は同梱DBをAppDataへ初回コピーし、以後はローカルDBを優先表示します。\n\n本アプリは公式アプリではなく、リーグワンおよび各チームとは関係ありません。",
                 TextColor = PageStyles.Navy,
-                FontSize = 14
+                FontSize = 14,
+                LineBreakMode = LineBreakMode.WordWrap
             }));
         }
         catch (Exception ex)
@@ -59,7 +60,7 @@ public sealed class InfoPage : ContentPage
             _body.Children.Add(PageStyles.Card(new Label
             {
                 Text = $"情報の読み込みに失敗しました: {ex.Message}",
-                TextColor = Colors.DarkRed
+                TextColor = PageStyles.WarningText
             }));
         }
     }
@@ -70,7 +71,14 @@ public sealed class InfoPage : ContentPage
         Children =
         {
             new Label { Text = title, FontSize = 12, TextColor = PageStyles.Muted },
-            new Label { Text = value, FontSize = 15, TextColor = PageStyles.Navy }
+            new Label
+            {
+                Text = value,
+                FontSize = 15,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = PageStyles.Navy,
+                LineBreakMode = LineBreakMode.WordWrap
+            }
         }
     };
 }

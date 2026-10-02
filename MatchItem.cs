@@ -64,11 +64,16 @@ namespace OneRugbyNavi2
         public string DateTimeCompact => $"{MatchDate}  {KickoffTime}";
         public string VenueCompact => string.IsNullOrWhiteSpace(Prefecture) ? VenueDisplayName : $"{Prefecture}\u30FB{VenueDisplayName}";
         public string StatusText => string.IsNullOrWhiteSpace(MatchStatus) ? (HasResult ? "\u8A66\u5408\u7D42\u4E86" : "\u8A66\u5408\u524D") : MatchStatus;
-        public bool IsCompleted => HasResult ||
+        public bool IsInProgress =>
+            (MatchStatus.Contains("\u8A66\u5408\u4E2D", System.StringComparison.Ordinal) ||
+             MatchStatus.Contains("\u958B\u50AC\u4E2D", System.StringComparison.Ordinal) ||
+             MatchStatus.Contains("LIVE", System.StringComparison.OrdinalIgnoreCase) ||
+             MatchStatus.Contains("IN PROGRESS", System.StringComparison.OrdinalIgnoreCase));
+        public bool IsCompleted => !IsInProgress && (HasResult ||
             StatusText.Contains("\u8A66\u5408\u7D42\u4E86", System.StringComparison.Ordinal) ||
-            StatusText.Contains("Full-Time", System.StringComparison.OrdinalIgnoreCase);
+            StatusText.Contains("Full-Time", System.StringComparison.OrdinalIgnoreCase));
         public bool HasStatusBadge => IsCompleted || HasSpecialStatus;
-        public bool HasSpecialStatus => !IsCompleted && StatusesShownWithoutScore.Any(status => MatchStatus.Contains(status, System.StringComparison.Ordinal));
+        public bool HasSpecialStatus => !IsCompleted && (IsInProgress || StatusesShownWithoutScore.Any(status => MatchStatus.Contains(status, System.StringComparison.Ordinal)));
         public string StatusBadgeText => IsCompleted ? "\u8A66\u5408\u7D42\u4E86" : MatchStatus;
 
         private static readonly string[] StatusesShownWithoutScore =

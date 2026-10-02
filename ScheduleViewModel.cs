@@ -109,7 +109,9 @@ namespace OneRugbyNavi2
 
             if (!string.IsNullOrWhiteSpace(TeamFilter))
             {
-                query = query.Where(m => m.HomeTeam == TeamFilter || m.AwayTeam == TeamFilter);
+                query = query.Where(m =>
+                    SeasonCatalog.AreSameTeamName(m.HomeTeam, TeamFilter, m.SeasonStartYear) ||
+                    SeasonCatalog.AreSameTeamName(m.AwayTeam, TeamFilter, m.SeasonStartYear));
             }
 
             if (!string.IsNullOrWhiteSpace(VenueFilter))
@@ -126,7 +128,7 @@ namespace OneRugbyNavi2
                 query = query.Where(m => TryMatchPeriod(m, today, PeriodFilter));
             }
 
-            var list = SortMatches(query, DateTime.Today, PeriodFilter).ToList();
+            var list = SortMatches(query, DateTime.Now, PeriodFilter).ToList();
             FilteredItems.Clear();
             foreach (var item in list)
             {
@@ -147,40 +149,6 @@ namespace OneRugbyNavi2
         public int GetCategoryItemCount(string category)
         {
             return _itemsByCategory.TryGetValue(NormalizeCategoryCode(category), out var source) ? source.Count : 0;
-        }
-
-        public MatchItem? GetNextMatch(string? preferredTeam = null)
-        {
-            if (_currentSource is null)
-            {
-                return null;
-            }
-
-            var today = DateTime.Today;
-            var team = !string.IsNullOrWhiteSpace(TeamFilter) ? TeamFilter : preferredTeam;
-            if (!string.IsNullOrWhiteSpace(team))
-            {
-                var teamNextMatch = FindNextMatch(
-                    _currentSource.Where(m => m.HomeTeam == team || m.AwayTeam == team),
-                    today);
-                if (teamNextMatch != null)
-                {
-                    return teamNextMatch;
-                }
-            }
-
-            return FindNextMatch(_currentSource, today);
-        }
-
-        private static MatchItem? FindNextMatch(IEnumerable<MatchItem> matches, DateTime today)
-        {
-            return matches
-                .Select(match => new { Match = match, HasDate = TryGetMatchDate(match, out var date), Date = date })
-                .Where(item => item.HasDate && (item.Date > today || (item.Date == today && !item.Match.IsCompleted)))
-                .OrderBy(item => item.Date)
-                .ThenBy(item => TryGetMatchStart(item.Match, out var start) ? start.TimeOfDay : TimeSpan.MaxValue)
-                .Select(item => item.Match)
-                .FirstOrDefault();
         }
 
         public List<string> GetTeamsForPicker()
@@ -290,7 +258,7 @@ namespace OneRugbyNavi2
                 Section = item.Round,
                 MatchDate = item.Date,
                 KickoffTime = item.Kickoff,
-                Conference = seasonStartYear >= 2026 && category == CategoryDiv1 ? "" : item.Conference,
+                Conference = seasonStartYear == 2026 && category == CategoryDiv1 ? "" : item.Conference,
                 HomeTeam = home,
                 AwayTeam = away,
                 Prefecture = item.Pref,
@@ -306,8 +274,8 @@ namespace OneRugbyNavi2
                 ReportUrl = item.ReportUrl,
                 BroadcastText = item.BroadcastText,
                 SourceUrl = item.SourceUrl,
-                HomeLogoPath = TeamLogoResolver.GetLogoPath(home),
-                AwayLogoPath = TeamLogoResolver.GetLogoPath(away),
+                HomeLogoPath = TeamLogoResolver.GetLogoPath(home, seasonStartYear),
+                AwayLogoPath = TeamLogoResolver.GetLogoPath(away, seasonStartYear),
                 HomeBadgeText = TeamLogoResolver.GetBadgeText(home),
                 AwayBadgeText = TeamLogoResolver.GetBadgeText(away)
             };
@@ -388,7 +356,7 @@ namespace OneRugbyNavi2
             return match.IsCompleted;
         }
 
-        private static IEnumerable<MatchItem> SortMatches(IEnumerable<MatchItem> matches, DateTime today, DateRangeFilter filter)
+        private static IEnumerable<MatchItem> SortMatches(IEnumerable<MatchItem> matches, DateTime now, DateRangeFilter filter)
         {
             var sortable = matches
                 .Select(match => new
@@ -414,11 +382,15 @@ namespace OneRugbyNavi2
                     .Select(item => item.Match);
             }
 
-            return sortable
-                .OrderBy(item => item.HasDate ? 0 : 1)
-                .ThenBy(item => item.HasDate && (item.Date > today || (item.Date == today && !item.Match.IsCompleted)) ? 0 : 1)
-                .ThenBy(item => item.HasDate && (item.Date > today || (item.Date == today && !item.Match.IsCompleted)) ? item.Date.Ticks : -item.Date.Ticks)
-                .Select(item => item.Match);
+            return ScheduleDisplayOrder.Sort(
+                sortable,
+                item => item.HasDate
+                    ? (TryGetMatchStart(item.Match, out var start) ? start : item.Date)
+                    : (DateTime?)null,
+                item => TryGetMatchStart(item.Match, out _),
+                item => item.Match.IsInProgress,
+                item => item.Match.IsCompleted,
+                now);
         }
 
         private static bool IsAmbiguousDateText(string value)

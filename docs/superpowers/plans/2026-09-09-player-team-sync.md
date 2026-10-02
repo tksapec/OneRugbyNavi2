@@ -1,24 +1,28 @@
 # Player and Team Synchronization Implementation Plan
 
+> **Scope update (2026-10-02):** This remains a historical implementation plan. Do not restore roster/profile crawlers or app-owned player directory, player detail, school search, or local player-stat rankings. Current player-related UI is limited to the official League One ranking page embedded in the app.
+
+> **Execution note (2026-10-01):** This earlier draft is not an active runbook as written. The current authorized work uses `main` only, creates no branch/worktree, and must not add or run GitHub Actions. The official pages were rechecked live; `https://league-one.jp/team/` currently provides the 2026-27 team index, while sampled 2026-27 team pages have empty rosters and older player pages remain labeled 2025-26. Do not execute a step below that conflicts with those facts or the current user instructions. The safe team catalog and season-scoped read changes are implemented separately; full roster synchronization and a seed DB rebuild remain blocked until current-season roster rows are published.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Safely synchronize current-season League One team and player data while the official site may still expose prior-season roster pages.
 
 **Architecture:** Keep lightweight team-catalog acquisition separate from full roster/profile synchronization. Parse and season-validate official HTML before writing; write full updates into a temporary SQLite copy, preserve historical rows, validate the copy, then atomically replace the live database.
 
-**Tech Stack:** .NET 9, .NET MAUI, C#, HtmlAgilityPack 1.12.2, Microsoft.Data.Sqlite 9.0.5, System.Text.Json, xUnit, GitHub Actions.
+**Tech Stack:** .NET 9, .NET MAUI, C#, HtmlAgilityPack 1.12.2, Microsoft.Data.Sqlite 9.0.5, System.Text.Json, xUnit. GitHub Actions are excluded by the active instructions.
 
 **Spec:** `docs/superpowers/specs/2026-09-09-player-team-sync-design.md`
 
 ## Global Constraints
 
-- Target branch is `work/2026-27-player-team-sync`; do not modify `main`.
+- Use `main` only. Do not create another branch or worktree branch.
 - Official League One pages are the source of truth; do not synthesize complete rosters from news releases.
 - A page explicitly showing another season is `NotPublished` and must not overwrite existing data.
 - Preserve previous-season rows and cached images.
 - Use parameterized SQL for values and validate required schema before writes.
 - Startup work downloads team catalog metadata only; full player/profile/photo downloads require explicit user action.
-- The current environment has no local `dotnet`; RED/GREEN verification must use the core GitHub Actions test workflow.
+- Do not add or run GitHub Actions. If local `dotnet` is unavailable, report tests/build as unverified.
 
 ---
 
@@ -27,7 +31,6 @@
 **Files:**
 - Create: `tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj`
 - Create: `tests/OneRugbyNavi2.Core.Tests/SeasonAndCatalogParserTests.cs`
-- Create: `.github/workflows/core-tests.yml`
 
 **Interfaces:**
 - Consumes: none.
@@ -48,17 +51,13 @@ Assert.Equal(2025, LeagueOneSeasonDetector.Detect("<h2>2025-26シーズン</h2>"
 
 and parse a minimal HTML sample containing `DIVISION 1`, `DIVISION 2`, `DIVISION 3` with team names into `TeamCatalogEntry` objects with `DIV1`, `DIV2`, `DIV3`.
 
-- [ ] **Step 3: Add GitHub Actions**
+- [x] **Step 3: Exclude GitHub Actions**
 
-Workflow runs on pushes to `work/**` and pull requests, installs .NET 9 with `actions/setup-dotnet@v4`, then executes:
+Do not create `.github/workflows/core-tests.yml`; this step is superseded by the active no-GitHub-Actions instruction.
 
-```bash
-dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --configuration Release
-```
+- [ ] **Step 4: Verify RED locally**
 
-- [ ] **Step 4: Verify RED**
-
-Push the test-only commit and inspect the workflow run. Expected result: compile/test failure because the production parser/model files do not yet exist.
+Run the test project locally when `dotnet` is installed. Do not push a test-only commit to trigger CI. If the SDK is unavailable, report the RED state as unverified.
 
 - [ ] **Step 5: Commit**
 
@@ -94,9 +93,9 @@ Parse headings/text in DOM order, switch current division on `DIVISION 1/2/3`, t
 
 Cover duplicate team nodes, empty HTML, and a stale team name value. Parser output must deduplicate exact team names within the same division.
 
-- [ ] **Step 4: Verify GREEN**
+- [ ] **Step 4: Verify GREEN locally**
 
-Run the GitHub Actions core test workflow. Expected: all Task 1/2 tests pass.
+Run the core tests locally when `dotnet` is installed. Report the tests as unverified if the SDK is unavailable.
 
 - [ ] **Step 5: Commit**
 
@@ -314,17 +313,17 @@ Commit: `feat: expose safe League One data refresh in team UI`.
 ### Task 8: Review, regression checks and completion validation
 
 **Files:**
-- Review all files changed from `work/2026-27-season-review`.
+- Review the full working diff on `main`, including the previously created season-review and player-team-sync commits before finalizing.
 
 **Interfaces:** none.
 
-- [ ] **Step 1: Run all core tests in GitHub Actions**
+- [ ] **Step 1: Run all core tests locally**
 
-Require a green `core-tests` run.
+Do not add or run an Actions workflow. Require a successful local test run before claiming tests pass.
 
-- [ ] **Step 2: Attempt Android MAUI build in CI**
+- [ ] **Step 2: Attempt Android MAUI build locally**
 
-If practical, add or run a job that installs/restores the MAUI Android workload and executes `dotnet build OneRugbyNavi2.csproj -f net9.0-android -c Release`. If the environment cannot provide the workload, record that as unverified; do not report a pass.
+Run `dotnet build OneRugbyNavi2.csproj -f net9.0-android -c Release` only in an available local environment. If the SDK/workload is unavailable, record that as unverified; do not report a pass.
 
 - [ ] **Step 3: Diff review**
 
@@ -332,8 +331,8 @@ Check spec match, stale-season safety, transaction boundaries, SQL parameterizat
 
 - [ ] **Step 4: Use Superpowers review skills**
 
-Run requesting-code-review/verification-before-completion guidance manually because subagents are unavailable. Fix findings and re-run core tests.
+Use the available review workflow, fix findings and repeat local verification where the toolchain permits.
 
 - [ ] **Step 5: Compare branch to base and report unresolved items**
 
-Use GitHub compare against `work/2026-27-season-review`. Do not merge to main without explicit user instruction.
+Review the final diff on `main`. The active task authorizes necessary reviewed changes to be integrated into `main`; do not create another branch or trigger Actions.

@@ -24,10 +24,15 @@
     <Color x:Key="AppWarningBackground">#FFF8E6</Color>
     <Color x:Key="AppWarningStroke">#FFE3A3</Color>
     <Color x:Key="AppWarningText">#7A4E00</Color>
+    <Color x:Key="AppSubtleBackground">#F3F5F9</Color>
+    <Color x:Key="AppOnStrongBlue">#DCEBFF</Color>
+    <Color x:Key="AppSuccessBackground">#E8F5E2</Color>
+    <Color x:Key="AppSuccessText">#2E7D32</Color>
+    <Color x:Key="AppNoticeBackground">#FFF3D9</Color>
+    <Color x:Key="AppNoticeText">#B26A00</Color>
 
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>
-    <Color x:Key="Magenta">#D600AA</Color>
     <Color x:Key="MidnightBlue">#10233F</Color>
     <Color x:Key="OffBlack">#1F1F1F</Color>
 

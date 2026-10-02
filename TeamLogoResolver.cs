@@ -7,6 +7,55 @@ namespace OneRugbyNavi2
 {
     public static class TeamLogoResolver
     {
+        private static readonly Dictionary<string, string> CurrentLeagueOneTeamIds = new()
+        {
+            ["浦安D-Rocks"] = "126",
+            ["クボタスピアーズ船橋・東京ベイ"] = "123",
+            ["コベルコ神戸スティーラーズ"] = "127",
+            ["埼玉パナソニックワイルドナイツ"] = "128",
+            ["埼玉ワイルドナイツ"] = "128",
+            ["静岡ブルーレヴズ"] = "124",
+            ["東京サントリーサンゴリアス"] = "125",
+            ["東京サンゴリアス"] = "125",
+            ["東芝ブレイブルーパス武蔵"] = "129",
+            ["栃木ホンダヒート"] = "131",
+            ["トヨタヴェルブリッツ"] = "130",
+            ["三菱重工相模原ダイナボアーズ"] = "132",
+            ["横浜キヤノンイーグルス"] = "133",
+            ["リコーブラックラムズ東京"] = "134",
+            ["ブラックラムズ東京"] = "134",
+            ["清水建設江東ブルーシャークス"] = "137",
+            ["豊田自動織機シャトルズ愛知"] = "138",
+            ["花園近鉄ライナーズ"] = "140",
+            ["レッドハリケーンズ大阪"] = "142",
+            ["マツダスカイアクティブズ広島"] = "146",
+            ["スカイアクティブズ広島"] = "146",
+            ["川越狭山セコムラガッツ"] = "144",
+            ["JR東日本グリーンウォリアーズ東葛"] = "135",
+            ["グリーンウォリアーズ東葛"] = "135",
+            ["九州電力キューデンヴォルテクス"] = "136",
+            ["クリタウォーターガッシュ昭島"] = "143",
+            ["日野レッドドルフィンズ"] = "141",
+            ["日本製鉄釜石シーウェイブス"] = "139",
+            ["中国電力レッドレグリオンズ"] = "145",
+            ["ルリーロ福岡"] = "148",
+            ["ヤクルトレビンズ戸田"] = "147",
+            ["丸和MOMOTARO’S成田"] = "149"
+        };
+
+        private static readonly HashSet<string> ChangedOrRenamedCurrentNames = new()
+        {
+            "埼玉パナソニックワイルドナイツ", "埼玉ワイルドナイツ",
+            "東京サントリーサンゴリアス", "東京サンゴリアス",
+            "東芝ブレイブルーパス武蔵", "栃木ホンダヒート",
+            "リコーブラックラムズ東京", "ブラックラムズ東京",
+            "マツダスカイアクティブズ広島", "スカイアクティブズ広島",
+            "JR東日本グリーンウォリアーズ東葛", "グリーンウォリアーズ東葛",
+            "川越狭山セコムラガッツ", "丸和MOMOTARO’S成田",
+            "三重ホンダヒート", "NECグリーンロケッツ東葛", "グリーンロケッツ東葛",
+            "狭山セコムラガッツ", "AZ-COM丸和MOMOTARO’S", "AZ-COM丸和MOMOTARO'S"
+        };
+
         private static readonly Dictionary<string, string> Logos = new()
         {
             ["\u6D66\u5B89D-Rocks"] = "urayasu_d_rocks.jpg",
@@ -42,14 +91,26 @@ namespace OneRugbyNavi2
             ["\u30EB\u30EA\u30FC\u30ED\u798F\u5CA1"] = "lelir_fukuoka.png"
         };
 
-        public static string? GetLogoPath(string? teamName)
+        public static string? GetLogoPath(string? teamName, int seasonStartYear = 0)
         {
             if (string.IsNullOrWhiteSpace(teamName))
             {
                 return null;
             }
 
-            return Logos.TryGetValue(teamName.Trim(), out var fileName)
+            var name = teamName.Trim();
+            if (seasonStartYear >= 2026)
+            {
+                if (CurrentLeagueOneTeamIds.TryGetValue(name, out var teamId))
+                {
+                    var currentLogo = ImageAssetCache.GetCachedPath(teamId);
+                    if (!string.IsNullOrWhiteSpace(currentLogo)) return currentLogo;
+                }
+
+                if (ChangedOrRenamedCurrentNames.Contains(name)) return null;
+            }
+
+            return Logos.TryGetValue(name, out var fileName)
                 ? fileName
                 : null;
         }
@@ -81,4 +142,3 @@ namespace OneRugbyNavi2
         }
     }
 }
-

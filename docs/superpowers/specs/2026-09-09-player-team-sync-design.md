@@ -1,5 +1,7 @@
 # 2026-27 Player and Team Synchronization Design
 
+> **Scope update (2026-10-02):** The player roster/profile synchronization and app-owned player directory, player detail, school search, and local-stat ranking features in this historical design are no longer part of the current app scope. Keep the current official team catalog, and show League One's official points/tries/other rankings inside an in-app WebView at `/ranking/?year=...`; do not synthesize values when the official page says data is unavailable.
+
 ## Goal
 
 Improve team and player data acquisition so OneRugbyNavi2 can adopt the 2026-27 season safely even while the official League One team/player pages are still partly on 2025-26, and continue to work for future season transitions without guessing unpublished roster data.
@@ -17,11 +19,15 @@ Improve team and player data acquisition so OneRugbyNavi2 can adopt the 2026-27 
 
 ### Team catalog
 
-Primary current-season source:
+Primary current-season source for team IDs, official names, division membership and logo URLs:
+
+- `https://league-one.jp/team/` (current page title and internal `/team/{id}` links)
+
+The season-specific content page is a second source for the public Division list and club presentation:
 
 - `https://league-one.jp/content/team/{seasonStartYear}`
 
-It supplies the season's Division 1/2/3 membership and current displayed team names. This source is used for the startup team catalog refresh.
+It supplies Division membership, displayed names, club website links and logo URLs, but its club links are external and do not supply League One team IDs. Keep each page's original team label; use a separate verified identity alias only when matching data from different official pages.
 
 Supplemental current metadata may be read from League One's public team/about pages only when it can be matched unambiguously to a current catalog entry. Supplemental metadata must never override the season membership from `content/team/{seasonStartYear}`.
 
@@ -63,7 +69,7 @@ Create an app-data JSON cache per season containing:
 
 The cache is refreshed at startup only when stale. Default staleness interval: 12 hours. Startup refresh is non-blocking and exceptions are contained.
 
-The Team screen renders the current official catalog first and merges stored SQLite metadata by normalized team name. For renamed teams, legacy branding assets are not reused when branding changed. If no cache exists, `SeasonCatalog.Teams2026` remains the offline fallback for the 2026 season.
+The Team screen fetches the current official catalog when opened, with an 8-second request timeout and a 24-hour JSON cache. It falls back to a validated cache or season-specific catalog when offline. Current official logos are fetched only while the Team screen is open, through a bounded image cache that validates file signatures and writes by hash through a temporary file. A renamed club does not reuse a legacy logo when no current logo is available. No roster, player page or player photo request runs at app startup.
 
 ## Full data update flow
 
@@ -98,11 +104,11 @@ Writes use parameterized SQL. Do not depend on undocumented UNIQUE indexes: reso
 
 Season history is preserved. New `teams` and `player_season_registrations` rows are associated with the target `season_id`; previous seasons are not overwritten.
 
-Read queries are updated to avoid duplicate cross-season display:
+Read queries are season-scoped to avoid duplicate cross-season display:
 
-- Team display prefers the requested/current season, otherwise the latest stored season for the normalized club identity.
-- Team-specific player display uses the selected team's season-specific row.
-- Global player/ranking/search display uses the newest known registration for each player, while a current-season synced registration takes priority over historical rows.
+- Team display uses the requested/current season; it does not silently substitute the latest older season.
+- Team-specific player display uses the selected/current season's registration only.
+- Global player/ranking/search display uses the requested/current season's registration only. Older registrations remain in SQLite and can be queried by an explicit season.
 
 The UI must expose freshness so users can distinguish current 2026-27 data from a historical fallback during the publication transition.
 
@@ -141,9 +147,8 @@ Selectors prefer semantic text/links and table headers over a single fragile CSS
 Team page:
 
 - Show a compact data freshness/status line.
-- Add a visible `データ更新` action for the explicit full sync.
-- During update, show progress by team and disable duplicate starts.
-- Completion dialog distinguishes `更新`, `未公開`, `取得失敗`.
+- Do not expose the existing update-preparation placeholder as a real update action. It stays hidden until a complete, season-safe roster update path is implemented.
+- Report missing current-season registrations clearly; do not display old-season players as current.
 
 The current hidden `更新準備確認` placeholder is removed/replaced; user-facing text must no longer claim that real updating is unimplemented after the implementation lands.
 
@@ -161,7 +166,7 @@ Add a pure .NET test project for parser and database-sync core behavior so tests
 - no duplicate player display when multiple seasons exist;
 - safe handling of partial detail/photo failures.
 
-A GitHub Actions core-test workflow is added because the current execution environment does not provide `dotnet`. App build verification is attempted separately; if the Android MAUI workload cannot be run in CI, that limitation is reported explicitly rather than treated as passing.
+Do not add or run GitHub Actions. Run tests and builds locally when a .NET SDK and required MAUI workloads are available; otherwise report them as unverified. A missing local SDK is not a reason to introduce a workflow.
 
 ## Non-goals
 

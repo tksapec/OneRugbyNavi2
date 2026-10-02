@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -72,6 +72,7 @@ namespace OneRugbyNavi2
             public string? ReplacementError { get; init; }
             public string? OtherError { get; init; }
             public string? ResultsError { get; init; }
+            public string? DataConsistencyWarning { get; init; }
 
             public bool HasAnyData =>
                 Div1.Count > 0 ||
@@ -181,6 +182,25 @@ namespace OneRugbyNavi2
             var tableDiv2 = tableResults.First(result => result.Division == "D2");
             var tableDiv3 = tableResults.First(result => result.Division == "D3");
 
+            string? dataConsistencyWarning = null;
+            if (selected.SeasonKey == "2026")
+            {
+                try
+                {
+                    var catalogHtml = await Http.GetStringAsync("https://league-one.jp/team/");
+                    var currentCatalog = TeamIndexParser.Parse(catalogHtml, 2026, "https://league-one.jp/team/");
+                    if (currentCatalog.Readiness == SyncReadiness.Ready)
+                    {
+                        dataConsistencyWarning = BuildDivisionConsistencyWarning(
+                            tableDiv1.Items, tableDiv2.Items, tableDiv3.Items, currentCatalog.Teams);
+                    }
+                }
+                catch
+                {
+                    // Keep schedule data available when the optional live index check fails.
+                }
+            }
+
             var div1 = MergeRegularSeason(tableDiv1.Items, detailedDiv1);
             var div2 = MergeRegularSeason(tableDiv2.Items, detailedDiv2);
             var div3 = MergeRegularSeason(tableDiv3.Items, detailedDiv3);
@@ -203,6 +223,7 @@ namespace OneRugbyNavi2
                 Div3 = div3,
                 Replacement = Deduplicate(replacement),
                 Other = Deduplicate(other),
+                DataConsistencyWarning = dataConsistencyWarning,
                 Div1Error = div1.Count == 0 ? tableDiv1.Error : null,
                 Div2Error = div2.Count == 0 ? tableDiv2.Error : null,
                 Div3Error = div3.Count == 0 ? tableDiv3.Error : null,
@@ -210,6 +231,28 @@ namespace OneRugbyNavi2
                     ? detailError ?? "No schedule data was found on the official League One pages."
                     : null
             };
+        }
+
+        internal static string? BuildDivisionConsistencyWarning(
+            IReadOnlyCollection<Item> div1,
+            IReadOnlyCollection<Item> div2,
+            IReadOnlyCollection<Item> div3,
+            IReadOnlyCollection<TeamIndexEntry> currentTeams)
+        {
+            var scheduleDivisionByTeam = div1.SelectMany(item => new[] { (item.Home, Division: "DIV1"), (item.Away, Division: "DIV1") })
+                .Concat(div2.SelectMany(item => new[] { (item.Home, Division: "DIV2"), (item.Away, Division: "DIV2") }))
+                .Concat(div3.SelectMany(item => new[] { (item.Home, Division: "DIV3"), (item.Away, Division: "DIV3") }))
+                .GroupBy(entry => SeasonCatalog.NormalizeTeamName(entry.Item1, 2026), StringComparer.Ordinal)
+                .ToDictionary(group => group.Key, group => group.Select(entry => entry.Division).Distinct().ToArray(), StringComparer.Ordinal);
+
+            var conflicts = currentTeams
+                .Where(team => scheduleDivisionByTeam.TryGetValue(SeasonCatalog.NormalizeTeamName(team.TeamName, 2026), out var scheduleDivisions) &&
+                               scheduleDivisions.Any(division => !string.Equals(division, team.DivisionCode, StringComparison.Ordinal)))
+                .Select(team => team.TeamName)
+                .ToList();
+            return conflicts.Count == 0
+                ? null
+                : $"公式チーム一覧とDivision別日程で所属が一致しないチームがあります: {string.Join("、", conflicts)}。各公式ページの表示を保持しています。";
         }
 
         private static async Task<DivisionFetchResult> FetchScheduleTableAsync(SeasonOption season, string division)
@@ -282,8 +325,10 @@ namespace OneRugbyNavi2
                 return true;
             }
 
-            if (!string.Equals(left.Home, right.Home, StringComparison.Ordinal) ||
-                !string.Equals(left.Away, right.Away, StringComparison.Ordinal))
+            var seasonYear = left.SeasonStartYear > 0 ? left.SeasonStartYear : right.SeasonStartYear;
+            if ((left.SeasonStartYear > 0 && right.SeasonStartYear > 0 && left.SeasonStartYear != right.SeasonStartYear) ||
+                !SeasonCatalog.AreSameTeamName(left.Home, right.Home, seasonYear) ||
+                !SeasonCatalog.AreSameTeamName(left.Away, right.Away, seasonYear))
             {
                 return false;
             }
@@ -569,7 +614,7 @@ namespace OneRugbyNavi2
                 Round = ParseRoundFromTitle(titleText),
                 Date = MergeDate(ToJapaneseDate(dateText), BracketDow(dow)),
                 Kickoff = kickoff,
-                Conference = seasonStartYear >= 2026 && category.Code == "D1" ? "" : ParseConferenceFromTitle(titleText),
+                Conference = seasonStartYear == 2026 && category.Code == "D1" ? "" : ParseConferenceFromTitle(titleText),
                 Home = SeasonCatalog.NormalizeTeamName(GetTeamName(homeNode), seasonStartYear),
                 Away = SeasonCatalog.NormalizeTeamName(GetTeamName(awayNode), seasonStartYear),
                 Pref = pref,

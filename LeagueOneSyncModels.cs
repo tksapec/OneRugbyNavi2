@@ -15,8 +15,19 @@ public sealed record TeamCatalogEntry(
     string AreaText = "",
     string LogoUrl = "");
 
-public sealed record TeamCatalogSnapshot(
-    int SeasonStartYear,
-    DateTimeOffset FetchedAt,
-    string SourceUrl,
-    IReadOnlyList<TeamCatalogEntry> Teams);
+public sealed record TeamIndexEntry(
+    string LeagueOneTeamId,
+    string TeamName,
+    string DivisionCode,
+    string TeamUrl,
+    string LogoUrl);
+
+public sealed record TeamIndexResult(
+    SyncReadiness Readiness,
+    int DetectedSeasonStartYear,
+    IReadOnlyList<TeamIndexEntry> Teams);
+
+public sealed record TeamIndexFetchResult(
+    TeamIndexResult Snapshot,
+    bool UsedFallback,
+    DateTimeOffset UpdatedAt);

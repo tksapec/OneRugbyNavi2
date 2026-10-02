@@ -6,7 +6,7 @@ using HtmlAgilityPack;
 
 namespace OneRugbyNavi2;
 
-internal static class ScheduleTableParser
+public static class ScheduleTableParser
 {
     private static readonly Regex RoundRegex = new(@"^第\s*\d+\s*節$", RegexOptions.Compiled);
     private static readonly Regex DateRegex = new(@"\d{1,2}月.*日", RegexOptions.Compiled);

@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using System.Globalization;
 
 namespace OneRugbyNavi2;
@@ -44,7 +44,6 @@ public sealed class LeagueOneDatabase
 
         return new DatabaseSummary(
             await CountAsync(connection, "teams"),
-            await CountAsync(connection, "players"),
             await CountAsync(connection, "matches"),
             await CountAsync(connection, "asset_files"),
             await ReadBuildTimestampSettingAsync(connection) ?? "");
@@ -57,129 +56,6 @@ public sealed class LeagueOneDatabase
         await connection.OpenAsync();
 
         return FormatSettingTimestamp(await ReadBuildTimestampSettingAsync(connection));
-    }
-
-    public async Task<IReadOnlyList<TeamCard>> GetTeamsAsync()
-    {
-        await InitializeAsync();
-        var results = new List<TeamCard>();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-        command.CommandText = """
-            SELECT t.id, t.league_one_team_id, t.team_name, COALESCE(t.short_name, ''),
-                   COALESCE(d.division_code, ''), COALESCE(t.area_text, ''), t.team_url,
-                   af.local_path
-            FROM teams t
-            LEFT JOIN divisions d ON d.id = t.division_id
-            LEFT JOIN asset_files af ON af.id = t.logo_asset_id
-            ORDER BY d.division_code, t.team_name
-            """;
-
-        await using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
-            results.Add(new TeamCard
-            {
-                Id = reader.GetInt32(0),
-                LeagueOneTeamId = reader.GetString(1),
-                TeamName = reader.GetString(2),
-                ShortName = reader.GetString(3),
-                DivisionCode = reader.GetString(4),
-                AreaText = reader.GetString(5),
-                TeamUrl = reader.GetString(6),
-                LocalAssetPath = reader.IsDBNull(7) ? null : reader.GetString(7)
-            });
-        }
-
-        return results;
-    }
-
-    public async Task<IReadOnlyList<PlayerCard>> GetPlayersAsync(
-        string? keyword = null,
-        string sort = "name",
-        int? teamId = null,
-        string? position = null,
-        string? schoolKeyword = null)
-    {
-        await InitializeAsync();
-        var results = new List<PlayerCard>();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-
-        var filters = new List<string>();
-        if (!string.IsNullOrWhiteSpace(keyword))
-        {
-            command.Parameters.AddWithValue("$keyword", $"%{keyword.Trim()}%");
-            command.Parameters.AddWithValue("$normalizedKeyword", $"%{SearchNormalizer.Normalize(keyword)}%");
-            filters.Add("""
-                (p.name_ja LIKE $keyword
-                 OR p.name_en LIKE $keyword
-                 OR t.team_name LIKE $keyword
-                 OR psr.position_code LIKE $keyword
-                 OR psr.school_team_history_text LIKE $keyword
-                 OR psr.school_team_history_search_text LIKE $normalizedKeyword)
-                """);
-        }
-
-        if (teamId.HasValue)
-        {
-            command.Parameters.AddWithValue("$teamId", teamId.Value);
-            filters.Add("psr.team_id = $teamId");
-        }
-
-        if (!string.IsNullOrWhiteSpace(position))
-        {
-            command.Parameters.AddWithValue("$position", position.Trim());
-            filters.Add("psr.position_code = $position");
-        }
-
-        if (!string.IsNullOrWhiteSpace(schoolKeyword))
-        {
-            command.Parameters.AddWithValue("$schoolKeyword", $"%{schoolKeyword.Trim()}%");
-            command.Parameters.AddWithValue("$normalizedSchoolKeyword", $"%{SearchNormalizer.Normalize(schoolKeyword)}%");
-            filters.Add("""
-                (psr.school_team_history_text LIKE $schoolKeyword
-                 OR psr.school_team_history_search_text LIKE $normalizedSchoolKeyword)
-                """);
-        }
-
-        var where = filters.Count == 0 ? "" : $"WHERE {string.Join(" AND ", filters)}";
-
-        var orderBy = sort switch
-        {
-            "team" => "t.team_name, p.name_ja",
-            "position" => "psr.position_code, p.name_ja",
-            "height_desc" => "psr.height_cm DESC, p.name_ja",
-            "weight_desc" => "psr.weight_kg DESC, p.name_ja",
-            "age_desc" => "psr.age_calculated DESC, p.name_ja",
-            "caps_desc" => "psr.league_one_caps DESC, p.name_ja",
-            _ => "p.name_ja"
-        };
-
-        command.CommandText = $"""
-            SELECT p.id, psr.team_id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
-                   COALESCE(t.team_name, ''), COALESCE(psr.position_code, ''),
-                   psr.height_cm, psr.weight_kg, COALESCE(p.birth_date, ''),
-                   psr.age_calculated, COALESCE(psr.registration_category, ''),
-                   psr.league_one_caps, COALESCE(psr.school_team_history_text, ''),
-                   p.profile_url, af.local_path
-            FROM players p
-            JOIN player_season_registrations psr ON psr.player_id = p.id
-            LEFT JOIN teams t ON t.id = psr.team_id
-            LEFT JOIN asset_files af ON af.id = psr.photo_asset_id
-            {where}
-            ORDER BY {orderBy}
-            """;
-
-        await using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
-            results.Add(ReadPlayer(reader));
-        }
-
-        return results;
     }
 
     public async Task<ScheduleFetcher.FetchAllResult> GetScheduleAsync()
@@ -259,150 +135,6 @@ public sealed class LeagueOneDatabase
             Div3 = div3
         };
     }
-
-    public async Task<PlayerCard?> GetPlayerAsync(int playerId)
-    {
-        await InitializeAsync();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-        command.CommandText = """
-            SELECT p.id, psr.team_id, p.league_one_player_id, p.name_ja, COALESCE(p.name_en, ''),
-                   COALESCE(t.team_name, ''), COALESCE(psr.position_code, ''),
-                   psr.height_cm, psr.weight_kg, COALESCE(p.birth_date, ''),
-                   psr.age_calculated, COALESCE(psr.registration_category, ''),
-                   psr.league_one_caps, COALESCE(psr.school_team_history_text, ''),
-                   p.profile_url, af.local_path
-            FROM players p
-            JOIN player_season_registrations psr ON psr.player_id = p.id
-            LEFT JOIN teams t ON t.id = psr.team_id
-            LEFT JOIN asset_files af ON af.id = psr.photo_asset_id
-            WHERE p.id = $playerId
-            """;
-        command.Parameters.AddWithValue("$playerId", playerId);
-
-        await using var reader = await command.ExecuteReaderAsync();
-        return await reader.ReadAsync() ? ReadPlayer(reader) : null;
-    }
-
-    public async Task<IReadOnlyList<string>> GetPlayerPositionsAsync()
-    {
-        await InitializeAsync();
-        var results = new List<string>();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-        command.CommandText = """
-            SELECT DISTINCT position_code
-            FROM player_season_registrations
-            WHERE COALESCE(position_code, '') <> ''
-            ORDER BY position_code
-            """;
-
-        await using var reader = await command.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
-            results.Add(reader.GetString(0));
-        }
-
-        return results;
-    }
-
-    public async Task<IReadOnlyList<RankingRow>> GetRankingAsync(string rankingType, bool descending = true)
-    {
-        await InitializeAsync();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-
-        command.CommandText = rankingType switch
-        {
-            "school_count" => """
-                SELECT candidate_text, candidate_type, player_count
-                FROM school_candidates
-                ORDER BY player_count DESC, candidate_text
-                LIMIT 50
-                """,
-            "weight" => PlayerRankingSql("psr.weight_kg", "kg", descending),
-            "age" => PlayerRankingSql("psr.age_calculated", "歳", descending),
-            "caps" => PlayerRankingSql("psr.league_one_caps", "Caps", descending),
-            _ => PlayerRankingSql("psr.height_cm", "cm", descending)
-        };
-
-        var rows = new List<RankingRow>();
-        await using var reader = await command.ExecuteReaderAsync();
-        var rank = 1;
-        while (await reader.ReadAsync())
-        {
-            if (rankingType == "school_count")
-            {
-                rows.Add(new RankingRow
-                {
-                    Rank = rank++,
-                    Title = reader.GetString(0),
-                    Subtitle = reader.IsDBNull(1) ? "" : reader.GetString(1),
-                    ValueText = $"{reader.GetInt32(2)}人"
-                });
-            }
-            else
-            {
-                rows.Add(new RankingRow
-                {
-                    Rank = rank++,
-                    PlayerId = reader.GetInt32(0),
-                    Title = reader.GetString(1),
-                    Subtitle = reader.GetString(2),
-                    ValueText = reader.GetString(3),
-                    LocalAssetPath = reader.IsDBNull(4) ? null : reader.GetString(4)
-                });
-            }
-        }
-
-        return rows;
-    }
-
-    public async Task<int> CountPlayersForTeamAsync(int teamId)
-    {
-        await InitializeAsync();
-        await using var connection = CreateConnection();
-        await connection.OpenAsync();
-        await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM player_season_registrations WHERE team_id = $teamId";
-        command.Parameters.AddWithValue("$teamId", teamId);
-        return Convert.ToInt32(await command.ExecuteScalarAsync());
-    }
-
-    private static string PlayerRankingSql(string column, string unit, bool descending) => $"""
-        SELECT p.id, p.name_ja, COALESCE(t.team_name, '') || ' / ' || COALESCE(psr.position_code, ''),
-               CAST({column} AS TEXT) || '{unit}', af.local_path
-        FROM players p
-        JOIN player_season_registrations psr ON psr.player_id = p.id
-        LEFT JOIN teams t ON t.id = psr.team_id
-        LEFT JOIN asset_files af ON af.id = psr.photo_asset_id
-        WHERE {column} IS NOT NULL
-        ORDER BY {column} {(descending ? "DESC" : "ASC")}, p.name_ja
-        LIMIT 50
-        """;
-
-    private static PlayerCard ReadPlayer(SqliteDataReader reader) => new()
-    {
-        Id = reader.GetInt32(0),
-        TeamId = reader.IsDBNull(1) ? null : reader.GetInt32(1),
-        LeagueOnePlayerId = reader.GetString(2),
-        NameJa = reader.GetString(3),
-        NameEn = reader.GetString(4),
-        TeamName = reader.GetString(5),
-        PositionCode = reader.GetString(6),
-        HeightCm = reader.IsDBNull(7) ? null : reader.GetInt32(7),
-        WeightKg = reader.IsDBNull(8) ? null : reader.GetInt32(8),
-        BirthDate = reader.GetString(9),
-        AgeCalculated = reader.IsDBNull(10) ? null : reader.GetInt32(10),
-        RegistrationCategory = reader.GetString(11),
-        LeagueOneCaps = reader.IsDBNull(12) ? null : reader.GetInt32(12),
-        SchoolTeamHistoryText = reader.GetString(13),
-        ProfileUrl = reader.GetString(14),
-        LocalAssetPath = reader.IsDBNull(15) ? null : reader.GetString(15)
-    };
 
     private static async Task<int> CountAsync(SqliteConnection connection, string table)
     {
@@ -559,7 +291,7 @@ public sealed class LeagueOneDatabase
     }
 }
 
-public sealed record DatabaseSummary(int Teams, int Players, int Matches, int Assets, string GeneratedAt);
+public sealed record DatabaseSummary(int Teams, int Matches, int Assets, string GeneratedAt);
 
 internal sealed record DatabaseVersion(string LastFullBuildAt, string BuilderVersion, string SchemaVersion) : IComparable<DatabaseVersion>
 {

@@ -18,6 +18,38 @@ public static partial class TeamCatalogParser
         var document = new HtmlDocument();
         document.LoadHtml(html);
 
+        if (Uri.TryCreate(sourceUrl, UriKind.Absolute, out var sourceUri))
+        {
+            var sections = document.DocumentNode.SelectNodes("//section[starts-with(@id, 'division-')]");
+            if (sections != null)
+            {
+                var sectionResults = new List<TeamCatalogEntry>();
+                var sectionSeen = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var section in sections)
+                {
+                    var match = Regex.Match(section.GetAttributeValue("id", ""), @"^division-([123])$", RegexOptions.CultureInvariant);
+                    if (!match.Success) continue;
+                    var division = $"DIV{match.Groups[1].Value}";
+                    var anchors = section.SelectNodes(".//a[@href]");
+                    if (anchors == null) continue;
+                    foreach (var anchor in anchors)
+                    {
+                        var name = NormalizeTeamLinkText(anchor.SelectSingleNode(".//span[contains(concat(' ', normalize-space(@class), ' '), ' name ')]")?.InnerText
+                            ?? anchor.SelectSingleNode(".//img")?.GetAttributeValue("alt", "")
+                            ?? anchor.InnerText);
+                        if (string.IsNullOrWhiteSpace(name) || !sectionSeen.Add($"{division}\u001f{name}")) continue;
+                        var image = anchor.SelectSingleNode(".//img")?.GetAttributeValue("src", "") ?? "";
+                        sectionResults.Add(new TeamCatalogEntry(
+                            name,
+                            division,
+                            LogoUrl: Uri.TryCreate(sourceUri, image, out var logoUri) ? logoUri.AbsoluteUri : ""));
+                    }
+                }
+
+                return sectionResults;
+            }
+        }
+
         var results = new List<TeamCatalogEntry>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var currentDivision = "";

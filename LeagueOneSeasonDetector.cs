@@ -5,7 +5,7 @@ namespace OneRugbyNavi2;
 
 public static partial class LeagueOneSeasonDetector
 {
-    [GeneratedRegex(@"(?<!\d)(?<start>20\d{2})\s*[-ｰ‐‑–—−]\s*(?<end>\d{2}|20\d{2})\s*シーズン", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"(?<!\d)(?<start>20\d{2})\s*[-ｰ‐‑–—−]\s*(?<end>\d{2}|20\d{2})(?:\s*シーズン)?", RegexOptions.CultureInvariant)]
     private static partial Regex SeasonRegex();
 
     public static int Detect(string? html)
@@ -17,7 +17,10 @@ public static partial class LeagueOneSeasonDetector
 
         var document = new HtmlDocument();
         document.LoadHtml(html);
-        var text = Normalize(document.DocumentNode.InnerText);
+        // The current team index exposes the selected season in <title>, while
+        // older team pages often expose it only in visible body text.
+        var title = document.DocumentNode.SelectSingleNode("//title")?.InnerText ?? "";
+        var text = Normalize($"{title} {document.DocumentNode.InnerText}");
         var match = SeasonRegex().Match(text);
         if (!match.Success || !int.TryParse(match.Groups["start"].Value, out var startYear))
         {

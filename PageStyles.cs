@@ -36,6 +36,7 @@ public static class PageStyles
         FontSize = 22,
         FontAttributes = FontAttributes.Bold,
         TextColor = Navy,
+        FontFamily = "OpenSansSemibold",
         Margin = new Thickness(16, 16, 16, 8)
     };
 
@@ -43,6 +44,7 @@ public static class PageStyles
     {
         Text = text,
         FontSize = 13,
+        FontFamily = "OpenSansRegular",
         TextColor = Muted
     };
 
@@ -53,6 +55,7 @@ public static class PageStyles
         FontAttributes = FontAttributes.Bold,
         TextColor = Blue,
         BackgroundColor = ChipBackground,
+        FontFamily = "OpenSansSemibold",
         Padding = new Thickness(8, 4)
     };
 
@@ -61,7 +64,21 @@ public static class PageStyles
         Title = title,
         TextColor = Navy,
         TitleColor = Muted,
+        FontFamily = "OpenSansRegular",
         BackgroundColor = Surface
+    };
+
+    public static Button SecondaryButton(string text) => new()
+    {
+        Text = text,
+        TextColor = Blue,
+        BackgroundColor = ChipBackground,
+        FontFamily = "OpenSansSemibold",
+        FontSize = 13,
+        CornerRadius = 12,
+        Padding = new Thickness(10, 8),
+        MinimumHeightRequest = 44,
+        BorderWidth = 0
     };
 
     public static Entry Entry(string placeholder) => new()
@@ -69,6 +86,7 @@ public static class PageStyles
         Placeholder = placeholder,
         TextColor = Navy,
         PlaceholderColor = Muted,
+        FontFamily = "OpenSansRegular",
         BackgroundColor = Surface
     };
 }

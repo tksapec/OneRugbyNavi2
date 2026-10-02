@@ -23,7 +23,13 @@
     <Compile Include="../../LeagueOneSeasonDetector.cs" Link="Production/LeagueOneSeasonDetector.cs" />
     <Compile Include="../../TeamCatalogParser.cs" Link="Production/TeamCatalogParser.cs" />
     <Compile Include="../../TeamIndexParser.cs" Link="Production/TeamIndexParser.cs" />
-    <Compile Include="../../TeamRosterParser.cs" Link="Production/TeamRosterParser.cs" />
-    <Compile Include="../../PlayerProfileParser.cs" Link="Production/PlayerProfileParser.cs" />
+    <Compile Include="../../ImageSignatureValidator.cs" Link="Production/ImageSignatureValidator.cs" />
+    <Compile Include="../../SeasonCatalog.cs" Link="Production/SeasonCatalog.cs" />
+    <Compile Include="../../ScheduleTableParser.cs" Link="Production/ScheduleTableParser.cs" />
+    <Compile Include="../../ScheduleFetcher.cs" Link="Production/ScheduleFetcher.cs" />
+    <Compile Include="../../OfficialRankingUrl.cs" Link="Production/OfficialRankingUrl.cs" />
+    <Compile Include="../../ScheduleDisplayOrder.cs" Link="Production/ScheduleDisplayOrder.cs" />
+    <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
+    <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
   </ItemGroup>
 </Project>
