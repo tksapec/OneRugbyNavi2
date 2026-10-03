@@ -31,5 +31,6 @@
     <Compile Include="../../ScheduleDisplayOrder.cs" Link="Production/ScheduleDisplayOrder.cs" />
     <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
+    <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />
   </ItemGroup>
 </Project>
