@@ -32,5 +32,8 @@
     <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
     <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />
+    <Compile Include="../../ScheduleViewModel.cs" Link="Production/ScheduleViewModel.cs" />
+    <Compile Include="../../TeamLogoResolver.cs" Link="Production/TeamLogoResolver.cs" />
+    <Compile Include="../../VenueNameResolver.cs" Link="Production/VenueNameResolver.cs" />
   </ItemGroup>
 </Project>

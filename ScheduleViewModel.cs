@@ -41,6 +41,7 @@ namespace OneRugbyNavi2
         public ObservableCollection<MatchItem> FilteredItems { get; } = new();
 
         public string? TeamFilter { get; set; }
+        public IReadOnlyCollection<string> FavoriteTeamFilters { get; set; } = Array.Empty<string>();
         public string? VenueFilter { get; set; }
         public DateRangeFilter PeriodFilter { get; set; } = DateRangeFilter.All;
         public int CurrentDivision { get; private set; } = 1;
@@ -112,6 +113,10 @@ namespace OneRugbyNavi2
                 query = query.Where(m =>
                     SeasonCatalog.AreSameTeamName(m.HomeTeam, TeamFilter, m.SeasonStartYear) ||
                     SeasonCatalog.AreSameTeamName(m.AwayTeam, TeamFilter, m.SeasonStartYear));
+            }
+            else if (FavoriteTeamFilters.Count > 0)
+            {
+                query = query.Where(match => FavoriteTeamLogic.MatchAnyFavorite(match, FavoriteTeamFilters));
             }
 
             if (!string.IsNullOrWhiteSpace(VenueFilter))

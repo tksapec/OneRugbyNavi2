@@ -50,12 +50,12 @@
 - Produces `FavoriteTeamLogic.FindHighestFavoriteDivision(IReadOnlyList<MatchItem> div1, IReadOnlyList<MatchItem> div2, IReadOnlyList<MatchItem> div3, IReadOnlyList<string> favorites) -> int?`, returning 1, 2, 3, or null.
 - Produces `FavoriteTeamLogic.MatchAnyFavorite(MatchItem match, IReadOnlyCollection<string> favorites) -> bool`, comparing each favorite against both sides using the match season year.
 
-- [ ] **Step 1: Write failing tests** for `InvalidV2MigratesLegacyFavorite`, `ValidV2DeduplicatesNames`, `ToggleFavoriteUsesSeasonAwareIdentity`, `FavoriteMatchUsesHistoricalAlias`, `FindHighestFavoriteDivisionPrefersD1ThenD2ThenD3`, and `FindHighestFavoriteDivisionReturnsNullWhenUnmatched`. Assert invalid V2 plus `"Legacy Club"` returns that one favorite with migration required; duplicate identities collapse; toggling a rebranded alias removes the existing identity; a historical alias matches; D1 wins over D2/D3, otherwise D2 wins; unmatched returns null.
-- [ ] **Step 2: Run the focused tests and confirm failure** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore --filter FullyQualifiedName~FavoriteTeamLogicTests`; expected: compile/test failure because `FavoriteTeamLogic` and its result type do not exist.
-- [ ] **Step 3: Implement the four exact helper interfaces above** in `FavoriteTeamLogic.cs`; malformed/empty JSON falls back to legacy, valid JSON is a string array, names remain raw display names, and aliases only affect identity comparisons.
-- [ ] **Step 4: Link the helper into Core.Tests and rerun the focused tests**; expected: all six tests pass.
-- [ ] **Step 5: Run the complete Core.Tests project** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore`; expected: all tests pass.
-- [ ] **Step 6: Commit** as `feat: add multi-team favorite logic`.
+- [x] **Step 1: Write failing tests** for `InvalidV2MigratesLegacyFavorite`, `ValidV2DeduplicatesNames`, `ToggleFavoriteUsesSeasonAwareIdentity`, `FavoriteMatchUsesHistoricalAlias`, `FindHighestFavoriteDivisionPrefersD1ThenD2ThenD3`, and `FindHighestFavoriteDivisionReturnsNullWhenUnmatched`. Assert invalid V2 plus `"Legacy Club"` returns that one favorite with migration required; duplicate identities collapse; toggling a rebranded alias removes the existing identity; a historical alias matches; D1 wins over D2/D3, otherwise D2 wins; unmatched returns null.
+- [x] **Step 2: Run the focused tests and confirm failure** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore --filter FullyQualifiedName~FavoriteTeamLogicTests`; expected: compile/test failure because `FavoriteTeamLogic` and its result type do not exist.
+- [x] **Step 3: Implement the four exact helper interfaces above** in `FavoriteTeamLogic.cs`; malformed/empty JSON falls back to legacy, valid JSON is a string array, names remain raw display names, and aliases only affect identity comparisons.
+- [x] **Step 4: Link the helper into Core.Tests and rerun the focused tests**; expected: all six tests pass.
+- [x] **Step 5: Run the complete Core.Tests project** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore`; expected: all tests pass.
+- [x] **Step 6: Commit** as `feat: add multi-team favorite logic`.
 
 ### Task 2: Division-Scoped OR Filtering in the View Model
 
@@ -69,12 +69,12 @@
 - Produces `ScheduleViewModel.FavoriteTeamFilters`, an optional `IReadOnlyCollection<string>` state separate from `TeamFilter`; empty means inactive.
 - `ApplyFilters()` applies regular `TeamFilter` when set, otherwise favorite OR matching when favorite filters are set, then applies venue and period filters exactly as before.
 
-- [ ] **Step 1: Link `ScheduleViewModel.cs` and its production dependencies into Core.Tests**, adding only the compile links required by compiler diagnostics and no packages.
-- [ ] **Step 2: Add `FavoriteFilterCombinesWithIndependentFilters` coverage** for two favorites in the active division, an unrelated team, one matching venue, and the configured period; assert only a match involving either favorite that also passes venue and period remains. Add a check that empty favorites preserve all matches subject to independent filters.
-- [ ] **Step 3: Run the focused test** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore --filter FullyQualifiedName~FavoriteFilterCombinesWithIndependentFilters`; expected: compile/test failure because the ViewModel does not yet expose or apply `FavoriteTeamFilters`.
-- [ ] **Step 4: Implement `FavoriteTeamFilters` and the OR branch in `ScheduleViewModel.ApplyFilters()`**, ensuring existing manual `TeamFilter` keeps its single-team meaning and independent filters remain ANDed.
-- [ ] **Step 5: Run the focused test then the complete Core.Tests project**; expected: focused test passes and the full suite passes.
-- [ ] **Step 6: Commit** as `feat: filter schedule by favorite teams`.
+- [x] **Step 1: Link `ScheduleViewModel.cs` and its production dependencies into Core.Tests**, adding only the compile links required by compiler diagnostics and no packages.
+- [x] **Step 2: Add `FavoriteFilterCombinesWithIndependentFilters` coverage** for two favorites in the active division, an unrelated team, one matching venue, and the configured period; assert only a match involving either favorite that also passes venue and period remains. Add a check that empty favorites preserve all matches subject to independent filters.
+- [x] **Step 3: Run the focused test** with `dotnet test tests/OneRugbyNavi2.Core.Tests/OneRugbyNavi2.Core.Tests.csproj --no-restore --filter FullyQualifiedName~FavoriteFilterCombinesWithIndependentFilters`; expected: compile/test failure because the ViewModel does not yet expose or apply `FavoriteTeamFilters`.
+- [x] **Step 4: Implement `FavoriteTeamFilters` and the OR branch in `ScheduleViewModel.ApplyFilters()`**, ensuring existing manual `TeamFilter` keeps its single-team meaning and independent filters remain ANDed.
+- [x] **Step 5: Run the focused test then the complete Core.Tests project**; expected: focused test passes and the full suite passes.
+- [x] **Step 6: Commit** as `feat: filter schedule by favorite teams`.
 
 ### Task 3: Preferences, Compact Toggle, and UI State Transitions
 

@@ -70,6 +70,45 @@ public sealed class FavoriteTeamLogicTests
             new[] { "遠い架空クラブ" }));
     }
 
+    [Fact]
+    public void FavoriteFilterCombinesWithIndependentFilters()
+    {
+        var viewModel = NewViewModel();
+        viewModel.SetItems(new[]
+        {
+            Fixture("favorite-tokyo", "浦安D-Rocks", "横浜キヤノンイーグルス", "東京", "秩父宮ラグビー場", daysFromToday: 3),
+            Fixture("favorite-osaka", "花園近鉄ライナーズ", "横浜キヤノンイーグルス", "大阪", "花園ラグビー場", daysFromToday: 3),
+            Fixture("unrelated-tokyo", "東京サントリーサンゴリアス", "埼玉パナソニックワイルドナイツ", "東京", "秩父宮ラグビー場", daysFromToday: 3),
+            Fixture("favorite-past", "花園近鉄ライナーズ", "横浜キヤノンイーグルス", "東京", "秩父宮ラグビー場", daysFromToday: -3)
+        }, Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
+        viewModel.FavoriteTeamFilters = new[] { "浦安D-Rocks", "花園近鉄ライナーズ" };
+        viewModel.VenueFilter = "東京";
+        viewModel.PeriodFilter = ScheduleViewModel.DateRangeFilter.Upcoming;
+
+        viewModel.ApplyFilters();
+
+        Assert.Equal(new[] { "favorite-tokyo" }, viewModel.FilteredItems.Select(match => match.MatchId));
+    }
+
+    [Fact]
+    public void EmptyFavoriteFilterPreservesIndependentFilteredMatches()
+    {
+        var viewModel = NewViewModel();
+        viewModel.SetItems(new[]
+        {
+            Fixture("favorite-tokyo", "浦安D-Rocks", "横浜キヤノンイーグルス", "東京", "秩父宮ラグビー場", daysFromToday: 3),
+            Fixture("unrelated-tokyo", "東京サントリーサンゴリアス", "埼玉パナソニックワイルドナイツ", "東京", "秩父宮ラグビー場", daysFromToday: 3),
+            Fixture("osaka", "花園近鉄ライナーズ", "横浜キヤノンイーグルス", "大阪", "花園ラグビー場", daysFromToday: 3)
+        }, Array.Empty<ScheduleFetcher.Item>(), Array.Empty<ScheduleFetcher.Item>());
+        viewModel.FavoriteTeamFilters = Array.Empty<string>();
+        viewModel.VenueFilter = "東京";
+        viewModel.PeriodFilter = ScheduleViewModel.DateRangeFilter.Upcoming;
+
+        viewModel.ApplyFilters();
+
+        Assert.Equal(new[] { "favorite-tokyo", "unrelated-tokyo" }, viewModel.FilteredItems.Select(match => match.MatchId));
+    }
+
     private static MatchItem Match(string id, string home, string away) => new()
     {
         MatchId = id,
@@ -77,4 +116,23 @@ public sealed class FavoriteTeamLogicTests
         HomeTeam = home,
         AwayTeam = away
     };
+
+    private static ScheduleViewModel NewViewModel() => new();
+
+    private static ScheduleFetcher.Item Fixture(string id, string home, string away, string prefecture, string venue, int daysFromToday)
+    {
+        var date = DateTime.Today.AddDays(daysFromToday);
+        return new ScheduleFetcher.Item
+        {
+            MatchId = id,
+            SeasonStartYear = date.Month >= 9 ? date.Year : date.Year - 1,
+            CategoryCode = "D1",
+            Date = $"{date.Month}月{date.Day}日",
+            Kickoff = "14:00",
+            Home = home,
+            Away = away,
+            Pref = prefecture,
+            Venue = venue
+        };
+    }
 }
