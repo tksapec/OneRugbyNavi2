@@ -196,30 +196,29 @@
                            TextColor="{StaticResource AppMuted}"
                            Text="最終更新: -" />
 
-                    <VerticalStackLayout Grid.Row="1"
-                                         Grid.ColumnSpan="2"
-                                         Spacing="6">
+                    <Grid Grid.Row="1"
+                          Grid.ColumnSpan="2"
+                          ColumnDefinitions="*,Auto"
+                          ColumnSpacing="8">
                         <Label x:Name="filterSummaryLabel"
                                FontSize="13"
                                TextColor="{StaticResource AppNavy}"
                                LineBreakMode="TailTruncation"
                                MaxLines="2"
+                               VerticalTextAlignment="Center"
                                Text="フィルタなし" />
-                        <Border BackgroundColor="{StaticResource AppWarningBackground}"
-                                Stroke="{StaticResource AppWarningStroke}"
-                                StrokeThickness="1"
-                                Padding="10,5"
-                                HorizontalOptions="Start">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="999" />
-                            </Border.StrokeShape>
-                            <Label x:Name="favoriteChipLabel"
-                                   FontSize="12"
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource AppWarningText}"
-                                   Text="★ 未登録" />
-                        </Border>
-                    </VerticalStackLayout>
+                        <Button x:Name="favoriteQuickFilterButton"
+                                Grid.Column="1"
+                                Text="★ 0"
+                                FontSize="12"
+                                FontAttributes="Bold"
+                                BackgroundColor="{StaticResource AppWarningBackground}"
+                                TextColor="{StaticResource AppWarningText}"
+                                CornerRadius="12"
+                                Padding="10,4"
+                                HeightRequest="32"
+                                Clicked="OnQuickFavoriteFilterClicked" />
+                    </Grid>
                 </Grid>
             </Border>
 

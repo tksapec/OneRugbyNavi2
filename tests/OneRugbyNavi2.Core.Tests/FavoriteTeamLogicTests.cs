@@ -109,6 +109,45 @@ public sealed class FavoriteTeamLogicTests
         Assert.Equal(new[] { "favorite-tokyo", "unrelated-tokyo" }, viewModel.FilteredItems.Select(match => match.MatchId));
     }
 
+    [Fact]
+    public void QuickFilterUsesAllFavoritesInCurrentDivision()
+    {
+        var d1 = new[]
+        {
+            Match("d1-first", "浦安D-Rocks", "横浜キヤノンイーグルス"),
+            Match("d1-second", "東京サントリーサンゴリアス", "埼玉パナソニックワイルドナイツ")
+        };
+        var d2 = new[] { Match("d2", "花園近鉄ライナーズ", "清水建設江東ブルーシャークス") };
+
+        var result = FavoriteTeamLogic.ResolveQuickFilter(1, d1, d2, Array.Empty<MatchItem>(),
+            new[] { "浦安D-Rocks", "東京サントリーサンゴリアス", "花園近鉄ライナーズ", "九州電力キューデンヴォルテクス" });
+
+        Assert.Equal(1, result!.Division);
+        Assert.Equal(new[] { "浦安D-Rocks", "東京サントリーサンゴリアス" }, result.Favorites);
+    }
+
+    [Fact]
+    public void QuickFilterSwitchesToHighestDivisionWithFavoriteMatches()
+    {
+        var d2 = new[] { Match("d2", "花園近鉄ライナーズ", "清水建設江東ブルーシャークス") };
+        var d3 = new[] { Match("d3", "ヤクルトレビンズ戸田", "中国電力レッドレグリオンズ") };
+
+        var result = FavoriteTeamLogic.ResolveQuickFilter(1, Array.Empty<MatchItem>(), d2, d3,
+            new[] { "ヤクルトレビンズ戸田", "花園近鉄ライナーズ" });
+
+        Assert.Equal(2, result!.Division);
+        Assert.Equal(new[] { "花園近鉄ライナーズ" }, result.Favorites);
+    }
+
+    [Fact]
+    public void QuickFilterWithoutAnyMatchReturnsNull()
+    {
+        var d1 = new[] { Match("d1", "浦安D-Rocks", "横浜キヤノンイーグルス") };
+
+        Assert.Null(FavoriteTeamLogic.ResolveQuickFilter(1, d1, Array.Empty<MatchItem>(), Array.Empty<MatchItem>(),
+            new[] { "架空チーム" }));
+    }
+
     private static MatchItem Match(string id, string home, string away) => new()
     {
         MatchId = id,

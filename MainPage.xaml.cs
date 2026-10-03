@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
@@ -17,7 +17,9 @@ namespace OneRugbyNavi2
         private const string PartialFailureMessage = "\u4E00\u90E8\u306EDivision\u306E\u53D6\u5F97\u307E\u305F\u306F\u7D50\u679C\u88DC\u5B8C\u306B\u5931\u6557\u3057\u307E\u3057\u305F\u3002\u8868\u793A\u3067\u304D\u308B\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059\u3002";
         private const string RefreshSuccessMessage = "\u6700\u65B0\u30C7\u30FC\u30BF\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F\u3002";
         private const string ShowingCacheMessage = "\u524D\u56DE\u53D6\u5F97\u30C7\u30FC\u30BF\u3092\u8868\u793A\u3057\u3066\u3044\u307E\u3059";
-        private const string FavoriteTeamKey = "FavoriteTeam";
+        private const string FavoriteTeamsKey = "FavoriteTeams.v2";
+        private const string LegacyFavoriteTeamKey = "FavoriteTeam";
+        private const string NoFavoriteMatchMessage = "このシーズンの日程にお気に入りチームが見つかりません。";
 
         private bool _hasInitialized;
         private bool _isRefreshing;
@@ -25,8 +27,9 @@ namespace OneRugbyNavi2
         private bool _isShowingCache;
         private bool _isFilterExpanded;
         private bool _teamFilterManuallySelected;
+        private bool _isFavoriteFilterActive;
         private string? _lastMessage;
-        private string _favoriteTeam = "";
+        private System.Collections.Generic.IReadOnlyList<string> _favoriteTeams = Array.Empty<string>();
         private string _databaseBuildTimestampText = "-";
         private string _selectedSeasonKey = "";
         private string _selectedSeasonLabel = "";
@@ -43,7 +46,7 @@ namespace OneRugbyNavi2
             list.ItemsSource = _vm.FilteredItems;
             periodPicker.ItemsSource = new[] { "\u3059\u3079\u3066", "\u4ECA\u5F8C\u306E\u8A66\u5408", "\u904E\u53BB\u306E\u8A66\u5408" };
             periodPicker.SelectedIndex = 0;
-            LoadFavoriteTeam();
+            LoadFavoriteTeams();
             UpdateFavoriteUi();
             UpdateTabVisual(1);
             RefreshCategoryTabs();
@@ -58,12 +61,21 @@ namespace OneRugbyNavi2
 
             if (_hasInitialized)
             {
-                var previousFavorite = _favoriteTeam;
-                LoadFavoriteTeam();
+                var previousFavorites = _favoriteTeams.ToArray();
+                LoadFavoriteTeams();
                 UpdateFavoriteUi();
-                if (previousFavorite != _favoriteTeam && !_teamFilterManuallySelected)
+                if (!previousFavorites.SequenceEqual(_favoriteTeams, StringComparer.Ordinal) && _isFavoriteFilterActive)
                 {
-                    ApplyTeamFilterForCurrentDivision(null, allowFavoriteFallback: true);
+                    var matchingFavorites = FindMatchingFavoritesForCurrentDivision();
+                    if (matchingFavorites.Count == 0)
+                    {
+                        ExitFavoriteFilterMode();
+                    }
+                    else
+                    {
+                        _vm.FavoriteTeamFilters = matchingFavorites;
+                    }
+                    _vm.ApplyFilters();
                     RefreshPickers(preserveSelection: true);
                     ScrollScheduleToStart();
                     UpdateEmptyState();
@@ -79,10 +91,10 @@ namespace OneRugbyNavi2
 
         private async Task InitAsync()
         {
-            await RefreshDataAsync(showSuccessMessage: false);
+            await RefreshDataAsync(showSuccessMessage: false, chooseFavoriteDivision: true);
         }
 
-        private async Task RefreshDataAsync(bool showSuccessMessage)
+        private async Task RefreshDataAsync(bool showSuccessMessage, bool chooseFavoriteDivision = false)
         {
             if (_isRefreshing)
             {
@@ -98,7 +110,8 @@ namespace OneRugbyNavi2
             try
             {
                 var currentCategory = _vm.CurrentCategory;
-                var selectedTeam = _vm.TeamFilter;
+                var preserveFavoriteFilter = _isFavoriteFilterActive && !chooseFavoriteDivision;
+                var selectedTeam = chooseFavoriteDivision ? null : _vm.TeamFilter;
                 var selectedVenue = _vm.VenueFilter;
                 var selectedPeriod = _vm.PeriodFilter;
                 ScheduleFetcher.FetchAllResult? fetchResult = null;
@@ -150,13 +163,15 @@ namespace OneRugbyNavi2
                             Array.Empty<ScheduleFetcher.Item>());
                         _vm.SetSource(currentCategory);
                         _vm.TeamFilter = null;
+                        ExitFavoriteFilterMode();
                         _vm.VenueFilter = null;
                         RefreshPickers(preserveSelection: false);
                         _databaseBuildTimestampText = "-";
                         UpdateLastUpdatedLabel();
                         SetMessage(FetchFailedMessage, true, autoHide: true);
                         UpdateEmptyState();
-                            UpdateFilterSummaryUi();
+                        UpdateFavoriteUi();
+                        UpdateFilterSummaryUi();
                         return;
                     }
 
@@ -180,15 +195,40 @@ namespace OneRugbyNavi2
                     _vm.SetSource(ScheduleViewModel.CategoryDiv1);
                 }
 
+                if (chooseFavoriteDivision)
+                {
+                    var favoriteDivision = FavoriteTeamLogic.FindHighestFavoriteDivision(
+                        _vm.ItemsDiv1.ToList(), _vm.ItemsDiv2.ToList(), _vm.ItemsDiv3.ToList(), _favoriteTeams);
+                    if (favoriteDivision.HasValue)
+                    {
+                        _vm.SetSource(DivisionToCategory(favoriteDivision.Value));
+                    }
+                }
+
                 bool canPreserveVenue = !string.IsNullOrWhiteSpace(selectedVenue) &&
                     _vm.GetVenuesForPicker().Contains(selectedVenue);
 
                 NormalizeManualTeamSelection(selectedTeam);
-                ApplyTeamFilterForCurrentDivision(
-                    selectedTeam,
-                    allowFavoriteFallback: !_teamFilterManuallySelected || string.IsNullOrWhiteSpace(selectedTeam));
+                _vm.TeamFilter = _teamFilterManuallySelected ? FindCurrentTeamAlias(selectedTeam) : null;
                 _vm.VenueFilter = canPreserveVenue ? selectedVenue : null;
                 _vm.PeriodFilter = selectedPeriod;
+                if (preserveFavoriteFilter)
+                {
+                    var matchingFavorites = FindMatchingFavoritesForCurrentDivision();
+                    if (matchingFavorites.Count == 0)
+                    {
+                        ExitFavoriteFilterMode();
+                        SetMessage(NoFavoriteMatchMessage, true, autoHide: true);
+                    }
+                    else
+                    {
+                        _vm.FavoriteTeamFilters = matchingFavorites;
+                    }
+                }
+                else
+                {
+                    ExitFavoriteFilterMode();
+                }
                 _vm.ApplyFilters();
                 RefreshCategoryTabs();
                 RefreshPickers(preserveSelection: true);
@@ -197,10 +237,12 @@ namespace OneRugbyNavi2
                 UpdateLastUpdatedLabel();
 
                 UpdateEmptyState();
+                UpdateFavoriteUi();
                 UpdateFilterSummaryUi();
             }
             catch
             {
+                ExitFavoriteFilterMode();
                 _vm.SetItems(
                     Array.Empty<ScheduleFetcher.Item>(),
                     Array.Empty<ScheduleFetcher.Item>(),
@@ -213,6 +255,7 @@ namespace OneRugbyNavi2
                 UpdateLastUpdatedLabel();
                 SetMessage(FetchFailedMessage, true, autoHide: true);
                 UpdateEmptyState();
+                UpdateFavoriteUi();
                 UpdateFilterSummaryUi();
             }
             finally
@@ -249,13 +292,16 @@ namespace OneRugbyNavi2
 
         private void SelectCategory(string category)
         {
+            ExitFavoriteFilterMode();
             _vm.SetSource(category);
             NormalizeManualTeamSelection(_vm.TeamFilter);
-            ApplyTeamFilterForCurrentDivision(_teamFilterManuallySelected ? _vm.TeamFilter : null, allowFavoriteFallback: !_teamFilterManuallySelected);
+            _vm.TeamFilter = _teamFilterManuallySelected ? FindCurrentTeamAlias(_vm.TeamFilter) : null;
+            _vm.ApplyFilters();
             UpdateTabVisual(_vm.CurrentCategory);
             RefreshPickers(preserveSelection: true);
             ScrollScheduleToStart();
             UpdateEmptyState();
+            UpdateFavoriteUi();
             UpdateFilterSummaryUi();
         }
 
@@ -305,7 +351,8 @@ namespace OneRugbyNavi2
             _selectedSeasonLabel = selected.SeasonLabel;
             UpdateSeasonTitle();
             _teamFilterManuallySelected = false;
-            await RefreshDataAsync(showSuccessMessage: true);
+            ExitFavoriteFilterMode();
+            await RefreshDataAsync(showSuccessMessage: true, chooseFavoriteDivision: true);
         }
 
         private void UpdateSeasonOptions(
@@ -415,11 +462,13 @@ namespace OneRugbyNavi2
             }
 
             var value = teamPicker.SelectedItem as string;
+            ExitFavoriteFilterMode();
             _vm.TeamFilter = string.IsNullOrWhiteSpace(value) ? null : value;
             _teamFilterManuallySelected = !string.IsNullOrWhiteSpace(_vm.TeamFilter);
             _vm.ApplyFilters();
             ScrollScheduleToStart();
             UpdateEmptyState();
+            UpdateFavoriteUi();
             UpdateFilterSummaryUi();
         }
 
@@ -435,6 +484,7 @@ namespace OneRugbyNavi2
             _vm.ApplyFilters();
             ScrollScheduleToStart();
             UpdateEmptyState();
+            UpdateFavoriteUi();
             UpdateFilterSummaryUi();
         }
 
@@ -454,6 +504,7 @@ namespace OneRugbyNavi2
 
         private void OnClearFilters(object sender, EventArgs e)
         {
+            ExitFavoriteFilterMode();
             _vm.TeamFilter = null;
             _vm.VenueFilter = null;
             _vm.PeriodFilter = ScheduleViewModel.DateRangeFilter.All;
@@ -462,6 +513,53 @@ namespace OneRugbyNavi2
             RefreshPickers(preserveSelection: true);
             ScrollScheduleToStart();
             UpdateEmptyState();
+            UpdateFavoriteUi();
+            UpdateFilterSummaryUi();
+        }
+
+        private void OnQuickFavoriteFilterClicked(object sender, EventArgs e)
+        {
+            if (_favoriteTeams.Count == 0)
+            {
+                return;
+            }
+
+            if (_isFavoriteFilterActive)
+            {
+                ExitFavoriteFilterMode();
+                _vm.ApplyFilters();
+                RefreshPickers(preserveSelection: true);
+                ScrollScheduleToStart();
+                UpdateEmptyState();
+                UpdateFavoriteUi();
+                UpdateFilterSummaryUi();
+                return;
+            }
+
+            var resolution = FavoriteTeamLogic.ResolveQuickFilter(
+                _vm.CurrentDivision,
+                _vm.ItemsDiv1.ToList(),
+                _vm.ItemsDiv2.ToList(),
+                _vm.ItemsDiv3.ToList(),
+                _favoriteTeams);
+            if (resolution is null)
+            {
+                SetMessage(NoFavoriteMatchMessage, true, autoHide: true);
+                return;
+            }
+
+            ExitFavoriteFilterMode();
+            _vm.SetSource(DivisionToCategory(resolution.Division));
+            _vm.TeamFilter = null;
+            _teamFilterManuallySelected = false;
+            _vm.FavoriteTeamFilters = resolution.Favorites;
+            _isFavoriteFilterActive = true;
+            _vm.ApplyFilters();
+            UpdateTabVisual(_vm.CurrentCategory);
+            RefreshPickers(preserveSelection: true);
+            ScrollScheduleToStart();
+            UpdateEmptyState();
+            UpdateFavoriteUi();
             UpdateFilterSummaryUi();
         }
 
@@ -515,32 +613,31 @@ namespace OneRugbyNavi2
             await RefreshDataAsync(showSuccessMessage: true);
         }
 
-        private async void OnFavoriteClicked(object sender, EventArgs e)
+        private void OnFavoriteClicked(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(_favoriteTeam))
-            {
-                Preferences.Remove(FavoriteTeamKey);
-                _favoriteTeam = "";
-                UpdateFavoriteUi();
-                UpdateFilterSummaryUi();
-                await DisplayAlert("\u5B8C\u4E86", "\u304A\u6C17\u306B\u5165\u308A\u3092\u89E3\u9664\u3057\u307E\u3057\u305F\u3002", "OK");
-                return;
-            }
-
             var team = _vm.TeamFilter;
             if (string.IsNullOrWhiteSpace(team))
             {
-                await DisplayAlert("\u78BA\u8A8D", "\u304A\u6C17\u306B\u5165\u308A\u306B\u767B\u9332\u3059\u308B\u30C1\u30FC\u30E0\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044\u3002", "OK");
+                SetMessage("お気に入りを管理するチームを選択してください。", true, autoHide: true);
                 return;
             }
 
-            Preferences.Set(FavoriteTeamKey, team);
-            _favoriteTeam = team;
+            var seasonYear = GetSelectedSeasonStartYear();
+            var wasFavorite = IsFavoriteTeam(team, seasonYear);
+            _favoriteTeams = FavoriteTeamLogic.Toggle(_favoriteTeams, team, seasonYear);
+            Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(_favoriteTeams));
+            Preferences.Remove(LegacyFavoriteTeamKey);
+            ExitFavoriteFilterMode();
+            _vm.TeamFilter = null;
+            _teamFilterManuallySelected = false;
+            _vm.ApplyFilters();
+            RefreshPickers(preserveSelection: true);
+            ScrollScheduleToStart();
+            UpdateEmptyState();
             UpdateFavoriteUi();
             UpdateFilterSummaryUi();
-            await DisplayAlert("\u5B8C\u4E86", $"\u304A\u6C17\u306B\u5165\u308A\u306B\u767B\u9332\u3057\u307E\u3057\u305F\u3002\n{team}", "OK");
+            SetMessage(wasFavorite ? $"お気に入りから解除しました: {team}" : $"お気に入りに登録しました: {team}", true, autoHide: true);
         }
-
         private void OnInfoClicked(object sender, EventArgs e)
         {
             menuOverlay.IsVisible = true;
@@ -745,6 +842,7 @@ namespace OneRugbyNavi2
             }
 
             if (!string.IsNullOrWhiteSpace(_vm.TeamFilter) ||
+                _vm.FavoriteTeamFilters.Count > 0 ||
                 !string.IsNullOrWhiteSpace(_vm.VenueFilter) ||
                 _vm.PeriodFilter != ScheduleViewModel.DateRangeFilter.All)
             {
@@ -765,72 +863,105 @@ namespace OneRugbyNavi2
             }
         }
 
-        private void LoadFavoriteTeam()
+        private void LoadFavoriteTeams()
         {
-            _favoriteTeam = Preferences.Get(FavoriteTeamKey, "");
+            var hasV2 = Preferences.ContainsKey(FavoriteTeamsKey);
+            var loaded = FavoriteTeamLogic.Load(
+                hasV2 ? Preferences.Get(FavoriteTeamsKey, "") : null,
+                Preferences.Get(LegacyFavoriteTeamKey, ""));
+            _favoriteTeams = loaded.Favorites;
+            if (loaded.RequiresWriteBack)
+            {
+                Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(_favoriteTeams));
+                Preferences.Remove(LegacyFavoriteTeamKey);
+            }
         }
 
         private void UpdateFavoriteUi()
         {
-            if (string.IsNullOrWhiteSpace(_favoriteTeam))
+            var selectedTeam = _vm.TeamFilter;
+            var hasSelection = !string.IsNullOrWhiteSpace(selectedTeam);
+            var isSelectedFavorite = hasSelection && IsFavoriteTeam(selectedTeam!, GetSelectedSeasonStartYear());
+            favoriteTeamLabel.Text = _favoriteTeams.Count == 0
+                ? "お気に入り: 未登録"
+                : $"お気に入り: {_favoriteTeams.Count}チーム";
+            if (hasSelection)
             {
-                favoriteTeamLabel.Text = "\u304A\u6C17\u306B\u5165\u308A: \u672A\u767B\u9332";
-                favoriteButton.Text = "\u304A\u6C17\u306B\u5165\u308A\u767B\u9332";
-                favoriteChipLabel.Text = "\u2605 \u672A\u767B\u9332";
-                return;
+                favoriteTeamLabel.Text += $"\n{selectedTeam}: {(isSelectedFavorite ? "登録済み" : "未登録")}";
             }
 
-            var displayFavorite = FindCurrentTeamAlias(_favoriteTeam) ?? _favoriteTeam;
-            favoriteTeamLabel.Text = $"\u304A\u6C17\u306B\u5165\u308A: {displayFavorite}";
-            favoriteButton.Text = "\u304A\u6C17\u306B\u5165\u308A\u89E3\u9664";
-            favoriteChipLabel.Text = $"\u2605 {displayFavorite}";
+            favoriteButton.Text = isSelectedFavorite ? "お気に入り解除" : "お気に入り登録";
+            favoriteButton.IsEnabled = hasSelection;
+            favoriteQuickFilterButton.Text = _isFavoriteFilterActive
+                ? $"★ {_favoriteTeams.Count} 絞込中"
+                : _favoriteTeams.Count == 0 ? "★ 0" : $"★ {_favoriteTeams.Count}";
+            favoriteQuickFilterButton.IsEnabled = _favoriteTeams.Count > 0;
+            favoriteQuickFilterButton.BackgroundColor = _isFavoriteFilterActive
+                ? Color.FromArgb("#FFE3A3")
+                : Color.FromArgb("#FFF6DD");
         }
 
-        private void ApplyTeamFilterForCurrentDivision(string? preferredTeam, bool allowFavoriteFallback)
+        private void ExitFavoriteFilterMode()
         {
-            var teams = _vm.GetTeamsForPicker();
-            var matchingPreferred = FindCurrentTeamAlias(preferredTeam, teams);
-            if (!string.IsNullOrWhiteSpace(matchingPreferred))
-            {
-                _vm.TeamFilter = matchingPreferred;
-                _vm.ApplyFilters();
-                return;
-            }
-
-            var matchingFavorite = allowFavoriteFallback ? FindCurrentTeamAlias(_favoriteTeam, teams) : null;
-            if (!string.IsNullOrWhiteSpace(matchingFavorite))
-            {
-                _vm.TeamFilter = matchingFavorite;
-                _vm.ApplyFilters();
-                return;
-            }
-
-            _vm.TeamFilter = null;
-            _vm.ApplyFilters();
+            _isFavoriteFilterActive = false;
+            _vm.FavoriteTeamFilters = Array.Empty<string>();
         }
 
         private string? FindCurrentTeamAlias(string? name, System.Collections.Generic.IReadOnlyList<string>? teams = null)
         {
             if (string.IsNullOrWhiteSpace(name)) return null;
             teams ??= _vm.GetTeamsForPicker();
-            var seasonYear = SeasonCatalog.ParseSeasonStartYear(_selectedSeasonKey);
-            if (seasonYear <= 0) seasonYear = SeasonCatalog.CurrentSeasonStartYear;
+            var seasonYear = GetSelectedSeasonStartYear();
             return teams.FirstOrDefault(team => SeasonCatalog.AreSameTeamName(team, name, seasonYear));
         }
 
+        private int GetSelectedSeasonStartYear()
+        {
+            var seasonYear = SeasonCatalog.ParseSeasonStartYear(_selectedSeasonKey);
+            return seasonYear > 0 ? seasonYear : SeasonCatalog.CurrentSeasonStartYear;
+        }
+
+        private bool IsFavoriteTeam(string team, int seasonStartYear)
+            => _favoriteTeams.Any(favorite => SeasonCatalog.AreSameTeamName(favorite, team, seasonStartYear));
+
+        private System.Collections.Generic.IReadOnlyList<string> FindMatchingFavoritesForCurrentDivision()
+        {
+            var matches = _vm.CurrentDivision switch
+            {
+                1 => _vm.ItemsDiv1.ToList(),
+                2 => _vm.ItemsDiv2.ToList(),
+                3 => _vm.ItemsDiv3.ToList(),
+                _ => new System.Collections.Generic.List<MatchItem>()
+            };
+            return FavoriteTeamLogic.FindMatchingFavorites(matches, _favoriteTeams);
+        }
+
+        private static string DivisionToCategory(int division) => division switch
+        {
+            1 => ScheduleViewModel.CategoryDiv1,
+            2 => ScheduleViewModel.CategoryDiv2,
+            3 => ScheduleViewModel.CategoryDiv3,
+            _ => ScheduleViewModel.CategoryDiv1
+        };
+
         private void NormalizeManualTeamSelection(string? preferredTeam)
         {
-            if (!_teamFilterManuallySelected || string.IsNullOrWhiteSpace(preferredTeam))
+            if (!_teamFilterManuallySelected)
             {
+                _vm.TeamFilter = null;
                 return;
             }
 
-            if (!_vm.GetTeamsForPicker().Contains(preferredTeam))
+            var matchingTeam = FindCurrentTeamAlias(preferredTeam);
+            if (matchingTeam is null)
             {
                 _teamFilterManuallySelected = false;
+                _vm.TeamFilter = null;
+                return;
             }
-        }
 
+            _vm.TeamFilter = matchingTeam;
+        }
         private async Task OpenWebAsync(string url)
         {
             if (!TryCreateHttpUri(url, out var uri))
