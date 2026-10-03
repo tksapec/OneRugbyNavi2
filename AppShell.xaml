@@ -8,31 +8,11 @@
     Shell.BackgroundColor="{StaticResource AppSurface}"
     Shell.ForegroundColor="{StaticResource AppNavy}"
     Shell.TitleColor="{StaticResource AppNavy}"
-    Shell.TabBarBackgroundColor="{StaticResource AppSurface}"
-    Shell.TabBarForegroundColor="{StaticResource Primary}"
-    Shell.TabBarTitleColor="{StaticResource Primary}"
-    Shell.TabBarUnselectedColor="{StaticResource AppMuted}">
+    FlyoutBehavior="Disabled">
 
-    <TabBar>
-        <ShellContent
-            Title="日程"
-            ContentTemplate="{DataTemplate local:MainPage}"
-            Route="SchedulePage" />
-
-        <ShellContent
-            Title="チーム"
-            ContentTemplate="{DataTemplate local:TeamListPage}"
-            Route="TeamListPage" />
-
-        <ShellContent
-            Title="ランキング"
-            ContentTemplate="{DataTemplate local:RankingPage}"
-            Route="RankingPage" />
-
-        <ShellContent
-            Title="情報"
-            ContentTemplate="{DataTemplate local:InfoPage}"
-            Route="InfoPage" />
-    </TabBar>
+    <ShellContent
+        Title="日程・結果"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="SchedulePage" />
 
 </Shell>

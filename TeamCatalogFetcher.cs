@@ -4,7 +4,12 @@ namespace OneRugbyNavi2;
 
 public sealed class TeamCatalogFetcher
 {
-    private static readonly Uri TeamIndexUri = new("https://league-one.jp/team/");
+    private const int CacheSchemaVersion = 2;
+
+    private static Uri GetTeamIndexUri(int seasonStartYear)
+        => seasonStartYear == 2026
+            ? new Uri("https://league-one.jp/content/team/2026")
+            : new Uri($"https://league-one.jp/team/?year={seasonStartYear}");
     private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(24);
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(8) };
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
@@ -12,16 +17,17 @@ public sealed class TeamCatalogFetcher
     public async Task<TeamIndexFetchResult> GetAsync(int seasonStartYear, CancellationToken cancellationToken = default)
     {
         var cachePath = GetCachePath(seasonStartYear);
+        var teamIndexUri = GetTeamIndexUri(seasonStartYear);
         var cached = await ReadCacheAsync(cachePath, cancellationToken);
         var now = DateTimeOffset.UtcNow;
-        if (cached != null && IsValidCachedCatalog(cached.Snapshot, seasonStartYear) && now - cached.UpdatedAt < CacheTtl)
+        if (IsUsableCache(cached, seasonStartYear) && now - cached!.UpdatedAt < CacheTtl)
         {
             return new TeamIndexFetchResult(cached.Snapshot, true, cached.UpdatedAt);
         }
 
         try
         {
-            using var response = await Http.GetAsync(TeamIndexUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            using var response = await Http.GetAsync(teamIndexUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
             response.EnsureSuccessStatusCode();
             var mediaType = response.Content.Headers.ContentType?.MediaType;
             if (mediaType is not null && !mediaType.Equals("text/html", StringComparison.OrdinalIgnoreCase) &&
@@ -31,13 +37,13 @@ public sealed class TeamCatalogFetcher
             }
 
             var html = await response.Content.ReadAsStringAsync(cancellationToken);
-            var parsed = TeamIndexParser.Parse(html, seasonStartYear, TeamIndexUri.AbsoluteUri);
+            var parsed = TeamIndexParser.Parse(html, seasonStartYear, teamIndexUri.AbsoluteUri);
             if (!IsCompleteCatalog(parsed, seasonStartYear))
             {
                 throw new InvalidDataException("The official team index did not provide a complete catalog for the requested season.");
             }
 
-            var snapshot = new CachedTeamIndex(parsed, now);
+            var snapshot = new CachedTeamIndex(CacheSchemaVersion, parsed, now);
             await WriteCacheAsync(cachePath, snapshot, cancellationToken);
             return new TeamIndexFetchResult(parsed, false, now);
         }
@@ -47,15 +53,18 @@ public sealed class TeamCatalogFetcher
         }
         catch
         {
-            if (cached != null && IsValidCachedCatalog(cached.Snapshot, seasonStartYear))
+            if (IsUsableCache(cached, seasonStartYear))
             {
-                return new TeamIndexFetchResult(cached.Snapshot, true, cached.UpdatedAt);
+                return new TeamIndexFetchResult(cached!.Snapshot, true, cached.UpdatedAt);
             }
 
             var fallback = BuildFallback(seasonStartYear);
             return new TeamIndexFetchResult(fallback, true, DateTimeOffset.MinValue);
         }
     }
+
+    private static bool IsUsableCache(CachedTeamIndex? cached, int seasonStartYear)
+        => cached is { SchemaVersion: CacheSchemaVersion } && IsValidCachedCatalog(cached.Snapshot, seasonStartYear);
 
     private static bool IsCompleteCatalog(TeamIndexResult result, int seasonStartYear)
     {
@@ -67,8 +76,9 @@ public sealed class TeamCatalogFetcher
         if (seasonStartYear != 2026) return true;
         return result.Teams.Count == 27 &&
                result.Teams.Count(team => team.DivisionCode == "DIV1") == 12 &&
-               result.Teams.Count(team => team.DivisionCode == "DIV2") == 7 &&
-               result.Teams.Count(team => team.DivisionCode == "DIV3") == 8;
+               result.Teams.Count(team => team.DivisionCode == "DIV2") == 8 &&
+               result.Teams.Count(team => team.DivisionCode == "DIV3") == 7 &&
+               HasOfficialLogos(result);
     }
 
     private static bool IsValidCachedCatalog(TeamIndexResult result, int seasonStartYear)
@@ -88,6 +98,13 @@ public sealed class TeamCatalogFetcher
 
         return seasonStartYear != 2026 || IsCompleteCatalog(result, seasonStartYear);
     }
+
+    private static bool HasOfficialLogos(TeamIndexResult result)
+        => result.Teams.All(team =>
+            Uri.TryCreate(team.LogoUrl, UriKind.Absolute, out var logoUri) &&
+            logoUri.Scheme == Uri.UriSchemeHttps &&
+            (logoUri.Host.Equals("league-one.s3.ap-northeast-1.amazonaws.com", StringComparison.OrdinalIgnoreCase) ||
+             logoUri.Host.Equals("league-one.s3-ap-northeast-1.amazonaws.com", StringComparison.OrdinalIgnoreCase)));
 
     private static TeamIndexResult BuildFallback(int seasonStartYear)
     {
@@ -142,5 +159,5 @@ public sealed class TeamCatalogFetcher
         }
     }
 
-    private sealed record CachedTeamIndex(TeamIndexResult Snapshot, DateTimeOffset UpdatedAt);
+    private sealed record CachedTeamIndex(int SchemaVersion, TeamIndexResult Snapshot, DateTimeOffset UpdatedAt);
 }

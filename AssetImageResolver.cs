@@ -9,6 +9,11 @@ public static class AssetImageResolver
             return null;
         }
 
+        if (Path.IsPathRooted(localPath))
+        {
+            return File.Exists(localPath) ? ImageSource.FromFile(localPath) : null;
+        }
+
         var normalized = localPath.Replace('\\', '/').TrimStart('/');
         var appDataPath = Path.Combine(LeagueOneDatabase.AppDataRoot, normalized.Replace('/', Path.DirectorySeparatorChar));
         if (File.Exists(appDataPath))

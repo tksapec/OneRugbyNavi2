@@ -11,7 +11,7 @@ public static class ScheduleTableParser
     private static readonly Regex RoundRegex = new(@"^第\s*\d+\s*節$", RegexOptions.Compiled);
     private static readonly Regex DateRegex = new(@"\d{1,2}月.*日", RegexOptions.Compiled);
     private static readonly Regex KickoffRegex = new(@"^(?:\d{1,2}:\d{2}|未定)$", RegexOptions.Compiled);
-    private static readonly Regex WeekdayRegex = new(@"^(?:月|火|水|木|金|土|日)(?:or(?:月|火|水|木|金|土|日))*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex WeekdayRegex = new(@"^(?:月|火|水|木|金|土|日|祝)(?:or(?:月|火|水|木|金|土|日|祝))*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public static List<ScheduleFetcher.Item> Parse(
         string html,

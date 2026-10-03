@@ -43,7 +43,6 @@
             <Setter Property="BackgroundColor" Value="Transparent" />
             <Setter Property="TextColor" Value="{StaticResource AppNavy}" />
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="HorizontalTextAlignment" Value="Start" />
             <Setter Property="Padding" Value="0,8" />
             <Setter Property="MinimumHeightRequest" Value="46" />
             <Setter Property="CornerRadius" Value="0" />
@@ -56,38 +55,31 @@
           RowSpacing="10">
 
         <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <VerticalStackLayout Spacing="8">
-                <VerticalStackLayout Spacing="0">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                <VerticalStackLayout Spacing="0" VerticalOptions="Center">
                     <Label Text="One Rugby Navi2"
-                           FontSize="24"
+                           FontSize="22"
                            FontAttributes="Bold"
+                           LineBreakMode="NoWrap"
                            TextColor="{StaticResource AppNavy}" />
                     <Label x:Name="seasonTitleLabel"
                            Text=""
                            FontSize="12"
                            TextColor="{StaticResource AppMuted}" />
                 </VerticalStackLayout>
-
-                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
-                    <Button Text="更新"
-                        Style="{StaticResource TopActionButton}"
-                        BackgroundColor="{StaticResource Primary}"
-                        TextColor="White"
-                        Clicked="OnRefreshClicked" />
-                    <Button Grid.Column="1"
-                        Text="順位表"
-                        Style="{StaticResource TopActionButton}"
-                        BackgroundColor="{StaticResource AppChipBackground}"
-                        TextColor="{StaticResource Primary}"
-                        Clicked="OnStandingsClicked" />
-                    <Button Grid.Column="2"
-                        Text="メニュー"
-                        Style="{StaticResource TopActionButton}"
-                        BackgroundColor="{StaticResource AppChipBackground}"
-                        TextColor="{StaticResource Primary}"
-                        Clicked="OnInfoClicked" />
-                </Grid>
-            </VerticalStackLayout>
+                <Button Grid.Column="1"
+                    Text="更新"
+                    Style="{StaticResource TopActionButton}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    Clicked="OnRefreshClicked" />
+                <Button Grid.Column="2"
+                    Text="メニュー"
+                    Style="{StaticResource TopActionButton}"
+                    BackgroundColor="{StaticResource AppChipBackground}"
+                    TextColor="{StaticResource Primary}"
+                    Clicked="OnInfoClicked" />
+            </Grid>
 
             <Border Stroke="{StaticResource AppStroke}"
                     BackgroundColor="White"
@@ -402,54 +394,25 @@
                                 <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
                                     <Grid ColumnDefinitions="Auto,*"
                                           ColumnSpacing="8">
-                                        <Button WidthRequest="36"
-                                                HeightRequest="36"
-                                                Padding="0"
-                                                BackgroundColor="Transparent"
-                                                BorderWidth="0"
-                                                Clicked="OnHomeTeamLogoClicked"
-                                                SemanticProperties.Hint="チームの公式ページを開く">
-                                            <Button.Content>
-                                                <Border WidthRequest="36"
-                                                        HeightRequest="36"
-                                                        BackgroundColor="{StaticResource AppBackground}"
-                                                        Stroke="{StaticResource AppStroke}"
-                                                        StrokeThickness="1"
-                                                        VerticalOptions="Start">
-                                                    <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="18" />
-                                                    </Border.StrokeShape>
-                                                    <Grid>
-                                                <Image Source="{Binding HomeLogoPath}"
-                                                       WidthRequest="24"
-                                                       HeightRequest="24"
-                                                       Aspect="AspectFit"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center"
-                                                       IsVisible="{Binding HasHomeLogo}" />
-                                                <Label Text="{Binding HomeBadgeText}"
-                                                       FontSize="11"
-                                                       FontAttributes="Bold"
-                                                       TextColor="{StaticResource Primary}"
-                                                       HorizontalTextAlignment="Center"
-                                                       VerticalTextAlignment="Center"
-                                                       IsVisible="{Binding HasHomeBadge}" />
-                                                <Label Text="↗"
-                                                       WidthRequest="14"
-                                                       HeightRequest="14"
-                                                       FontSize="9"
-                                                       FontAttributes="Bold"
-                                                       TextColor="{StaticResource Primary}"
-                                                       BackgroundColor="White"
-                                                       HorizontalTextAlignment="Center"
-                                                       VerticalTextAlignment="Center"
-                                                       HorizontalOptions="End"
-                                                       VerticalOptions="Start"
-                                                       InputTransparent="True" />
-                                            </Grid>
-                                                </Border>
-                                            </Button.Content>
-                                        </Button>
+                                        <Grid WidthRequest="36" HeightRequest="36">
+                                            <ImageButton Source="{Binding HomeLogoPath}"
+                                                         BackgroundColor="{StaticResource AppBackground}"
+                                                         BorderColor="{StaticResource AppStroke}"
+                                                         BorderWidth="1"
+                                                         CornerRadius="18"
+                                                         Padding="6"
+                                                         Aspect="AspectFit"
+                                                         Clicked="OnHomeTeamLogoClicked"
+                                                         SemanticProperties.Hint="チームの公式ページを開く" />
+                                            <Label Text="{Binding HomeBadgeText}"
+                                                   FontSize="11"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center"
+                                                   IsVisible="{Binding HasHomeBadge}"
+                                                   InputTransparent="True" />
+                                        </Grid>
                                         <Label Grid.Column="1"
                                                Text="{Binding HomeTeam}"
                                                FontSize="15"
@@ -474,55 +437,25 @@
                                                HorizontalTextAlignment="End"
                                                VerticalTextAlignment="Center"
                                                LineBreakMode="WordWrap" />
-                                        <Button Grid.Column="1"
-                                                WidthRequest="36"
-                                                HeightRequest="36"
-                                                Padding="0"
-                                                BackgroundColor="Transparent"
-                                                BorderWidth="0"
-                                                Clicked="OnAwayTeamLogoClicked"
-                                                SemanticProperties.Hint="チームの公式ページを開く">
-                                            <Button.Content>
-                                                <Border WidthRequest="36"
-                                                        HeightRequest="36"
-                                                        BackgroundColor="{StaticResource AppBackground}"
-                                                        Stroke="{StaticResource AppStroke}"
-                                                        StrokeThickness="1"
-                                                        VerticalOptions="Start">
-                                                <Border.StrokeShape>
-                                                    <RoundRectangle CornerRadius="18" />
-                                                </Border.StrokeShape>
-                                                <Grid>
-                                                <Image Source="{Binding AwayLogoPath}"
-                                                       WidthRequest="24"
-                                                       HeightRequest="24"
-                                                       Aspect="AspectFit"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center"
-                                                       IsVisible="{Binding HasAwayLogo}" />
-                                                <Label Text="{Binding AwayBadgeText}"
-                                                       FontSize="11"
-                                                       FontAttributes="Bold"
-                                                       TextColor="{StaticResource Primary}"
-                                                       HorizontalTextAlignment="Center"
-                                                       VerticalTextAlignment="Center"
-                                                       IsVisible="{Binding HasAwayBadge}" />
-                                                    <Label Text="↗"
-                                                           WidthRequest="14"
-                                                           HeightRequest="14"
-                                                           FontSize="9"
-                                                           FontAttributes="Bold"
-                                                           TextColor="{StaticResource Primary}"
-                                                           BackgroundColor="White"
-                                                           HorizontalTextAlignment="Center"
-                                                           VerticalTextAlignment="Center"
-                                                           HorizontalOptions="End"
-                                                           VerticalOptions="Start"
-                                                           InputTransparent="True" />
-                                                </Grid>
-                                                </Border>
-                                            </Button.Content>
-                                        </Button>
+                                        <Grid Grid.Column="1" WidthRequest="36" HeightRequest="36">
+                                            <ImageButton Source="{Binding AwayLogoPath}"
+                                                         BackgroundColor="{StaticResource AppBackground}"
+                                                         BorderColor="{StaticResource AppStroke}"
+                                                         BorderWidth="1"
+                                                         CornerRadius="18"
+                                                         Padding="6"
+                                                         Aspect="AspectFit"
+                                                         Clicked="OnAwayTeamLogoClicked"
+                                                         SemanticProperties.Hint="チームの公式ページを開く" />
+                                            <Label Text="{Binding AwayBadgeText}"
+                                                   FontSize="11"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center"
+                                                   IsVisible="{Binding HasAwayBadge}"
+                                                   InputTransparent="True" />
+                                        </Grid>
                                     </Grid>
                                 </Grid>
 
@@ -598,11 +531,19 @@
                             Style="{StaticResource MenuItemButton}"
                             Clicked="OnMenuStatusClicked" />
                     <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
+                    <Button Text="日程・結果"
+                            Style="{StaticResource MenuItemButton}"
+                            Clicked="OnMenuScheduleClicked" />
+                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
                     <Button Text="順位表"
                             Style="{StaticResource MenuItemButton}"
                             Clicked="OnMenuStandingsClicked" />
                     <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="公式ランキング"
+                    <Button Text="チーム一覧"
+                            Style="{StaticResource MenuItemButton}"
+                            Clicked="OnMenuTeamsClicked" />
+                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
+                    <Button Text="ランキング"
                             Style="{StaticResource MenuItemButton}"
                             Clicked="OnMenuRankingClicked" />
                     <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />

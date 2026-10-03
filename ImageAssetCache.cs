@@ -115,6 +115,7 @@ public static class ImageAssetCache
         try
         {
             if (!Directory.Exists(directory)) return null;
+            Span<byte> signature = stackalloc byte[12];
             foreach (var path in Directory.EnumerateFiles(directory))
             {
                 try
@@ -124,7 +125,6 @@ public static class ImageAssetCache
                     var fileInfo = new FileInfo(path);
                     if (fileInfo.Length <= 0 || fileInfo.Length > MaxImageBytes) continue;
                     using var stream = File.OpenRead(path);
-                    Span<byte> signature = stackalloc byte[12];
                     var count = stream.Read(signature);
                     if (string.Equals(ImageSignatureValidator.GetExtension(signature[..count]), expectedExtension, StringComparison.Ordinal)) return path;
                 }

@@ -390,7 +390,7 @@ namespace OneRugbyNavi2
                 item => TryGetMatchStart(item.Match, out _),
                 item => item.Match.IsInProgress,
                 item => item.Match.IsCompleted,
-                now);
+                now).Select(item => item.Match);
         }
 
         private static bool IsAmbiguousDateText(string value)

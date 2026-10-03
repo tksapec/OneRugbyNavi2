@@ -15,7 +15,7 @@ public sealed class InfoPage : ContentPage
             {
                 Children =
                 {
-                    PageStyles.Title("One Rugby Navi2"),
+                    PageStyles.NavigationTitle(this, "One Rugby Navi2"),
                     _body.Margin(new Thickness(0, 0, 0, 12))
                 }
             }

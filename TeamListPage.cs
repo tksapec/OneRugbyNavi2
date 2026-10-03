@@ -33,7 +33,7 @@ public sealed class TeamListPage : ContentPage
             },
             Children =
             {
-                PageStyles.Title("チーム一覧"),
+                PageStyles.NavigationTitle(this, "チーム一覧"),
                 _status.Row(1).Margin(new Thickness(16, 0, 16, 8)),
                 list.Row(2)
             }
@@ -134,21 +134,6 @@ public sealed class TeamListPage : ContentPage
         var imageLayer = new Grid { WidthRequest = 56, HeightRequest = 56 };
         imageLayer.Children.Add(badge);
         imageLayer.Children.Add(logo);
-        imageLayer.Children.Add(new Label
-        {
-            Text = "↗",
-            WidthRequest = 16,
-            HeightRequest = 16,
-            FontSize = 10,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = PageStyles.Blue,
-            BackgroundColor = Colors.White,
-            HorizontalTextAlignment = TextAlignment.Center,
-            VerticalTextAlignment = TextAlignment.Center,
-            HorizontalOptions = LayoutOptions.End,
-            VerticalOptions = LayoutOptions.Start,
-            InputTransparent = true
-        });
         var logoTap = new TapGestureRecognizer();
         logoTap.Tapped += async (_, _) =>
         {

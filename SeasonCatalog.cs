@@ -44,7 +44,7 @@ public static class SeasonCatalog
         new TeamSeasonInfo("日野レッドドルフィンズ", "DIV3", LeagueOneTeamId: "141", TeamUrl: "https://league-one.jp/team/141"),
         new TeamSeasonInfo("日本製鉄釜石シーウェイブス", "DIV3", LeagueOneTeamId: "139", TeamUrl: "https://league-one.jp/team/139"),
         new TeamSeasonInfo("中国電力レッドレグリオンズ", "DIV3", LeagueOneTeamId: "145", TeamUrl: "https://league-one.jp/team/145"),
-        new TeamSeasonInfo("川越狭山セコムラガッツ", "DIV3", LeagueOneTeamId: "144", TeamUrl: "https://league-one.jp/team/144"),
+        new TeamSeasonInfo("川越狭山セコムラガッツ", "DIV2", LeagueOneTeamId: "144", TeamUrl: "https://league-one.jp/team/144"),
         new TeamSeasonInfo("ルリーロ福岡", "DIV3", LeagueOneTeamId: "148", TeamUrl: "https://league-one.jp/team/148"),
         new TeamSeasonInfo("ヤクルトレビンズ戸田", "DIV3", LeagueOneTeamId: "147", TeamUrl: "https://league-one.jp/team/147"),
         new TeamSeasonInfo("丸和MOMOTARO’S成田", "DIV3", LeagueOneTeamId: "149", TeamUrl: "https://league-one.jp/team/149")
@@ -98,13 +98,19 @@ public static class SeasonCatalog
     {
         var key = seasonKey?.Trim() ?? "";
         var normalizedDivision = division?.Trim().ToLowerInvariant() ?? "";
-        if (string.IsNullOrWhiteSpace(key) ||
-            (normalizedDivision != "div1" && normalizedDivision != "div2" && normalizedDivision != "div3"))
+        var divisionNumber = normalizedDivision switch
+        {
+            "d1" or "div1" => "1",
+            "d2" or "div2" => "2",
+            "d3" or "div3" => "3",
+            _ => ""
+        };
+        if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(divisionNumber))
         {
             return "";
         }
 
-        return $"https://league-one.jp/content/schedule_table/{Uri.EscapeDataString(key)}/{normalizedDivision}";
+        return $"https://league-one.jp/content/schedule_table/{Uri.EscapeDataString(key)}/div{divisionNumber}";
     }
 
     public static string NormalizeTeamName(string? teamName, int seasonStartYear)

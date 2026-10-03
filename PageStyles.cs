@@ -30,15 +30,57 @@ public static class PageStyles
         Content = content
     };
 
-    public static Label Title(string text) => new()
+    public static View NavigationTitle(ContentPage page, string text)
     {
-        Text = text,
-        FontSize = 22,
-        FontAttributes = FontAttributes.Bold,
-        TextColor = Navy,
-        FontFamily = "OpenSansSemibold",
-        Margin = new Thickness(16, 16, 16, 8)
-    };
+        var title = new Label
+        {
+            Text = text,
+            FontSize = 22,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = Navy,
+            FontFamily = "OpenSansSemibold",
+            VerticalTextAlignment = TextAlignment.Center,
+            LineBreakMode = LineBreakMode.TailTruncation
+        };
+        var menu = SecondaryButton("メニュー");
+        menu.Clicked += async (_, _) =>
+        {
+            var choice = await page.DisplayActionSheet(
+                "メニュー", "閉じる", null,
+                "日程・結果", "チーム一覧", "ランキング", "アプリ情報");
+            var route = choice switch
+            {
+                "日程・結果" => "//SchedulePage",
+                "チーム一覧" => nameof(TeamListPage),
+                "ランキング" => nameof(RankingPage),
+                "アプリ情報" => nameof(InfoPage),
+                _ => null
+            };
+            if (route is null) return;
+
+            await Shell.Current.GoToAsync("//SchedulePage");
+            if (route != "//SchedulePage")
+            {
+                await Shell.Current.GoToAsync(route);
+            }
+        };
+
+        return new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Auto)
+            },
+            ColumnSpacing = 8,
+            Margin = new Thickness(16, 8, 16, 8),
+            Children =
+            {
+                title,
+                menu.Column(1)
+            }
+        };
+    }
 
     public static Label MutedLabel(string text = "") => new()
     {

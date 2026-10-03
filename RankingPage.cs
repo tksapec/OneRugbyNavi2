@@ -36,7 +36,7 @@ public sealed class RankingPage : ContentPage
                     Spacing = 4,
                     Children =
                     {
-                        PageStyles.Title("公式ランキング"),
+                        PageStyles.NavigationTitle(this, "公式ランキング"),
                         _status.Margin(new Thickness(16, 0, 16, 8))
                     }
                 },

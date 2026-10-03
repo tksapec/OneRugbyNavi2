@@ -53,7 +53,7 @@ public sealed class ScheduleParserTests
         Assert.Equal("リコーブラックラムズ東京", match.Home);
         Assert.Equal("栃木ホンダヒート", match.Away);
         Assert.Equal("未定", match.Kickoff);
-        Assert.Equal("試合前", match.Status);
+        Assert.Equal("未定", match.Status);
         Assert.Equal("", match.Conference);
     }
 
@@ -69,10 +69,16 @@ public sealed class ScheduleParserTests
         var warning = ScheduleFetcher.BuildDivisionConsistencyWarning(
             Array.Empty<ScheduleFetcher.Item>(),
             new[] { d2Fixture },
-            new[] { d3Fixture },
+            Array.Empty<ScheduleFetcher.Item>(),
             currentTeams);
 
-        Assert.Contains("川越狭山セコムラガッツ", warning, StringComparison.Ordinal);
+        Assert.Null(warning);
+        var staleScheduleWarning = ScheduleFetcher.BuildDivisionConsistencyWarning(
+            Array.Empty<ScheduleFetcher.Item>(),
+            Array.Empty<ScheduleFetcher.Item>(),
+            new[] { d3Fixture },
+            currentTeams);
+        Assert.Contains("川越狭山セコムラガッツ", staleScheduleWarning, StringComparison.Ordinal);
         Assert.Equal("川越狭山セコムラガッツ", d2Fixture.Home);
     }
 }

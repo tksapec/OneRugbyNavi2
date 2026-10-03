@@ -50,19 +50,38 @@ public static partial class TeamIndexParser
                 var href = Clean(anchor.GetAttributeValue("href", ""));
                 if (!Uri.TryCreate(sourceUri, href, out var teamUri)) continue;
                 var pathMatch = TeamPathRegex().Match(teamUri.AbsolutePath);
-                if (!pathMatch.Success || teamUri.Host != sourceUri.Host) continue;
 
                 var name = Clean(anchor.SelectSingleNode(".//span[contains(concat(' ', normalize-space(@class), ' '), ' name ')]")?.InnerText
                     ?? anchor.SelectSingleNode(".//img")?.GetAttributeValue("alt", "")
                     ?? "");
-                if (string.IsNullOrWhiteSpace(name) || !seen.Add(pathMatch.Groups["id"].Value)) continue;
+
+                var teamId = "";
+                var teamUrl = "";
+                var entryDivisionCode = divisionCode;
+                if (pathMatch.Success && teamUri.Host.Equals(sourceUri.Host, StringComparison.OrdinalIgnoreCase))
+                {
+                    teamId = pathMatch.Groups["id"].Value;
+                    teamUrl = teamUri.AbsoluteUri;
+                }
+                else if (expectedSeasonStartYear == 2026 &&
+                         sourceUri.Host.Equals("league-one.jp", StringComparison.OrdinalIgnoreCase) &&
+                         sourceUri.AbsolutePath.Equals("/content/team/2026", StringComparison.Ordinal))
+                {
+                    var knownTeam = SeasonCatalog.Teams2026.FirstOrDefault(team =>
+                        SeasonCatalog.AreSameTeamName(team.TeamName, name, expectedSeasonStartYear));
+                    if (knownTeam is null) continue;
+                    teamId = knownTeam.LeagueOneTeamId;
+                    teamUrl = knownTeam.TeamUrl;
+                }
+
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(teamId) || !seen.Add(teamId)) continue;
 
                 var imageUrl = anchor.SelectSingleNode(".//img")?.GetAttributeValue("src", "") ?? "";
                 entries.Add(new TeamIndexEntry(
-                    pathMatch.Groups["id"].Value,
+                    teamId,
                     name,
-                    divisionCode,
-                    teamUri.AbsoluteUri,
+                    entryDivisionCode,
+                    teamUrl,
                     ResolveUrl(sourceUri, imageUrl)));
             }
         }

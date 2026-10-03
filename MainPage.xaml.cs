@@ -30,6 +30,7 @@ namespace OneRugbyNavi2
         private string _databaseBuildTimestampText = "-";
         private string _selectedSeasonKey = "";
         private string _selectedSeasonLabel = "";
+        private string? _dataConsistencyWarning;
         private readonly System.Collections.Generic.List<ScheduleFetcher.SeasonOption> _seasonOptions = new();
         private CancellationTokenSource? _messageHideCts;
 
@@ -91,6 +92,7 @@ namespace OneRugbyNavi2
             _isRefreshing = true;
             SetLoading(true);
             SetMessage("", false);
+            _dataConsistencyWarning = null;
             cachePanel.IsVisible = false;
 
             try
@@ -126,12 +128,13 @@ namespace OneRugbyNavi2
                     var fetchedAt = fetchResult?.FetchedAt ?? DateTimeOffset.Now;
                     _selectedSeasonKey = fetchResult?.SeasonKey ?? _selectedSeasonKey;
                     _selectedSeasonLabel = fetchResult?.SeasonLabel ?? _selectedSeasonLabel;
+                    _dataConsistencyWarning = fetchResult?.DataConsistencyWarning;
                     await ScheduleCacheStore.SaveAsync(_selectedSeasonKey, _selectedSeasonLabel, div1, div2, div3, replacement, other, fetchedAt);
                     _databaseBuildTimestampText = fetchedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
                     var statusMessage = fetchResult?.DataConsistencyWarning is { Length: > 0 } warning
                         ? $"{FetchedOfficialScheduleMessage}\n{warning}"
                         : FetchedOfficialScheduleMessage;
-                    SetMessage(statusMessage, true, autoHide: fetchResult?.DataConsistencyWarning is null);
+                    SetMessage(statusMessage, true, autoHide: true);
                 }
                 else
                 {
@@ -151,7 +154,7 @@ namespace OneRugbyNavi2
                         RefreshPickers(preserveSelection: false);
                         _databaseBuildTimestampText = "-";
                         UpdateLastUpdatedLabel();
-                        SetMessage(FetchFailedMessage, true);
+                        SetMessage(FetchFailedMessage, true, autoHide: true);
                         UpdateEmptyState();
                             UpdateFilterSummaryUi();
                         return;
@@ -208,7 +211,7 @@ namespace OneRugbyNavi2
                 RefreshPickers(preserveSelection: false);
                 _databaseBuildTimestampText = "-";
                 UpdateLastUpdatedLabel();
-                SetMessage(FetchFailedMessage, true);
+                SetMessage(FetchFailedMessage, true, autoHide: true);
                 UpdateEmptyState();
                 UpdateFilterSummaryUi();
             }
@@ -538,15 +541,9 @@ namespace OneRugbyNavi2
             await DisplayAlert("\u5B8C\u4E86", $"\u304A\u6C17\u306B\u5165\u308A\u306B\u767B\u9332\u3057\u307E\u3057\u305F\u3002\n{team}", "OK");
         }
 
-        private async void OnStandingsClicked(object sender, EventArgs e)
-        {
-            await OpenWebAsync("https://league-one.jp/standings/");
-        }
-
-        private async void OnInfoClicked(object sender, EventArgs e)
+        private void OnInfoClicked(object sender, EventArgs e)
         {
             menuOverlay.IsVisible = true;
-            Shell.SetTabBarIsVisible(this, false);
         }
 
         private void CloseMenuOverlay()
@@ -557,7 +554,6 @@ namespace OneRugbyNavi2
             }
 
             menuOverlay.IsVisible = false;
-            Shell.SetTabBarIsVisible(this, true);
         }
 
         private void OnMenuBackdropTapped(object sender, TappedEventArgs e) => CloseMenuOverlay();
@@ -583,6 +579,7 @@ namespace OneRugbyNavi2
                 $"対象シーズン: {_selectedSeasonLabel}\n" +
                 $"表示状態: {cacheState}\n" +
                 $"最終更新: {_databaseBuildTimestampText}\n\n" +
+                (string.IsNullOrWhiteSpace(_dataConsistencyWarning) ? "" : $"データ確認: {_dataConsistencyWarning}\n\n") +
                 $"D1: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv1)}件 / " +
                 $"D2: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv2)}件 / " +
                 $"D3: {_vm.GetCategoryItemCount(ScheduleViewModel.CategoryDiv3)}件 / " +
@@ -593,6 +590,17 @@ namespace OneRugbyNavi2
             await DisplayAlert("更新状況", body, "OK");
         }
 
+        private async void OnMenuScheduleClicked(object sender, EventArgs e)
+        {
+            CloseMenuOverlay();
+            await Shell.Current.GoToAsync("//SchedulePage");
+        }
+
+        private async void OnMenuTeamsClicked(object sender, EventArgs e)
+        {
+            await NavigateToMenuPageAsync(nameof(TeamListPage));
+        }
+
         private async void OnMenuStandingsClicked(object sender, EventArgs e)
         {
             CloseMenuOverlay();
@@ -601,14 +609,19 @@ namespace OneRugbyNavi2
 
         private async void OnMenuRankingClicked(object sender, EventArgs e)
         {
-            CloseMenuOverlay();
-            await Shell.Current.GoToAsync("//RankingPage");
+            await NavigateToMenuPageAsync(nameof(RankingPage));
         }
 
         private async void OnMenuAboutClicked(object sender, EventArgs e)
         {
+            await NavigateToMenuPageAsync(nameof(InfoPage));
+        }
+
+        private async Task NavigateToMenuPageAsync(string route)
+        {
             CloseMenuOverlay();
-            await Shell.Current.GoToAsync("//InfoPage");
+            await Shell.Current.GoToAsync("//SchedulePage");
+            await Shell.Current.GoToAsync(route);
         }
 
         private async void OnMenuClearCacheClicked(object sender, EventArgs e)
@@ -622,7 +635,7 @@ namespace OneRugbyNavi2
             loadingPanel.IsVisible = isLoading;
         }
 
-        private void SetMessage(string message, bool visible, bool autoHide = false)
+        private void SetMessage(string message, bool visible, bool autoHide = true)
         {
             _messageHideCts?.Cancel();
             _lastMessage = visible ? message : null;

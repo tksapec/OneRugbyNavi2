@@ -6,6 +6,20 @@ namespace OneRugbyNavi2.Core.Tests;
 public sealed class SeasonAndCatalogParserTests
 {
     [Theory]
+    [InlineData("D1", "div1")]
+    [InlineData("d1", "div1")]
+    [InlineData("D2", "div2")]
+    [InlineData("d2", "div2")]
+    [InlineData("D3", "div3")]
+    [InlineData("d3", "div3")]
+    public void Schedule_table_url_accepts_fetcher_division_codes(string division, string expectedSlug)
+    {
+        Assert.Equal(
+            $"https://league-one.jp/content/schedule_table/2026/{expectedSlug}",
+            SeasonCatalog.ScheduleTableUrl("2026", division));
+    }
+
+    [Theory]
     [InlineData("<h2>2026-27シーズン</h2>", 2026)]
     [InlineData("<h2>2025-26シーズン</h2>", 2025)]
     [InlineData("<div>2026ｰ27 シーズン</div>", 2026)]
@@ -138,8 +152,9 @@ public sealed class SeasonAndCatalogParserTests
     {
         Assert.Equal(27, SeasonCatalog.Teams2026.Count);
         Assert.Equal(12, SeasonCatalog.Teams2026.Count(team => team.DivisionCode == "DIV1"));
-        Assert.Equal(7, SeasonCatalog.Teams2026.Count(team => team.DivisionCode == "DIV2"));
-        Assert.Equal(8, SeasonCatalog.Teams2026.Count(team => team.DivisionCode == "DIV3"));
+        Assert.Equal(8, SeasonCatalog.Teams2026.Count(team => team.DivisionCode == "DIV2"));
+        Assert.Equal(7, SeasonCatalog.Teams2026.Count(team => team.DivisionCode == "DIV3"));
+        Assert.Equal("DIV2", SeasonCatalog.GetCurrentTeam("川越狭山セコムラガッツ")?.DivisionCode);
         Assert.Equal(27, SeasonCatalog.Teams2026.Select(team => team.LeagueOneTeamId).Distinct().Count());
     }
 }
