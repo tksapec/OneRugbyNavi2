@@ -24,6 +24,19 @@ public sealed class FavoriteTeamLogicTests
     }
 
     [Fact]
+    public void FavoriteSummaryShowsEverySavedNameAndSelectedTeamStatus()
+    {
+        var summary = FavoriteTeamLogic.FormatFavoriteSummary(
+            new[] { "浦安D-Rocks", "埼玉パナソニックワイルドナイツ" },
+            "浦安D-Rocks",
+            true);
+
+        Assert.Contains("浦安D-Rocks", summary);
+        Assert.Contains("埼玉パナソニックワイルドナイツ", summary);
+        Assert.Contains("選択中: 浦安D-Rocks（登録済み）", summary);
+    }
+
+    [Fact]
     public void ToggleFavoriteUsesSeasonAwareIdentity()
     {
         var favorites = new[] { "埼玉ワイルドナイツ", "東芝ブレイブルーパス東京" };

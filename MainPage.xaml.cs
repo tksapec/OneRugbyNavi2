@@ -882,13 +882,8 @@ namespace OneRugbyNavi2
             var selectedTeam = _vm.TeamFilter;
             var hasSelection = !string.IsNullOrWhiteSpace(selectedTeam);
             var isSelectedFavorite = hasSelection && IsFavoriteTeam(selectedTeam!, GetSelectedSeasonStartYear());
-            favoriteTeamLabel.Text = _favoriteTeams.Count == 0
-                ? "お気に入り: 未登録"
-                : $"お気に入り: {_favoriteTeams.Count}チーム";
-            if (hasSelection)
-            {
-                favoriteTeamLabel.Text += $"\n{selectedTeam}: {(isSelectedFavorite ? "登録済み" : "未登録")}";
-            }
+            favoriteTeamLabel.Text = FavoriteTeamLogic.FormatFavoriteSummary(
+                _favoriteTeams, selectedTeam, isSelectedFavorite);
 
             favoriteButton.Text = isSelectedFavorite ? "お気に入り解除" : "お気に入り登録";
             favoriteButton.IsEnabled = hasSelection;

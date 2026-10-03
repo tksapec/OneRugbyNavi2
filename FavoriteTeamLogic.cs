@@ -34,6 +34,23 @@ public static class FavoriteTeamLogic
     public static string Serialize(IReadOnlyCollection<string> favorites)
         => JsonSerializer.Serialize(DeduplicateExact(favorites));
 
+    public static string FormatFavoriteSummary(
+        IReadOnlyList<string> favorites,
+        string? selectedTeam,
+        bool isSelectedFavorite)
+    {
+        var summary = favorites.Count == 0
+            ? "お気に入り: 未登録"
+            : $"登録済み ({favorites.Count}チーム):\n・" + string.Join("\n・", favorites);
+
+        if (!string.IsNullOrWhiteSpace(selectedTeam))
+        {
+            summary += $"\n\n選択中: {selectedTeam}（{(isSelectedFavorite ? "登録済み" : "未登録")}）";
+        }
+
+        return summary;
+    }
+
     public static IReadOnlyList<string> Toggle(IReadOnlyList<string> favorites, string team, int seasonStartYear)
     {
         var name = team?.Trim() ?? "";

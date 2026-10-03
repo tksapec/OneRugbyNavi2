@@ -296,7 +296,7 @@
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        TextColor="{StaticResource AppNavy}"
-                                       LineBreakMode="TailTruncation" />
+                                       LineBreakMode="WordWrap" />
                             </VerticalStackLayout>
                             <Button x:Name="favoriteButton"
                                     Grid.Column="1"
