@@ -47,6 +47,65 @@ public sealed class FavoriteTeamLogicTests
     }
 
     [Fact]
+    public void ToggleInDivisionReplacesOnlyThatDivisionFavorite()
+    {
+        var d1 = new[] { Match("d1", "浦安D-Rocks", "横浜キヤノンイーグルス") };
+        var d2 = new[] { Match("d2", "花園近鉄ライナーズ", "清水建設江東ブルーシャークス") };
+        var d3 = new[] { Match("d3", "ヤクルトレビンズ戸田", "中国電力レッドレグリオンズ") };
+
+        var updated = FavoriteTeamLogic.ToggleInDivision(
+            new[] { "浦安D-Rocks", "花園近鉄ライナーズ", "ヤクルトレビンズ戸田" },
+            "横浜キヤノンイーグルス",
+            1,
+            2026,
+            d1,
+            d2,
+            d3);
+
+        Assert.Equal(new[] { "花園近鉄ライナーズ", "ヤクルトレビンズ戸田", "横浜キヤノンイーグルス" }, updated);
+    }
+
+    [Fact]
+    public void ToggleInDivisionRemovesFavoriteFromItsSlot()
+    {
+        var d1 = new[] { Match("d1", "浦安D-Rocks", "横浜キヤノンイーグルス") };
+
+        var updated = FavoriteTeamLogic.ToggleInDivision(
+            new[] { "浦安D-Rocks", "花園近鉄ライナーズ" },
+            "浦安D-Rocks",
+            1,
+            2026,
+            d1,
+            new[] { Match("d2", "花園近鉄ライナーズ", "清水建設江東ブルーシャークス") },
+            Array.Empty<MatchItem>());
+
+        Assert.Equal(new[] { "花園近鉄ライナーズ" }, updated);
+    }
+
+    [Fact]
+    public void NormalizeByDivisionKeepsOneExistingFavoritePerDivision()
+    {
+        var favorites = new[]
+        {
+            "東京サントリーサンゴリアス",
+            "浦安D-Rocks",
+            "花園近鉄ライナーズ",
+            "中国電力レッドレグリオンズ"
+        };
+        var d1 = new[]
+        {
+            Match("d1-first", "浦安D-Rocks", "横浜キヤノンイーグルス"),
+            Match("d1-second", "東京サントリーサンゴリアス", "埼玉パナソニックワイルドナイツ")
+        };
+        var d2 = new[] { Match("d2", "花園近鉄ライナーズ", "清水建設江東ブルーシャークス") };
+        var d3 = new[] { Match("d3", "ヤクルトレビンズ戸田", "中国電力レッドレグリオンズ") };
+
+        var result = FavoriteTeamLogic.NormalizeByDivision(favorites, 2026, d1, d2, d3);
+
+        Assert.Equal(new[] { "東京サントリーサンゴリアス", "花園近鉄ライナーズ", "中国電力レッドレグリオンズ" }, result);
+    }
+
+    [Fact]
     public void FavoriteMatchUsesHistoricalAlias()
     {
         var match = new MatchItem

@@ -7,7 +7,7 @@ public sealed class TeamListPage : ContentPage
 {
     private readonly TeamCatalogFetcher _catalogFetcher = new();
 
-    private readonly ObservableCollection<TeamCard> _teams = new();
+    private readonly ObservableCollection<TeamGroup> _teamGroups = new();
     private readonly SemaphoreSlim _loadGate = new(1, 1);
     private readonly Label _status = PageStyles.MutedLabel("読み込み中...");
 
@@ -19,8 +19,10 @@ public sealed class TeamListPage : ContentPage
 
         var list = new CollectionView
         {
-            ItemsSource = _teams,
-            ItemTemplate = new DataTemplate(CreateTeamCard)
+            ItemsSource = _teamGroups,
+            IsGrouped = true,
+            ItemTemplate = new DataTemplate(CreateTeamCard),
+            GroupHeaderTemplate = new DataTemplate(CreateGroupHeader)
         };
 
         Content = new Grid
@@ -51,21 +53,28 @@ public sealed class TeamListPage : ContentPage
         if (!await _loadGate.WaitAsync(0)) return;
         try
         {
-            _teams.Clear();
+            _teamGroups.Clear();
             var seasonYear = SeasonCatalog.CurrentSeasonStartYear;
             var catalog = await _catalogFetcher.GetAsync(seasonYear);
             var displayTeams = await BuildTeamCardsAsync(catalog.Snapshot);
 
-            foreach (var team in displayTeams)
+            foreach (var division in new[] { "DIV1", "DIV2", "DIV3" })
             {
-                _teams.Add(team);
+                var teams = displayTeams
+                    .Where(team => string.Equals(team.DivisionCode, division, StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+                if (teams.Length > 0)
+                {
+                    _teamGroups.Add(new TeamGroup(division, teams));
+                }
             }
 
             var seasonLabel = SeasonCatalog.ToSeasonUiLabel(seasonYear.ToString());
             var sourceLabel = catalog.UsedFallback ? "保存済み/内蔵カタログ" : "公式サイト";
-            _status.Text = _teams.Count == 0
+            var teamCount = _teamGroups.Sum(group => group.Count);
+            _status.Text = teamCount == 0
                 ? $"{seasonLabel}: 公式チーム情報を確認できません"
-                : $"{seasonLabel}: {sourceLabel}から{_teams.Count}チーム";
+                : $"{seasonLabel}: {sourceLabel}から{teamCount}チーム";
         }
         catch (Exception ex)
         {
@@ -134,22 +143,8 @@ public sealed class TeamListPage : ContentPage
         var imageLayer = new Grid { WidthRequest = 56, HeightRequest = 56 };
         imageLayer.Children.Add(badge);
         imageLayer.Children.Add(logo);
-        var logoTap = new TapGestureRecognizer();
-        logoTap.Tapped += async (_, _) =>
-        {
-            if (imageLayer.BindingContext is TeamCard team)
-            {
-                await OpenOfficialTeamPageAsync(team.TeamUrl);
-            }
-        };
-        imageLayer.GestureRecognizers.Add(logoTap);
-        SemanticProperties.SetHint(imageLayer, "タップすると公式チームページを開きます");
-
         var name = new Label { FontSize = 16, FontAttributes = FontAttributes.Bold, TextColor = PageStyles.Navy };
         name.SetBinding(Label.TextProperty, nameof(TeamCard.TeamName));
-
-        var meta = PageStyles.MutedLabel();
-        meta.SetBinding(Label.TextProperty, nameof(TeamCard.MetaText));
 
         var row = new Grid
         {
@@ -162,13 +157,36 @@ public sealed class TeamListPage : ContentPage
             Children =
             {
                 imageLayer.Column(0),
-                new VerticalStackLayout { Spacing = 4, Children = { name, meta } }.Column(1)
+                name.Column(1)
             }
         };
 
         var card = PageStyles.Card(row);
         card.SetBinding(BindableObject.BindingContextProperty, ".");
+        var teamTap = new TapGestureRecognizer();
+        teamTap.Tapped += async (_, _) =>
+        {
+            if (card.BindingContext is TeamCard team)
+            {
+                await OpenOfficialTeamPageAsync(team.TeamUrl);
+            }
+        };
+        card.GestureRecognizers.Add(teamTap);
+        SemanticProperties.SetHint(card, "タップすると公式チームページを開きます");
         return card;
+    }
+
+    private static View CreateGroupHeader()
+    {
+        var heading = new Label
+        {
+            FontSize = 18,
+            FontAttributes = FontAttributes.Bold,
+            TextColor = PageStyles.Navy,
+            Margin = new Thickness(16, 16, 16, 4)
+        };
+        heading.SetBinding(Label.TextProperty, nameof(TeamGroup.Title));
+        return heading;
     }
 
     private async Task OpenOfficialTeamPageAsync(string teamUrl)
@@ -187,5 +205,15 @@ public sealed class TeamListPage : ContentPage
         {
             await DisplayAlert("確認", $"チーム公式ページを開けませんでした。\n{ex.Message}", "OK");
         }
+    }
+
+    private sealed class TeamGroup : ObservableCollection<TeamCard>
+    {
+        public TeamGroup(string title, IEnumerable<TeamCard> teams) : base(teams)
+        {
+            Title = title;
+        }
+
+        public string Title { get; }
     }
 }

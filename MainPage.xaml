@@ -198,8 +198,8 @@
 
                     <Grid Grid.Row="1"
                           Grid.ColumnSpan="2"
-                          ColumnDefinitions="*,Auto"
-                          ColumnSpacing="8">
+                          RowDefinitions="Auto,Auto"
+                          RowSpacing="6">
                         <Label x:Name="filterSummaryLabel"
                                FontSize="13"
                                TextColor="{StaticResource AppNavy}"
@@ -207,17 +207,28 @@
                                MaxLines="2"
                                VerticalTextAlignment="Center"
                                Text="フィルタなし" />
-                        <Button x:Name="favoriteQuickFilterButton"
-                                Grid.Column="1"
-                                Text="★ 0"
-                                FontSize="12"
-                                FontAttributes="Bold"
+                        <Border x:Name="favoriteQuickFilterBorder"
+                                Grid.Row="1"
+                                IsVisible="False"
+                                HorizontalOptions="Start"
+                                Stroke="{StaticResource AppWarningBackground}"
                                 BackgroundColor="{StaticResource AppWarningBackground}"
-                                TextColor="{StaticResource AppWarningText}"
-                                CornerRadius="12"
-                                Padding="10,4"
-                                HeightRequest="32"
-                                Clicked="OnQuickFavoriteFilterClicked" />
+                                Padding="10,5">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Label x:Name="favoriteQuickFilterLabel"
+                                   Text="☆ お気に入りチーム"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource AppWarningText}"
+                                   LineBreakMode="WordWrap"
+                                   MaxLines="2">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnFavoriteFilterLabelTapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Border>
                     </Grid>
                 </Grid>
             </Border>
@@ -296,7 +307,11 @@
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        TextColor="{StaticResource AppNavy}"
-                                       LineBreakMode="WordWrap" />
+                                       LineBreakMode="WordWrap">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnFavoriteFilterLabelTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </VerticalStackLayout>
                             <Button x:Name="favoriteButton"
                                     Grid.Column="1"
@@ -332,12 +347,16 @@
             </Border>
         </VerticalStackLayout>
 
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" IsClippedToBounds="True">
+            <Grid x:Name="schedulePageContent">
             <CollectionView x:Name="list"
                             VerticalOptions="FillAndExpand"
-                            SelectionMode="Single"
-                            SelectionChanged="OnMatchSelectionChanged"
+                            SelectionMode="None"
                             ItemSizingStrategy="MeasureFirstItem">
+                <CollectionView.GestureRecognizers>
+                    <SwipeGestureRecognizer Direction="Left" Swiped="OnScheduleSwiped" />
+                    <SwipeGestureRecognizer Direction="Right" Swiped="OnScheduleSwiped" />
+                </CollectionView.GestureRecognizers>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:MatchItem">
                         <Border Margin="0,0,0,12"
@@ -475,7 +494,11 @@
                                        FontSize="34"
                                        TextColor="{StaticResource Primary}"
                                        VerticalTextAlignment="Center"
-                                       HorizontalTextAlignment="End" />
+                                       HorizontalTextAlignment="End">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnMatchTapped" />
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -497,6 +520,11 @@
                        TextColor="{StaticResource AppMuted}"
                        Text="該当する試合はありません" />
             </Border>
+            </Grid>
+            <GraphicsView x:Name="pageCurlOverlay"
+                          IsVisible="False"
+                          InputTransparent="True"
+                          ZIndex="10" />
         </Grid>
 
         <Grid x:Name="menuOverlay"

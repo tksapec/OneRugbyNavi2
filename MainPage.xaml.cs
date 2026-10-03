@@ -28,6 +28,8 @@ namespace OneRugbyNavi2
         private bool _isFilterExpanded;
         private bool _teamFilterManuallySelected;
         private bool _isFavoriteFilterActive;
+        private bool _isDivisionSwipeAnimating;
+        private DateTime _lastHorizontalSwipeUtc = DateTime.MinValue;
         private string? _lastMessage;
         private System.Collections.Generic.IReadOnlyList<string> _favoriteTeams = Array.Empty<string>();
         private string _databaseBuildTimestampText = "-";
@@ -189,6 +191,19 @@ namespace OneRugbyNavi2
                 }
 
                 _vm.SetItems(div1, div2, div3, replacement, other);
+                var normalizedFavorites = FavoriteTeamLogic.NormalizeByDivision(
+                    _favoriteTeams,
+                    GetSelectedSeasonStartYear(),
+                    _vm.ItemsDiv1.ToList(),
+                    _vm.ItemsDiv2.ToList(),
+                    _vm.ItemsDiv3.ToList());
+                if (!_favoriteTeams.SequenceEqual(normalizedFavorites, StringComparer.Ordinal))
+                {
+                    _favoriteTeams = normalizedFavorites;
+                    Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(_favoriteTeams));
+                    Preferences.Remove(LegacyFavoriteTeamKey);
+                }
+
                 _vm.SetSource(currentCategory);
                 if (_vm.GetCurrentDivisionItemCount() == 0)
                 {
@@ -303,6 +318,94 @@ namespace OneRugbyNavi2
             UpdateEmptyState();
             UpdateFavoriteUi();
             UpdateFilterSummaryUi();
+        }
+
+        private async void OnScheduleSwiped(object sender, SwipedEventArgs e)
+        {
+            _lastHorizontalSwipeUtc = DateTime.UtcNow;
+            await TurnSchedulePageAsync(e.Direction);
+        }
+
+        private async Task TurnSchedulePageAsync(SwipeDirection direction)
+        {
+            if (_isDivisionSwipeAnimating)
+            {
+                return;
+            }
+
+            var currentDivision = _vm.CurrentDivision;
+            if (currentDivision is < 1 or > 3)
+            {
+                return;
+            }
+
+            var targetDivision = direction == SwipeDirection.Left
+                ? currentDivision + 1
+                : currentDivision - 1;
+            if (targetDivision is < 1 or > 3)
+            {
+                return;
+            }
+
+            _isDivisionSwipeAnimating = true;
+            var isForwardTurn = direction == SwipeDirection.Left;
+            var departingPage = CaptureSchedulePage();
+            var curl = new PageCurlDrawable(isForwardTurn, departingPage);
+            pageCurlOverlay.Drawable = curl;
+            try
+            {
+                pageCurlOverlay.IsVisible = true;
+                SelectCategory(DivisionToCategory(targetDivision));
+                await AnimatePageCurlAsync(curl, 0, 1, 520, Easing.CubicInOut);
+            }
+            finally
+            {
+                curl.SetProgress(0);
+                pageCurlOverlay.Invalidate();
+                pageCurlOverlay.IsVisible = false;
+                _isDivisionSwipeAnimating = false;
+            }
+        }
+
+#if ANDROID
+        private Microsoft.Maui.Graphics.IImage? CaptureSchedulePage()
+        {
+            if (schedulePageContent.Handler?.PlatformView is not Android.Views.View nativePage ||
+                nativePage.Width <= 0 || nativePage.Height <= 0)
+                return null;
+
+            using var bitmap = Android.Graphics.Bitmap.CreateBitmap(
+                nativePage.Width, nativePage.Height, Android.Graphics.Bitmap.Config.Argb8888!);
+            using (var nativeCanvas = new Android.Graphics.Canvas(bitmap))
+                nativePage.Draw(nativeCanvas);
+
+            using var stream = new System.IO.MemoryStream();
+            bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png!, 100, stream);
+            stream.Position = 0;
+            var imageLoader = schedulePageContent.Handler.MauiContext?.Services
+                .GetService<Microsoft.Maui.Graphics.IImageLoadingService>();
+            return imageLoader?.FromStream(stream, Microsoft.Maui.Graphics.ImageFormat.Png);
+        }
+
+#endif
+
+        private async Task AnimatePageCurlAsync(PageCurlDrawable curl, double from, double to, uint duration, Easing easing)
+        {
+            var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var animation = new Animation(value =>
+            {
+                curl.SetProgress(value);
+                pageCurlOverlay.Invalidate();
+            }, from, to, easing);
+            animation.Commit(this, "DivisionPageCurl", length: duration, finished: (_, wasCancelled) =>
+            {
+                if (wasCancelled)
+                    completion.TrySetCanceled();
+                else
+                    completion.TrySetResult();
+            });
+
+            await completion.Task;
         }
 
         private void UpdateTabVisual(int active)
@@ -517,7 +620,7 @@ namespace OneRugbyNavi2
             UpdateFilterSummaryUi();
         }
 
-        private void OnQuickFavoriteFilterClicked(object sender, EventArgs e)
+        private void OnFavoriteFilterLabelTapped(object sender, TappedEventArgs e)
         {
             if (_favoriteTeams.Count == 0)
             {
@@ -569,14 +672,18 @@ namespace OneRugbyNavi2
             UpdateFilterPanelUi();
         }
 
-        private async void OnMatchSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void OnMatchTapped(object? sender, TappedEventArgs e)
         {
-            if (e.CurrentSelection.FirstOrDefault() is not MatchItem match)
+            if (sender is not BindableObject { BindingContext: MatchItem match })
             {
                 return;
             }
 
-            list.SelectedItem = null;
+            // A fast fling can raise both the swipe and tap recognizers on Android.
+            await Task.Delay(180);
+            if (DateTime.UtcNow - _lastHorizontalSwipeUtc < TimeSpan.FromMilliseconds(600))
+                return;
+
             try
             {
                 await NavigateToMatchAsync(match);
@@ -624,7 +731,14 @@ namespace OneRugbyNavi2
 
             var seasonYear = GetSelectedSeasonStartYear();
             var wasFavorite = IsFavoriteTeam(team, seasonYear);
-            _favoriteTeams = FavoriteTeamLogic.Toggle(_favoriteTeams, team, seasonYear);
+            _favoriteTeams = FavoriteTeamLogic.ToggleInDivision(
+                _favoriteTeams,
+                team,
+                _vm.CurrentDivision,
+                seasonYear,
+                _vm.ItemsDiv1.ToList(),
+                _vm.ItemsDiv2.ToList(),
+                _vm.ItemsDiv3.ToList());
             Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(_favoriteTeams));
             Preferences.Remove(LegacyFavoriteTeamKey);
             ExitFavoriteFilterMode();
@@ -799,6 +913,7 @@ namespace OneRugbyNavi2
                 parts.Add($"\u671F\u9593: {GetPeriodFilterText(_vm.PeriodFilter)}");
             }
 
+            filterSummaryLabel.IsVisible = parts.Count > 0 || !_isFavoriteFilterActive;
             filterSummaryLabel.Text = parts.Count == 0
                 ? "\u30D5\u30A3\u30EB\u30BF\u306A\u3057"
                 : string.Join(" / ", parts);
@@ -882,18 +997,26 @@ namespace OneRugbyNavi2
             var selectedTeam = _vm.TeamFilter;
             var hasSelection = !string.IsNullOrWhiteSpace(selectedTeam);
             var isSelectedFavorite = hasSelection && IsFavoriteTeam(selectedTeam!, GetSelectedSeasonStartYear());
-            favoriteTeamLabel.Text = FavoriteTeamLogic.FormatFavoriteSummary(
+            var favoriteSummary = FavoriteTeamLogic.FormatFavoriteSummary(
                 _favoriteTeams, selectedTeam, isSelectedFavorite);
+            favoriteTeamLabel.Text = $"{(_isFavoriteFilterActive ? "★" : "☆")} {favoriteSummary}";
+            favoriteTeamLabel.IsEnabled = _favoriteTeams.Count > 0;
+            favoriteTeamLabel.Opacity = _favoriteTeams.Count > 0 ? 1 : 0.65;
+
+            var quickFilterFavorites = _isFavoriteFilterActive && _vm.FavoriteTeamFilters.Count > 0
+                ? _vm.FavoriteTeamFilters
+                : _favoriteTeams;
+            var quickFilterNames = quickFilterFavorites
+                .Select(favorite => FindCurrentTeamAlias(favorite) ?? favorite)
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            favoriteQuickFilterLabel.Text = $"{(_isFavoriteFilterActive ? "★" : "☆")} {string.Join("、", quickFilterNames)}";
+            favoriteQuickFilterBorder.IsVisible = _favoriteTeams.Count > 0;
+            favoriteQuickFilterBorder.IsEnabled = _favoriteTeams.Count > 0;
+            favoriteQuickFilterBorder.Opacity = _favoriteTeams.Count > 0 ? 1 : 0.65;
 
             favoriteButton.Text = isSelectedFavorite ? "お気に入り解除" : "お気に入り登録";
             favoriteButton.IsEnabled = hasSelection;
-            favoriteQuickFilterButton.Text = _isFavoriteFilterActive
-                ? $"★ {_favoriteTeams.Count} 絞込中"
-                : _favoriteTeams.Count == 0 ? "★ 0" : $"★ {_favoriteTeams.Count}";
-            favoriteQuickFilterButton.IsEnabled = _favoriteTeams.Count > 0;
-            favoriteQuickFilterButton.BackgroundColor = _isFavoriteFilterActive
-                ? Color.FromArgb("#FFE3A3")
-                : Color.FromArgb("#FFF6DD");
         }
 
         private void ExitFavoriteFilterMode()

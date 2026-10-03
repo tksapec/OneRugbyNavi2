@@ -69,6 +69,102 @@ public static class FavoriteTeamLogic
         return current;
     }
 
+    public static IReadOnlyList<string> ToggleInDivision(
+        IReadOnlyList<string> favorites,
+        string team,
+        int division,
+        int seasonStartYear,
+        IReadOnlyList<MatchItem> div1,
+        IReadOnlyList<MatchItem> div2,
+        IReadOnlyList<MatchItem> div3)
+    {
+        var name = team?.Trim() ?? "";
+        var current = favorites
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value.Trim())
+            .ToList();
+        if (name.Length == 0 || division is < 1 or > 3)
+        {
+            return current;
+        }
+
+        var selectedIsFavorite = current.Any(value =>
+            SeasonCatalog.AreSameTeamName(value, name, seasonStartYear));
+        var divisionMatches = division switch
+        {
+            1 => div1,
+            2 => div2,
+            _ => div3
+        };
+        var currentDivisionFavorites = FindMatchingFavorites(divisionMatches, current);
+
+        current.RemoveAll(value => currentDivisionFavorites.Any(existing =>
+            SeasonCatalog.AreSameTeamName(value, existing, seasonStartYear)));
+        if (!selectedIsFavorite)
+        {
+            current.Add(name);
+        }
+
+        var unique = new List<string>();
+        foreach (var value in current.Where(value => !string.IsNullOrWhiteSpace(value)))
+        {
+            if (!unique.Any(existing => SeasonCatalog.AreSameTeamName(existing, value, seasonStartYear)))
+            {
+                unique.Add(value);
+            }
+        }
+
+        return unique;
+    }
+
+    public static IReadOnlyList<string> NormalizeByDivision(
+        IReadOnlyList<string> favorites,
+        int seasonStartYear,
+        IReadOnlyList<MatchItem> div1,
+        IReadOnlyList<MatchItem> div2,
+        IReadOnlyList<MatchItem> div3)
+    {
+        var current = favorites
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value.Trim())
+            .ToList();
+        var divisions = new[] { div1, div2, div3 };
+        var normalized = new List<string>();
+        var assigned = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var matches in divisions)
+        {
+            var divisionFavorites = FindMatchingFavorites(matches, current);
+            if (divisionFavorites.Count == 0)
+            {
+                continue;
+            }
+
+            normalized.Add(divisionFavorites[0]);
+            foreach (var favorite in current)
+            {
+                if (divisionFavorites.Any(candidate =>
+                    SeasonCatalog.AreSameTeamName(candidate, favorite, seasonStartYear)))
+                {
+                    assigned.Add(favorite);
+                }
+            }
+        }
+
+        normalized.AddRange(current.Where(favorite => !assigned.Contains(favorite)));
+
+        var unique = new List<string>();
+        foreach (var value in normalized)
+        {
+            if (!unique.Any(existing => SeasonCatalog.AreSameTeamName(existing, value, seasonStartYear)))
+            {
+                unique.Add(value);
+            }
+        }
+
+        return unique;
+    }
+
     public static bool MatchAnyFavorite(MatchItem match, IReadOnlyCollection<string> favorites)
     {
         if (favorites.Count == 0)
