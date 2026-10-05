@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="../../MainPage.xaml" Link="Fixtures/MainPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="../../LeagueOneSyncModels.cs" Link="Production/LeagueOneSyncModels.cs" />
     <Compile Include="../../LeagueOneSeasonDetector.cs" Link="Production/LeagueOneSeasonDetector.cs" />
     <Compile Include="../../TeamCatalogParser.cs" Link="Production/TeamCatalogParser.cs" />
@@ -29,6 +33,7 @@
     <Compile Include="../../ScheduleFetcher.cs" Link="Production/ScheduleFetcher.cs" />
     <Compile Include="../../OfficialRankingUrl.cs" Link="Production/OfficialRankingUrl.cs" />
     <Compile Include="../../ScheduleDisplayOrder.cs" Link="Production/ScheduleDisplayOrder.cs" />
+    <Compile Include="../../DivisionSwipeNavigation.cs" Link="Production/DivisionSwipeNavigation.cs" />
     <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
     <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />

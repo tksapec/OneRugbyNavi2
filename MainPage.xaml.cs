@@ -29,7 +29,6 @@ namespace OneRugbyNavi2
         private bool _teamFilterManuallySelected;
         private bool _isFavoriteFilterActive;
         private bool _isDivisionSwipeAnimating;
-        private DateTime _lastHorizontalSwipeUtc = DateTime.MinValue;
         private string? _lastMessage;
         private System.Collections.Generic.IReadOnlyList<string> _favoriteTeams = Array.Empty<string>();
         private string _databaseBuildTimestampText = "-";
@@ -320,9 +319,13 @@ namespace OneRugbyNavi2
             UpdateFilterSummaryUi();
         }
 
-        private async void OnScheduleSwiped(object sender, SwipedEventArgs e)
+        private async void OnDivisionTabsSwiped(object sender, SwipedEventArgs e)
         {
-            _lastHorizontalSwipeUtc = DateTime.UtcNow;
+            if (e.Direction is not (SwipeDirection.Left or SwipeDirection.Right))
+            {
+                return;
+            }
+
             await TurnSchedulePageAsync(e.Direction);
         }
 
@@ -339,10 +342,19 @@ namespace OneRugbyNavi2
                 return;
             }
 
-            var targetDivision = direction == SwipeDirection.Left
-                ? currentDivision + 1
-                : currentDivision - 1;
-            if (targetDivision is < 1 or > 3)
+            var swipeDirection = direction switch
+            {
+                SwipeDirection.Left => DivisionSwipeDirection.Left,
+                SwipeDirection.Right => DivisionSwipeDirection.Right,
+                _ => (DivisionSwipeDirection?)null
+            };
+            if (swipeDirection is null)
+            {
+                return;
+            }
+
+            var targetDivision = DivisionSwipeNavigation.GetAdjacentDivision(currentDivision, swipeDirection.Value);
+            if (targetDivision is null)
             {
                 return;
             }
@@ -355,7 +367,7 @@ namespace OneRugbyNavi2
             try
             {
                 pageCurlOverlay.IsVisible = true;
-                SelectCategory(DivisionToCategory(targetDivision));
+                SelectCategory(DivisionToCategory(targetDivision.Value));
                 await AnimatePageCurlAsync(curl, 0, 1, 520, Easing.CubicInOut);
             }
             finally
@@ -678,11 +690,6 @@ namespace OneRugbyNavi2
             {
                 return;
             }
-
-            // A fast fling can raise both the swipe and tap recognizers on Android.
-            await Task.Delay(180);
-            if (DateTime.UtcNow - _lastHorizontalSwipeUtc < TimeSpan.FromMilliseconds(600))
-                return;
 
             try
             {
