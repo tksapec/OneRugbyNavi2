@@ -7,7 +7,7 @@ public sealed class TeamCard
     public string LeagueOneTeamId { get; init; } = "";
     public string TeamName { get; init; } = "";
     public string DivisionCode { get; init; } = "";
-    public string TeamUrl { get; init; } = "";
+    public string OfficialTeamPageUrl { get; init; } = "";
     public string LogoUrl { get; init; } = "";
     public string? LocalAssetPath { get; init; }
     public ImageSource? LogoSource => AssetImageResolver.CreateImageSource(LocalAssetPath)

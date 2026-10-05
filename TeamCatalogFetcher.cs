@@ -4,7 +4,7 @@ namespace OneRugbyNavi2;
 
 public sealed class TeamCatalogFetcher
 {
-    private const int CacheSchemaVersion = 2;
+    private const int CacheSchemaVersion = 3;
 
     private static Uri GetTeamIndexUri(int seasonStartYear)
         => seasonStartYear == 2026
@@ -78,7 +78,8 @@ public sealed class TeamCatalogFetcher
                result.Teams.Count(team => team.DivisionCode == "DIV1") == 12 &&
                result.Teams.Count(team => team.DivisionCode == "DIV2") == 8 &&
                result.Teams.Count(team => team.DivisionCode == "DIV3") == 7 &&
-               HasOfficialLogos(result);
+               HasOfficialLogos(result) &&
+               result.Teams.All(team => TeamClubPageLink.TryCreateUri(team.OfficialTeamPageUrl, out _));
     }
 
     private static bool IsValidCachedCatalog(TeamIndexResult result, int seasonStartYear)

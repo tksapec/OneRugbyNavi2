@@ -20,7 +20,8 @@ public sealed record TeamIndexEntry(
     string TeamName,
     string DivisionCode,
     string TeamUrl,
-    string LogoUrl);
+    string LogoUrl,
+    string OfficialTeamPageUrl = "");
 
 public sealed record TeamIndexResult(
     SyncReadiness Readiness,

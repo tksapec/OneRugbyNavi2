@@ -37,6 +37,7 @@
     <Compile Include="../../DivisionSwipeGesture.cs" Link="Production/DivisionSwipeGesture.cs" />
     <Compile Include="../../AppInfoCopy.cs" Link="Production/AppInfoCopy.cs" />
     <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
+    <Compile Include="../../TeamClubPageLink.cs" Link="Production/TeamClubPageLink.cs" />
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
     <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />
     <Compile Include="../../ScheduleViewModel.cs" Link="Production/ScheduleViewModel.cs" />

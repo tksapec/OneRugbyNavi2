@@ -79,7 +79,38 @@ public sealed class TeamIndexParserTests
         Assert.Equal("126", team.LeagueOneTeamId);
         Assert.Equal("DIV2", team.DivisionCode);
         Assert.Equal("https://league-one.jp/team/126", team.TeamUrl);
+        Assert.Equal("https://urayasu-d-rocks.com/", team.OfficialTeamPageUrl);
         Assert.Equal("https://league-one.s3.ap-northeast-1.amazonaws.com/image/menu/126.png", team.LogoUrl);
+    }
+
+    [Fact]
+    public void Current_season_keeps_direct_club_links_for_all_divisions()
+    {
+        var html = new System.Text.StringBuilder("<html><body><h1>チーム一覧 2026-27シーズン</h1>");
+        foreach (var division in new[] { "DIV1", "DIV2", "DIV3" })
+        {
+            var number = division[^1];
+            html.Append($"<section id='division-{number}'><h2>DIVISION {number}</h2>");
+            foreach (var team in SeasonCatalog.Teams2026.Where(team => team.DivisionCode == division))
+            {
+                html.Append($"<a href='https://club-{team.LeagueOneTeamId}.example.jp/'><img alt='{team.TeamName}' /></a>");
+            }
+
+            html.Append("</section>");
+        }
+        html.Append("</body></html>");
+
+        var result = TeamIndexParser.Parse(html.ToString(), 2026, "https://league-one.jp/content/team/2026");
+
+        Assert.Equal(27, result.Teams.Count);
+        Assert.All(result.Teams, team =>
+        {
+            Assert.True(TeamClubPageLink.TryCreateUri(team.OfficialTeamPageUrl, out _));
+            Assert.StartsWith("https://league-one.jp/team/", team.TeamUrl, StringComparison.Ordinal);
+        });
+        Assert.Equal(12, result.Teams.Count(team => team.DivisionCode == "DIV1"));
+        Assert.Equal(8, result.Teams.Count(team => team.DivisionCode == "DIV2"));
+        Assert.Equal(7, result.Teams.Count(team => team.DivisionCode == "DIV3"));
     }
 
 }

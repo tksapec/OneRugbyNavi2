@@ -57,7 +57,14 @@ public static partial class TeamIndexParser
 
                 var teamId = "";
                 var teamUrl = "";
+                var officialTeamPageUrl = "";
                 var entryDivisionCode = divisionCode;
+                var linkedPageUrl = ResolveUrl(sourceUri, href);
+                if (TeamClubPageLink.TryCreateUri(linkedPageUrl, out var officialTeamUri))
+                {
+                    officialTeamPageUrl = officialTeamUri.AbsoluteUri;
+                }
+
                 if (pathMatch.Success && teamUri.Host.Equals(sourceUri.Host, StringComparison.OrdinalIgnoreCase))
                 {
                     teamId = pathMatch.Groups["id"].Value;
@@ -82,7 +89,8 @@ public static partial class TeamIndexParser
                     name,
                     entryDivisionCode,
                     teamUrl,
-                    ResolveUrl(sourceUri, imageUrl)));
+                    ResolveUrl(sourceUri, imageUrl),
+                    officialTeamPageUrl));
             }
         }
 

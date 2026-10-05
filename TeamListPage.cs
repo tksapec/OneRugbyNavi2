@@ -113,7 +113,7 @@ public sealed class TeamListPage : ContentPage
                 LeagueOneTeamId = official.LeagueOneTeamId,
                 TeamName = official.TeamName,
                 DivisionCode = official.DivisionCode,
-                TeamUrl = official.TeamUrl,
+                OfficialTeamPageUrl = official.OfficialTeamPageUrl,
                 LogoUrl = official.LogoUrl,
                 LocalAssetPath = imagePath
             };
@@ -168,7 +168,7 @@ public sealed class TeamListPage : ContentPage
         {
             if (card.BindingContext is TeamCard team)
             {
-                await OpenOfficialTeamPageAsync(team.TeamUrl);
+                await OpenClubOfficialPageAsync(team.OfficialTeamPageUrl);
             }
         };
         card.GestureRecognizers.Add(teamTap);
@@ -189,11 +189,11 @@ public sealed class TeamListPage : ContentPage
         return heading;
     }
 
-    private async Task OpenOfficialTeamPageAsync(string teamUrl)
+    private async Task OpenClubOfficialPageAsync(string teamUrl)
     {
-        if (!TeamOfficialPageLink.TryCreateUri(teamUrl, out var uri))
+        if (!TeamClubPageLink.TryCreateUri(teamUrl, out var uri))
         {
-            await DisplayAlert("確認", "チーム公式ページのURLを確認できません。", "OK");
+            await DisplayAlert("確認", "チーム一覧から公式チームページのURLを確認できません。", "OK");
             return;
         }
 
@@ -203,7 +203,7 @@ public sealed class TeamListPage : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlert("確認", $"チーム公式ページを開けませんでした。\n{ex.Message}", "OK");
+            await DisplayAlert("確認", $"クラブ公式ページを開けませんでした。\n{ex.Message}", "OK");
         }
     }
 
