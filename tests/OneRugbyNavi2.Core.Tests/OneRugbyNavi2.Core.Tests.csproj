@@ -34,6 +34,8 @@
     <Compile Include="../../OfficialRankingUrl.cs" Link="Production/OfficialRankingUrl.cs" />
     <Compile Include="../../ScheduleDisplayOrder.cs" Link="Production/ScheduleDisplayOrder.cs" />
     <Compile Include="../../DivisionSwipeNavigation.cs" Link="Production/DivisionSwipeNavigation.cs" />
+    <Compile Include="../../DivisionSwipeGesture.cs" Link="Production/DivisionSwipeGesture.cs" />
+    <Compile Include="../../AppInfoCopy.cs" Link="Production/AppInfoCopy.cs" />
     <Compile Include="../../TeamOfficialPageLink.cs" Link="Production/TeamOfficialPageLink.cs" />
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
     <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />

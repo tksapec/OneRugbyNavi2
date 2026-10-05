@@ -11,13 +11,24 @@ namespace OneRugbyNavi2
 {
     public sealed class MatchDetailPage : ContentPage
     {
-        private const string FavoriteTeamKey = "FavoriteTeam";
+        private const string FavoriteTeamsKey = "FavoriteTeams.v2";
+        private const string LegacyFavoriteTeamKey = "FavoriteTeam";
 
         private readonly MatchItem _match;
+        private readonly IReadOnlyList<MatchItem> _div1;
+        private readonly IReadOnlyList<MatchItem> _div2;
+        private readonly IReadOnlyList<MatchItem> _div3;
 
-        public MatchDetailPage(MatchItem match)
+        public MatchDetailPage(
+            MatchItem match,
+            IReadOnlyList<MatchItem> div1,
+            IReadOnlyList<MatchItem> div2,
+            IReadOnlyList<MatchItem> div3)
         {
             _match = match;
+            _div1 = div1;
+            _div2 = div2;
+            _div3 = div3;
             BackgroundColor = PageStyles.Background;
             Shell.SetNavBarIsVisible(this, false);
 
@@ -541,8 +552,41 @@ namespace OneRugbyNavi2
                     return;
                 }
 
-                Preferences.Set(FavoriteTeamKey, team);
-                await DisplayAlert("\u5B8C\u4E86", $"\u304A\u6C17\u306B\u5165\u308A\u306B\u767B\u9332\u3057\u307E\u3057\u305F\u3002\n{team}", "OK");
+                var seasonYear = _match.SeasonStartYear > 0
+                    ? _match.SeasonStartYear
+                    : SeasonCatalog.CurrentSeasonStartYear;
+                var division = FavoriteTeamLogic.FindDivisionForTeam(team, seasonYear, _div1, _div2, _div3);
+                if (division is null)
+                {
+                    await DisplayAlert("\u78BA\u8A8D", "\u3053\u306E\u30C1\u30FC\u30E0\u306EDivision\u3092\u78BA\u8A8D\u3067\u304D\u306A\u3044\u305F\u3081、お気に入りに登録できません。", "OK");
+                    return;
+                }
+
+                var hasV2 = Preferences.ContainsKey(FavoriteTeamsKey);
+                var loaded = FavoriteTeamLogic.Load(
+                    hasV2 ? Preferences.Get(FavoriteTeamsKey, "") : null,
+                    Preferences.Get(LegacyFavoriteTeamKey, ""));
+                var divisionMatches = division.Value switch
+                {
+                    1 => _div1,
+                    2 => _div2,
+                    _ => _div3
+                };
+                var previousFavorite = FavoriteTeamLogic.FindMatchingFavorites(divisionMatches, loaded.Favorites)
+                    .FirstOrDefault(favorite => !SeasonCatalog.AreSameTeamName(favorite, team, seasonYear));
+                var wasFavorite = loaded.Favorites.Any(favorite =>
+                    SeasonCatalog.AreSameTeamName(favorite, team, seasonYear));
+                var updated = FavoriteTeamLogic.ToggleInDivision(
+                    loaded.Favorites, team, division.Value, seasonYear, _div1, _div2, _div3);
+                Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(updated));
+                Preferences.Remove(LegacyFavoriteTeamKey);
+
+                var message = wasFavorite
+                    ? $"お気に入りから解除しました。\n{team}"
+                    : previousFavorite is null
+                        ? $"お気に入りに登録しました。\n{team}"
+                        : $"{previousFavorite} から {team} にお気に入りを変更しました。";
+                await DisplayAlert("完了", message, "OK");
             }
             catch (Exception ex)
             {

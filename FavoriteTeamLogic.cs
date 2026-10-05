@@ -7,6 +7,32 @@ public sealed record QuickFavoriteFilterResolution(int Division, IReadOnlyList<s
 
 public static class FavoriteTeamLogic
 {
+    public static int? FindDivisionForTeam(
+        string? team,
+        int seasonStartYear,
+        IReadOnlyList<MatchItem> div1,
+        IReadOnlyList<MatchItem> div2,
+        IReadOnlyList<MatchItem> div3)
+    {
+        if (string.IsNullOrWhiteSpace(team))
+        {
+            return null;
+        }
+
+        var divisions = new[] { div1, div2, div3 };
+        for (var index = 0; index < divisions.Length; index++)
+        {
+            if (divisions[index].Any(match =>
+                    SeasonCatalog.AreSameTeamName(match.HomeTeam, team, seasonStartYear) ||
+                    SeasonCatalog.AreSameTeamName(match.AwayTeam, team, seasonStartYear)))
+            {
+                return index + 1;
+            }
+        }
+
+        return null;
+    }
+
     public static FavoriteLoadResult Load(string? json, string? legacyTeam)
     {
         if (!string.IsNullOrWhiteSpace(json))

@@ -37,10 +37,17 @@ namespace OneRugbyNavi2
         private string? _dataConsistencyWarning;
         private readonly System.Collections.Generic.List<ScheduleFetcher.SeasonOption> _seasonOptions = new();
         private CancellationTokenSource? _messageHideCts;
+#if ANDROID
+        private AndroidX.RecyclerView.Widget.RecyclerView? _divisionSwipeRecyclerView;
+        private AndroidX.RecyclerView.Widget.RecyclerView.SimpleOnItemTouchListener? _divisionSwipeTouchListener;
+#endif
 
         public MainPage()
         {
             InitializeComponent();
+#if ANDROID
+            list.HandlerChanged += OnScheduleListHandlerChanged;
+#endif
 
             UpdateSeasonTitle();
 
@@ -378,6 +385,135 @@ namespace OneRugbyNavi2
                 _isDivisionSwipeAnimating = false;
             }
         }
+
+#if ANDROID
+        private void OnScheduleListHandlerChanged(object? sender, EventArgs e)
+        {
+            if (_divisionSwipeRecyclerView is not null && _divisionSwipeTouchListener is not null)
+            {
+                _divisionSwipeRecyclerView.RemoveOnItemTouchListener(_divisionSwipeTouchListener);
+            }
+
+            _divisionSwipeRecyclerView = list.Handler?.PlatformView as AndroidX.RecyclerView.Widget.RecyclerView;
+            _divisionSwipeTouchListener = null;
+            if (_divisionSwipeRecyclerView is null)
+            {
+                return;
+            }
+
+            var view = _divisionSwipeRecyclerView;
+            var context = view.Context;
+            if (context is null)
+            {
+                return;
+            }
+
+            var density = view.Resources?.DisplayMetrics?.Density ?? 1f;
+            var touchSlop = Android.Views.ViewConfiguration.Get(context)?.ScaledTouchSlop ?? 0;
+            var minimumDistance = Math.Max(
+                touchSlop * 3f,
+                48f * density);
+            _divisionSwipeTouchListener = new ScheduleSwipeTouchListener(
+                minimumDistance,
+                direction =>
+                {
+                    var mauiDirection = direction == DivisionSwipeDirection.Left
+                        ? SwipeDirection.Left
+                        : SwipeDirection.Right;
+                    _ = TurnSchedulePageAsync(mauiDirection);
+                });
+            view.AddOnItemTouchListener(_divisionSwipeTouchListener);
+        }
+
+        private sealed class ScheduleSwipeTouchListener : AndroidX.RecyclerView.Widget.RecyclerView.SimpleOnItemTouchListener
+        {
+            private const float HorizontalDominanceRatio = 1.2f;
+            private readonly float _minimumDistance;
+            private readonly Action<DivisionSwipeDirection> _onSwipe;
+            private float _startX;
+            private float _startY;
+            private bool _captured;
+
+            public ScheduleSwipeTouchListener(float minimumDistance, Action<DivisionSwipeDirection> onSwipe)
+            {
+                _minimumDistance = minimumDistance;
+                _onSwipe = onSwipe;
+            }
+
+            public override bool OnInterceptTouchEvent(
+                AndroidX.RecyclerView.Widget.RecyclerView recyclerView,
+                Android.Views.MotionEvent motionEvent)
+            {
+                switch (motionEvent.ActionMasked)
+                {
+                    case Android.Views.MotionEventActions.Down:
+                        _startX = motionEvent.GetX();
+                        _startY = motionEvent.GetY();
+                        _captured = false;
+                        return false;
+                    case Android.Views.MotionEventActions.Move:
+                        if (TryGetDirection(motionEvent, out _))
+                        {
+                            _captured = true;
+                            return true;
+                        }
+                        return false;
+                    case Android.Views.MotionEventActions.Up:
+                        if (_captured)
+                        {
+                            return true;
+                        }
+
+                        if (TryGetDirection(motionEvent, out var direction))
+                        {
+                            _onSwipe(direction);
+                        }
+                        Reset();
+                        return false;
+                    case Android.Views.MotionEventActions.Cancel:
+                        Reset();
+                        return false;
+                    default:
+                        return false;
+                }
+            }
+
+            public override void OnTouchEvent(
+                AndroidX.RecyclerView.Widget.RecyclerView recyclerView,
+                Android.Views.MotionEvent motionEvent)
+            {
+                if (motionEvent.ActionMasked == Android.Views.MotionEventActions.Up)
+                {
+                    if (_captured && TryGetDirection(motionEvent, out var direction))
+                    {
+                        _onSwipe(direction);
+                    }
+                    Reset();
+                }
+                else if (motionEvent.ActionMasked == Android.Views.MotionEventActions.Cancel)
+                {
+                    Reset();
+                }
+            }
+
+            private bool TryGetDirection(Android.Views.MotionEvent motionEvent, out DivisionSwipeDirection direction)
+                => DivisionSwipeGesture.TryClassify(
+                    _startX,
+                    _startY,
+                    motionEvent.GetX(),
+                    motionEvent.GetY(),
+                    _minimumDistance,
+                    HorizontalDominanceRatio,
+                    out direction);
+
+            private void Reset()
+            {
+                _startX = 0;
+                _startY = 0;
+                _captured = false;
+            }
+        }
+#endif
 
 #if ANDROID
         private Microsoft.Maui.Graphics.IImage? CaptureSchedulePage()
@@ -719,7 +855,11 @@ namespace OneRugbyNavi2
 
         private async Task NavigateToMatchAsync(MatchItem match)
         {
-            await Navigation.PushAsync(new MatchDetailPage(match));
+            await Navigation.PushAsync(new MatchDetailPage(
+                match,
+                _vm.ItemsDiv1.ToArray(),
+                _vm.ItemsDiv2.ToArray(),
+                _vm.ItemsDiv3.ToArray()));
         }
 
         private async void OnRefreshClicked(object sender, EventArgs e)

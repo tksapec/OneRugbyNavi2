@@ -6,6 +6,25 @@ namespace OneRugbyNavi2.Core.Tests;
 public sealed class FavoriteTeamLogicTests
 {
     [Fact]
+    public void FindDivisionForTeam_resolves_the_team_from_regular_season_matches()
+    {
+        var div1 = new[] { Match("d1", "埼玉パナソニックワイルドナイツ", "東京サントリーサンゴリアス") };
+        var div2 = new[] { Match("d2", "花園近鉄ライナーズ", "九州電力キューデンヴォルテクス") };
+
+        Assert.Equal(2, FavoriteTeamLogic.FindDivisionForTeam(
+            "花園近鉄ライナーズ", 2026, div1, div2, Array.Empty<MatchItem>()));
+    }
+
+    [Fact]
+    public void FindDivisionForTeam_rejects_unknown_or_blank_team_names()
+    {
+        Assert.Null(FavoriteTeamLogic.FindDivisionForTeam(
+            "", 2026, Array.Empty<MatchItem>(), Array.Empty<MatchItem>(), Array.Empty<MatchItem>()));
+        Assert.Null(FavoriteTeamLogic.FindDivisionForTeam(
+            "未定チーム", 2026, Array.Empty<MatchItem>(), Array.Empty<MatchItem>(), Array.Empty<MatchItem>()));
+    }
+
+    [Fact]
     public void InvalidV2MigratesLegacyFavorite()
     {
         var result = FavoriteTeamLogic.Load("not-json", "Legacy Club");

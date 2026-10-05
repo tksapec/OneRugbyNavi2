@@ -49,7 +49,7 @@ public sealed class InfoPage : ContentPage
 
             _body.Children.Add(PageStyles.Card(new Label
             {
-                Text = "リーグワン公式サイトの公開情報をもとに、日程・試合結果・チーム情報・公式ランキングを表示します。起動時は同梱DBをAppDataへ初回コピーし、以後はローカルDBを優先表示します。\n\n本アプリは公式アプリではなく、リーグワンおよび各チームとは関係ありません。",
+                Text = AppInfoCopy.DataSourceDescription,
                 TextColor = PageStyles.Navy,
                 FontSize = 14,
                 LineBreakMode = LineBreakMode.WordWrap
