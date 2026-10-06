@@ -71,10 +71,13 @@ public sealed class TeamListPage : ContentPage
 
             var seasonLabel = SeasonCatalog.ToSeasonUiLabel(seasonYear.ToString());
             var sourceLabel = catalog.UsedFallback ? "保存済み/内蔵カタログ" : "公式サイト";
+            var linkStatus = displayTeams.All(team => team.CanOpenOfficialPage)
+                ? ""
+                : "（公式リンクはネット接続時に取得）";
             var teamCount = _teamGroups.Sum(group => group.Count);
             _status.Text = teamCount == 0
                 ? $"{seasonLabel}: 公式チーム情報を確認できません"
-                : $"{seasonLabel}: {sourceLabel}から{teamCount}チーム";
+                : $"{seasonLabel}: {sourceLabel}から{teamCount}チーム{linkStatus}";
         }
         catch (Exception ex)
         {
@@ -163,6 +166,7 @@ public sealed class TeamListPage : ContentPage
 
         var card = PageStyles.Card(row);
         card.SetBinding(BindableObject.BindingContextProperty, ".");
+        card.SetBinding(VisualElement.IsEnabledProperty, nameof(TeamCard.CanOpenOfficialPage));
         var teamTap = new TapGestureRecognizer();
         teamTap.Tapped += async (_, _) =>
         {
@@ -172,7 +176,7 @@ public sealed class TeamListPage : ContentPage
             }
         };
         card.GestureRecognizers.Add(teamTap);
-        SemanticProperties.SetHint(card, "タップすると公式チームページを開きます");
+        SemanticProperties.SetHint(card, "公式リンクが取得済みのチームはタップすると公式ページを開きます");
         return card;
     }
 
@@ -193,7 +197,6 @@ public sealed class TeamListPage : ContentPage
     {
         if (!TeamClubPageLink.TryCreateUri(teamUrl, out var uri))
         {
-            await DisplayAlert("確認", "チーム一覧から公式チームページのURLを確認できません。", "OK");
             return;
         }
 

@@ -6,6 +6,21 @@ namespace OneRugbyNavi2.Core.Tests;
 public sealed class TeamClubPageLinkTests
 {
     [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Official_page_card_is_not_interactive_when_no_url_was_fetched(string? source)
+    {
+        Assert.False(TeamClubPageLink.CanOpenOfficialPage(source));
+    }
+
+    [Fact]
+    public void Official_page_card_is_interactive_when_a_valid_club_url_was_fetched()
+    {
+        Assert.True(TeamClubPageLink.CanOpenOfficialPage("https://urayasu-d-rocks.com/"));
+    }
+
+    [Theory]
     [InlineData("https://urayasu-d-rocks.com/", "https://urayasu-d-rocks.com/")]
     [InlineData("https://club.example.jp/team/2026?from=league-one", "https://club.example.jp/team/2026?from=league-one")]
     public void Accepts_https_team_page_urls_extracted_from_the_league_index(string source, string expected)

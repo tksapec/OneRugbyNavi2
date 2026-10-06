@@ -8,6 +8,7 @@ public sealed class TeamCard
     public string TeamName { get; init; } = "";
     public string DivisionCode { get; init; } = "";
     public string OfficialTeamPageUrl { get; init; } = "";
+    public bool CanOpenOfficialPage => TeamClubPageLink.CanOpenOfficialPage(OfficialTeamPageUrl);
     public string LogoUrl { get; init; } = "";
     public string? LocalAssetPath { get; init; }
     public ImageSource? LogoSource => AssetImageResolver.CreateImageSource(LocalAssetPath)

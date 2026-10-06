@@ -2,6 +2,9 @@ namespace OneRugbyNavi2;
 
 public static class TeamClubPageLink
 {
+    public static bool CanOpenOfficialPage(string? value)
+        => TryCreateUri(value, out _);
+
     public static bool TryCreateUri(string? value, out Uri uri)
     {
         uri = null!;
