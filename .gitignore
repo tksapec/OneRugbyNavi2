@@ -12,3 +12,5 @@ leagueone_update_team_*.db
 leagueone.db
 leagueone.db.backup-*
 AppData/
+Resources/Raw/player-portraits/*
+!Resources/Raw/player-portraits/.gitkeep
