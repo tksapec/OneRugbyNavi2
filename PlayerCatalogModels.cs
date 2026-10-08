@@ -4,7 +4,7 @@ public sealed class PlayerCatalogDocument
 {
     public int SchemaVersion { get; init; }
     public string Season { get; init; } = "";
-    public List<PlayerRecord> Players { get; init; } = [];
+    public List<PlayerRecord> Players { get; init; } = []; 
 }
 
 public sealed class PlayerRecord
