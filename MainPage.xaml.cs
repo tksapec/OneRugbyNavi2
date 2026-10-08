@@ -970,6 +970,11 @@ namespace OneRugbyNavi2
             await NavigateToMenuPageAsync(nameof(RankingPage));
         }
 
+        private async void OnMenuPlayersClicked(object sender, EventArgs e)
+        {
+            await NavigateToMenuPageAsync(nameof(PlayersPage));
+        }
+
         private async void OnMenuAboutClicked(object sender, EventArgs e)
         {
             await NavigateToMenuPageAsync(nameof(InfoPage));

@@ -20,9 +20,13 @@
 
   <ItemGroup>
     <None Include="../../MainPage.xaml" Link="Fixtures/MainPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Resources/Raw/league-one-players-2026-27.json" Link="Fixtures/league-one-players-2026-27.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="../../PlayerCatalogModels.cs" Link="Production/PlayerCatalogModels.cs" />
+    <Compile Include="../../PlayerSearch.cs" Link="Production/PlayerSearch.cs" />
+    <Compile Include="../../PlayerCatalogParser.cs" Link="Production/PlayerCatalogParser.cs" />
     <Compile Include="../../LeagueOneSyncModels.cs" Link="Production/LeagueOneSyncModels.cs" />
     <Compile Include="../../LeagueOneSeasonDetector.cs" Link="Production/LeagueOneSeasonDetector.cs" />
     <Compile Include="../../TeamCatalogParser.cs" Link="Production/TeamCatalogParser.cs" />
