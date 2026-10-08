@@ -574,6 +574,10 @@
                             Style="{StaticResource MenuItemButton}"
                             Clicked="OnMenuRankingClicked" />
                     <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
+                    <Button Text="選手検索"
+                            Style="{StaticResource MenuItemButton}"
+                            Clicked="OnMenuPlayersClicked" />
+                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
                     <Button Text="アプリ情報"
                             Style="{StaticResource MenuItemButton}"
                             Clicked="OnMenuAboutClicked" />
