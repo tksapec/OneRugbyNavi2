@@ -87,6 +87,14 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Parser_rejects_null_collections_without_throwing()
+    {
+        const string json = """{"schemaVersion":1,"season":"2026-27","players":null}""";
+        Assert.False(PlayerCatalogParser.TryParse(json, out _, out var errors));
+        Assert.Contains(errors, error => error.Contains("Players"));
+    }
+
+    [Fact]
     public void Parser_accepts_a_valid_empty_catalog()
     {
         const string json = """{"schemaVersion":1,"season":"2026-27","players":[]}""";
