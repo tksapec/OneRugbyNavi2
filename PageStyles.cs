@@ -47,12 +47,13 @@ public static class PageStyles
         {
             var choice = await page.DisplayActionSheet(
                 "メニュー", "閉じる", null,
-                "日程・結果", "チーム一覧", "ランキング", "アプリ情報");
+                "日程・結果", "チーム一覧", "ランキング", "選手検索", "アプリ情報");
             var route = choice switch
             {
                 "日程・結果" => "//SchedulePage",
                 "チーム一覧" => nameof(TeamListPage),
                 "ランキング" => nameof(RankingPage),
+                "選手検索" => nameof(PlayersPage),
                 "アプリ情報" => nameof(InfoPage),
                 _ => null
             };

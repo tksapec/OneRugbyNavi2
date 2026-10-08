@@ -2,9 +2,20 @@ using System.Text;
 
 namespace OneRugbyNavi2;
 
+public enum PlayerSearchScope
+{
+    All,
+    CurrentTeam,
+    PreviousTeam,
+    School
+}
+
 public static class PlayerSearch
 {
-    public static IReadOnlyList<PlayerRecord> Search(IEnumerable<PlayerRecord> players, string? query)
+    public static IReadOnlyList<PlayerRecord> Search(
+        IEnumerable<PlayerRecord> players,
+        string? query,
+        PlayerSearchScope scope = PlayerSearchScope.All)
     {
         ArgumentNullException.ThrowIfNull(players);
         var allPlayers = players as IReadOnlyCollection<PlayerRecord> ?? players.ToArray();
@@ -17,7 +28,7 @@ public static class PlayerSearch
         return allPlayers
             .Where(player =>
             {
-                var searchableFields = GetSearchFields(player).Select(Normalize).Where(value => value.Length > 0).ToArray();
+                var searchableFields = GetSearchFields(player, scope).Select(Normalize).Where(value => value.Length > 0).ToArray();
                 return tokens.All(token => searchableFields.Any(field =>
                     field.Contains(token, StringComparison.Ordinal) ||
                     NormalizeKana(field).Contains(NormalizeKana(token), StringComparison.Ordinal)));
@@ -25,8 +36,28 @@ public static class PlayerSearch
             .ToArray();
     }
 
-    private static IEnumerable<string> GetSearchFields(PlayerRecord player)
+    private static IEnumerable<string> GetSearchFields(PlayerRecord player, PlayerSearchScope scope)
     {
+        if (scope == PlayerSearchScope.CurrentTeam)
+        {
+            yield return player.CurrentTeamName;
+            yield break;
+        }
+
+        if (scope == PlayerSearchScope.PreviousTeam)
+        {
+            foreach (var history in player.TeamHistory.Where(history =>
+                         history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName))
+                yield return history.TeamName;
+            yield break;
+        }
+
+        if (scope == PlayerSearchScope.School)
+        {
+            foreach (var school in player.Schools) yield return school;
+            yield break;
+        }
+
         yield return player.PlayerId;
         yield return player.NameJa;
         yield return player.NameEn;

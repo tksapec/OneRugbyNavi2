@@ -68,6 +68,31 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Search_scope_can_limit_matches_to_current_team_previous_team_or_school()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "player-1",
+            CurrentTeamId = "team-current",
+            CurrentTeamName = "花園近鉄ライナーズ",
+            NameJa = "山田 太郎",
+            Schools = ["大阪大学"],
+            TeamHistory =
+            [
+                new PlayerTeamHistory { TeamId = "team-past", TeamName = "浦安D-Rocks", FromSeason = "2022-23", ToSeason = "2024-25" },
+                new PlayerTeamHistory { TeamId = "team-current", TeamName = "花園近鉄ライナーズ", FromSeason = "2025-26" }
+            ]
+        };
+
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "花園", PlayerSearchScope.CurrentTeam)));
+        Assert.Empty(PlayerSearch.Search([player], "浦安", PlayerSearchScope.CurrentTeam));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "浦安", PlayerSearchScope.PreviousTeam)));
+        Assert.Empty(PlayerSearch.Search([player], "花園", PlayerSearchScope.PreviousTeam));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "大阪", PlayerSearchScope.School)));
+        Assert.Empty(PlayerSearch.Search([player], "山田", PlayerSearchScope.School));
+    }
+
+    [Fact]
     public void Search_with_empty_query_returns_all_players()
     {
         var players = new[]
