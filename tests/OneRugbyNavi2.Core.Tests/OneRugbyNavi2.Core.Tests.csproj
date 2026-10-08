@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Compile Include="../../PlayerCatalogModels.cs" Link="Production/PlayerCatalogModels.cs" />
+    <Compile Include="../../PlayerCatalogDuplicateDetector.cs" Link="Production/PlayerCatalogDuplicateDetector.cs" />
     <Compile Include="../../PlayerSearch.cs" Link="Production/PlayerSearch.cs" />
     <Compile Include="../../PlayerCatalogParser.cs" Link="Production/PlayerCatalogParser.cs" />
     <Compile Include="../../LeagueOneSyncModels.cs" Link="Production/LeagueOneSyncModels.cs" />

@@ -68,7 +68,8 @@ public sealed class PlayerDetailPage : ContentPage
     private static void AddProfile(VerticalStackLayout content, PlayerRecord player)
     {
         var rows = new VerticalStackLayout { Spacing = 8 };
-        AddRow(rows, "ポジション", player.Positions.Count == 0 ? "未登録" : string.Join(" / ", player.Positions));
+        var positions = player.Positions ?? [];
+        AddRow(rows, "ポジション", positions.Count == 0 ? "未登録" : string.Join(" / ", positions));
         if (player.BirthDate is { } birthDate)
         {
             var age = GetAge(birthDate, DateOnly.FromDateTime(DateTime.Today));
@@ -78,17 +79,21 @@ public sealed class PlayerDetailPage : ContentPage
         {
             AddRow(rows, "身長・体重", $"{Format(player.HeightCm, "cm")} / {Format(player.WeightKg, "kg")}");
         }
-        if (player.Schools.Count > 0) AddRow(rows, "出身校", string.Join(" / ", player.Schools));
-        if (player.Aliases.Count > 0) AddRow(rows, "別表記・検索語", string.Join(" / ", player.Aliases));
+        if (player.Schools is { Count: > 0 } schools) AddRow(rows, "出身校", string.Join(" / ", schools));
+        if (player.Aliases is { Count: > 0 } aliases) AddRow(rows, "別表記・検索語", string.Join(" / ", aliases));
         if (!string.IsNullOrWhiteSpace(player.LeagueOnePlayerId)) AddRow(rows, "リーグワン選手ID", player.LeagueOnePlayerId);
         content.Add(Section("プロフィール", rows));
     }
 
     private static void AddTeamHistory(VerticalStackLayout content, PlayerRecord player)
     {
-        if (player.TeamHistory.Count == 0) return;
+        var histories = (player.TeamHistory ?? []).Where(history => history is not null).ToArray();
         var rows = new VerticalStackLayout { Spacing = 8 };
-        foreach (var history in player.TeamHistory)
+        if (histories.Length == 0)
+        {
+            AddRow(rows, "所属歴", "このデータで確認できる所属期間はありません。");
+        }
+        else foreach (var history in histories)
         {
             var period = GetPeriod(history.FromSeason, history.ToSeason);
             var row = new Grid
@@ -103,30 +108,38 @@ public sealed class PlayerDetailPage : ContentPage
             };
             rows.Add(row);
         }
-        content.Add(Section("所属チームの経歴", rows));
+        rows.Add(new Label
+        {
+            Text = "出典で確認できた履歴のみを表示しています。記録のない期間は在籍の有無を確認できていません。",
+            FontSize = 12,
+            TextColor = PageStyles.Muted
+        });
+        content.Add(Section("確認できた所属チーム歴", rows));
     }
 
     private static void AddRepresentativeHistory(VerticalStackLayout content, PlayerRecord player)
     {
-        if (player.RepresentativeHistory.Count == 0) return;
         var rows = new VerticalStackLayout { Spacing = 8 };
-        foreach (var history in player.RepresentativeHistory)
+        foreach (var history in player.RepresentativeHistory ?? [])
         {
+            if (history is null) continue;
             var details = new List<string>();
             if (!string.IsNullOrWhiteSpace(history.Level)) details.Add(history.Level);
             if (history.Caps is { } caps) details.Add($"{caps}キャップ");
-            if (history.Seasons.Count > 0) details.Add(string.Join(", ", history.Seasons));
+            if (history.Seasons is { Count: > 0 } seasons) details.Add(string.Join(", ", seasons));
             AddRow(rows, history.TeamName, string.Join(" · ", details));
         }
+        if (rows.Children.Count == 0) return;
         content.Add(Section("代表歴", rows));
     }
 
     private void AddSources(VerticalStackLayout content, PlayerRecord player)
     {
-        if (player.Sources.Count == 0) return;
+        if (player.Sources is not { Count: > 0 } sources) return;
         var rows = new VerticalStackLayout { Spacing = 10 };
-        foreach (var source in player.Sources)
+        foreach (var source in sources)
         {
+            if (source is null) continue;
             var publisher = new Label
             {
                 Text = source.Publisher,
@@ -140,7 +153,7 @@ public sealed class PlayerDetailPage : ContentPage
                 FontSize = 12,
                 TextColor = PageStyles.Muted
             };
-            var fields = source.Fields
+            var fields = (source.Fields ?? [])
                 .Select(field => FieldLabels.TryGetValue(field, out var label) ? label : field)
                 .Distinct(StringComparer.Ordinal);
             var supportedFacts = new Label
@@ -209,7 +222,7 @@ public sealed class PlayerDetailPage : ContentPage
 
     private static string Format(int? value, string suffix) => value is { } number ? $"{number}{suffix}" : "未登録";
 
-    private static string GetPeriod(string from, string to)
+    private static string GetPeriod(string? from, string? to)
     {
         if (string.IsNullOrWhiteSpace(from)) return "時期未確認";
         if (string.IsNullOrWhiteSpace(to)) return $"{from}〜現在";

@@ -333,8 +333,9 @@ public sealed class PlayersPage : ContentPage
             _ => new[] { position }
         };
 
-        return player.Positions.Any(value =>
+        return (player.Positions ?? []).Any(value =>
         {
+            if (string.IsNullOrWhiteSpace(value)) return false;
             var normalized = NormalizePositionText(value);
             return aliases.Any(alias => normalized.Contains(NormalizePositionText(alias), StringComparison.Ordinal));
         });
@@ -419,7 +420,7 @@ internal sealed class PlayerDisplayNameConverter : IValueConverter
 internal sealed class PlayerMetadataConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-        => value is PlayerRecord player ? $"{player.CurrentTeamName} · {string.Join(" / ", player.Positions)}" : "";
+        => value is PlayerRecord player ? $"{player.CurrentTeamName} · {string.Join(" / ", player.Positions ?? [])}" : "";
     public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
 }
 
@@ -439,7 +440,8 @@ internal sealed class PlayerPastTeamsConverter : IValueConverter
     }
     internal static string[] GetPastTeams(object? value)
         => value is PlayerRecord player
-            ? player.TeamHistory.Where(history => history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName)
+            ? (player.TeamHistory ?? []).Where(history => history is not null &&
+                  (history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName))
                 .Select(history => history.TeamName).Distinct(StringComparer.Ordinal).ToArray()
             : [];
     public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();

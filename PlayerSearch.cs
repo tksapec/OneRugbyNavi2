@@ -18,7 +18,7 @@ public static class PlayerSearch
         PlayerSearchScope scope = PlayerSearchScope.All)
     {
         ArgumentNullException.ThrowIfNull(players);
-        var allPlayers = players as IReadOnlyCollection<PlayerRecord> ?? players.ToArray();
+        var allPlayers = players.Where(player => player is not null).ToArray();
         var tokens = SplitTokens(query);
         if (tokens.Count == 0)
         {
@@ -36,7 +36,7 @@ public static class PlayerSearch
             .ToArray();
     }
 
-    private static IEnumerable<string> GetSearchFields(PlayerRecord player, PlayerSearchScope scope)
+    private static IEnumerable<string?> GetSearchFields(PlayerRecord player, PlayerSearchScope scope)
     {
         if (scope == PlayerSearchScope.CurrentTeam)
         {
@@ -46,15 +46,15 @@ public static class PlayerSearch
 
         if (scope == PlayerSearchScope.PreviousTeam)
         {
-            foreach (var history in player.TeamHistory.Where(history =>
-                         history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName))
+            foreach (var history in (player.TeamHistory ?? []).Where(history => history is not null &&
+                         (history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName)))
                 yield return history.TeamName;
             yield break;
         }
 
         if (scope == PlayerSearchScope.School)
         {
-            foreach (var school in player.Schools) yield return school;
+            foreach (var school in player.Schools ?? []) yield return school;
             yield break;
         }
 
@@ -62,15 +62,17 @@ public static class PlayerSearch
         yield return player.NameJa;
         yield return player.NameEn;
         yield return player.CurrentTeamName;
-        foreach (var value in player.Aliases) yield return value;
-        foreach (var value in player.Positions) yield return value;
-        foreach (var value in player.Schools) yield return value;
-        foreach (var history in player.TeamHistory) yield return history.TeamName;
-        foreach (var history in player.RepresentativeHistory)
+        foreach (var value in player.Aliases ?? []) yield return value;
+        foreach (var value in player.Positions ?? []) yield return value;
+        foreach (var value in player.Schools ?? []) yield return value;
+        foreach (var history in player.TeamHistory ?? [])
+            if (history is not null) yield return history.TeamName;
+        foreach (var history in player.RepresentativeHistory ?? [])
         {
+            if (history is null) continue;
             yield return history.TeamName;
             yield return history.Level;
-            foreach (var season in history.Seasons) yield return season;
+            foreach (var season in history.Seasons ?? []) yield return season;
         }
     }
 

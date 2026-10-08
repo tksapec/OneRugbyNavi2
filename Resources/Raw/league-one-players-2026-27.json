@@ -9064,7 +9064,7 @@
         {
           "teamId": "108",
           "teamName": "リコーブラックラムズ東京",
-          "fromSeason": "2025-26",
+          "fromSeason": "2023-24",
           "toSeason": "2025-26"
         }
       ],
@@ -9110,7 +9110,8 @@
           "checkedOn": "2026-10-08",
           "fields": [
             "nameJa",
-            "positions"
+            "positions",
+            "teamHistory"
           ]
         }
       ],
@@ -10468,7 +10469,10 @@
       "division": "DIV1",
       "nameJa": "パトリック ヴァカタ",
       "nameEn": "PATRICK VAKATA",
-      "aliases": [],
+      "aliases": [
+        "パトリク・ヴァカタ",
+        "10433"
+      ],
       "positions": [
         "FL/No.8 フランカー/ナンバーエイト"
       ],
@@ -10508,6 +10512,28 @@
             "weightKg",
             "schools",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/724.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/10433.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName",
+            "teamHistory",
+            "schools"
           ]
         }
       ],
@@ -10966,11 +10992,17 @@
       "division": "DIV1",
       "nameJa": "髙本 幹也",
       "nameEn": "TAKAMOTO MIKIYA",
-      "aliases": [],
+      "aliases": [
+        "高本幹也",
+        "5228"
+      ],
       "positions": [
         "SO スタンドオフ"
       ],
-      "schools": [],
+      "schools": [
+        "大阪桐蔭高校",
+        "帝京大学"
+      ],
       "teamHistory": [
         {
           "teamId": "125",
@@ -10990,6 +11022,28 @@
             "nameEn",
             "currentTeamName",
             "positions"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/724.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/5228.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName",
+            "teamHistory",
+            "schools"
           ]
         }
       ]
@@ -11443,7 +11497,10 @@
       "division": "DIV1",
       "nameJa": "ジェームス ロウ",
       "nameEn": "JAMES LOWE",
-      "aliases": [],
+      "aliases": [
+        "ジャームズ・ロウ",
+        "1560"
+      ],
       "positions": [
         "WTB ウイング"
       ],
@@ -11467,6 +11524,27 @@
             "nameEn",
             "currentTeamName",
             "positions"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/724.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/1560.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName",
+            "teamHistory"
           ]
         }
       ]
@@ -12092,11 +12170,17 @@
       "division": "DIV1",
       "nameJa": "尾﨑 泰雅",
       "nameEn": "OZAKI TAIGA",
-      "aliases": [],
+      "aliases": [
+        "尾崎泰雅",
+        "4124"
+      ],
       "positions": [
         "UTB ユーティリティーバックス"
       ],
-      "schools": [],
+      "schools": [
+        "京都工学院高校",
+        "帝京大学"
+      ],
       "teamHistory": [
         {
           "teamId": "125",
@@ -12116,6 +12200,28 @@
             "nameEn",
             "currentTeamName",
             "positions"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/724.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/4124.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName",
+            "teamHistory",
+            "schools"
           ]
         }
       ]
@@ -17467,7 +17573,10 @@
       "division": "DIV1",
       "nameJa": "マシュー・ダルトン",
       "nameEn": "Matthew Dalton",
-      "aliases": [],
+      "aliases": [
+        "Matthew Dalton",
+        "37805"
+      ],
       "positions": [
         "ロック"
       ],
@@ -17491,6 +17600,23 @@
             "nameEn",
             "currentTeamName",
             "positions"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/729.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/37805.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameEn",
+            "currentTeamName"
           ]
         }
       ]
@@ -86279,26 +86405,26 @@
         "8207"
       ],
       "positions": [
-        "SO"
+        "SO / FB"
       ],
       "birthDate": "2001-01-05",
       "heightCm": 182,
       "weightKg": 93,
       "schools": [
-        "石見智翠館高校",
+        "石見智翠館高等学校",
         "大東文化大学"
       ],
       "teamHistory": [
         {
           "teamId": "138",
           "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
+          "fromSeason": "2026-27",
           "toSeason": ""
         },
         {
           "teamId": "113",
           "teamName": "日本製鉄釜石シーウェイブス",
-          "fromSeason": "2025-26",
+          "fromSeason": "2023-24",
           "toSeason": "2025-26"
         }
       ],
@@ -86351,6 +86477,20 @@
           "fields": [
             "nameJa",
             "positions"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/6091",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions",
+            "schools",
+            "teamHistory"
           ]
         }
       ]
@@ -86621,21 +86761,27 @@
       "heightCm": 178,
       "weightKg": 94,
       "schools": [
-        "札幌山の手高校",
+        "札幌山の手高等学校",
         "明治大学"
       ],
       "teamHistory": [
         {
           "teamId": "138",
           "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
+          "fromSeason": "2026-27",
           "toSeason": ""
         },
         {
           "teamId": "100",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "2025-26",
+          "fromSeason": "2022-23",
           "toSeason": "2025-26"
+        },
+        {
+          "teamId": "116",
+          "teamName": "レッドハリケーンズ大阪",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
         }
       ],
       "representativeHistory": [],
@@ -86687,6 +86833,20 @@
           "fields": [
             "nameJa",
             "positions"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/6091",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions",
+            "schools",
+            "teamHistory"
           ]
         }
       ]
@@ -87657,7 +87817,9 @@
       "nameJa": "髙橋 信之",
       "nameEn": "",
       "aliases": [
-        "高橋 信之"
+        "高橋 信之",
+        "高橋信之",
+        "4334"
       ],
       "positions": [
         "PR"
@@ -87706,6 +87868,25 @@
             "positions",
             "schools",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/737.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/4334.html",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "positions"
           ]
         }
       ]
@@ -88846,16 +89027,20 @@
         "11726"
       ],
       "positions": [
-        "PR"
+        "PR / HO"
       ],
       "birthDate": "1998-10-04",
       "heightCm": 179,
-      "schools": [],
+      "schools": [
+        "浦和高等学校",
+        "筑波大学",
+        "筑波大学大学院"
+      ],
       "teamHistory": [
         {
           "teamId": "138",
           "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
+          "fromSeason": "2026-27",
           "toSeason": ""
         }
       ],
@@ -88894,6 +89079,20 @@
           "fields": [
             "nameJa",
             "positions"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/6091",
+          "checkedOn": "2026-10-08",
+          "fields": [
+            "nameJa",
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions",
+            "schools",
+            "currentTeamName"
           ]
         }
       ]
@@ -90528,147 +90727,6 @@
       ]
     },
     {
-      "playerId": "leagueone-138-山崎翔吾",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "138",
-      "currentTeamName": "豊田自動織機シャトルズ愛知",
-      "division": "DIV2",
-      "nameJa": "山崎 翔吾",
-      "nameEn": "SHOGO YAMAZAKI",
-      "aliases": [],
-      "positions": [
-        "PR / HO"
-      ],
-      "birthDate": "1998-10-04",
-      "heightCm": 179,
-      "weightKg": 115,
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "",
-          "teamName": "筑波大学大学院",
-          "fromSeason": "",
-          "toSeason": ""
-        },
-        {
-          "teamId": "138",
-          "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "JAPAN RUGBY LEAGUE ONE",
-          "url": "https://league-one.jp/news/6091",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "birthDate",
-            "heightCm",
-            "weightKg",
-            "teamHistory"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "leagueone-138-重松鉄平",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "138",
-      "currentTeamName": "豊田自動織機シャトルズ愛知",
-      "division": "DIV2",
-      "nameJa": "重松 鉄平",
-      "nameEn": "TETTA SHIGEMATSU",
-      "aliases": [],
-      "positions": [
-        "FL"
-      ],
-      "birthDate": "1999-01-06",
-      "heightCm": 178,
-      "weightKg": 94,
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "126",
-          "teamName": "浦安D-Rocks",
-          "fromSeason": "2025-26",
-          "toSeason": "2025-26"
-        },
-        {
-          "teamId": "138",
-          "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "JAPAN RUGBY LEAGUE ONE",
-          "url": "https://league-one.jp/news/6091",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "birthDate",
-            "heightCm",
-            "weightKg",
-            "teamHistory"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "leagueone-138-越智一真",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "138",
-      "currentTeamName": "豊田自動織機シャトルズ愛知",
-      "division": "DIV2",
-      "nameJa": "越智 一真",
-      "nameEn": "KAZUSHI OCHI",
-      "aliases": [],
-      "positions": [
-        "SO / FB"
-      ],
-      "birthDate": "2001-01-05",
-      "heightCm": 182,
-      "weightKg": 93,
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "139",
-          "teamName": "日本製鉄釜石シーウェイブス",
-          "fromSeason": "2025-26",
-          "toSeason": "2025-26"
-        },
-        {
-          "teamId": "138",
-          "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "JAPAN RUGBY LEAGUE ONE",
-          "url": "https://league-one.jp/news/6091",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "birthDate",
-            "heightCm",
-            "weightKg",
-            "teamHistory"
-          ]
-        }
-      ]
-    },
-    {
       "playerId": "rugbydb-124-21084",
       "leagueOnePlayerId": "",
       "currentTeamId": "124",
@@ -90706,190 +90764,6 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/21084.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-125-10433",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "125",
-      "currentTeamName": "東京サントリーサンゴリアス",
-      "division": "DIV1",
-      "nameJa": "パトリク・ヴァカタ",
-      "nameEn": "",
-      "aliases": [
-        "10433"
-      ],
-      "positions": [
-        "NO8"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "125",
-          "teamName": "東京サントリーサンゴリアス",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/724.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/10433.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-125-5228",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "125",
-      "currentTeamName": "東京サントリーサンゴリアス",
-      "division": "DIV1",
-      "nameJa": "高本幹也",
-      "nameEn": "",
-      "aliases": [
-        "5228"
-      ],
-      "positions": [
-        "SO"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "125",
-          "teamName": "東京サントリーサンゴリアス",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/724.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/5228.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-125-4124",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "125",
-      "currentTeamName": "東京サントリーサンゴリアス",
-      "division": "DIV1",
-      "nameJa": "尾崎泰雅",
-      "nameEn": "",
-      "aliases": [
-        "4124"
-      ],
-      "positions": [
-        "WTB"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "125",
-          "teamName": "東京サントリーサンゴリアス",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/724.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/4124.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-125-1560",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "125",
-      "currentTeamName": "東京サントリーサンゴリアス",
-      "division": "DIV1",
-      "nameJa": "ジャームズ・ロウ",
-      "nameEn": "",
-      "aliases": [
-        "1560"
-      ],
-      "positions": [
-        "WTB"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "125",
-          "teamName": "東京サントリーサンゴリアス",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/724.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/1560.html",
           "checkedOn": "2026-10-08",
           "fields": [
             "nameJa",
@@ -91028,52 +90902,6 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/11167.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-127-37805",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "127",
-      "currentTeamName": "コベルコ神戸スティーラーズ",
-      "division": "DIV1",
-      "nameJa": "Matthew Dalton",
-      "nameEn": "",
-      "aliases": [
-        "37805"
-      ],
-      "positions": [
-        "FL"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "127",
-          "teamName": "コベルコ神戸スティーラーズ",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/729.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/37805.html",
           "checkedOn": "2026-10-08",
           "fields": [
             "nameJa",
@@ -96686,52 +96514,6 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/19070.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
-      "playerId": "rugbydb-138-4334",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "138",
-      "currentTeamName": "豊田自動織機シャトルズ愛知",
-      "division": "DIV2",
-      "nameJa": "高橋信之",
-      "nameEn": "",
-      "aliases": [
-        "4334"
-      ],
-      "positions": [
-        "PR"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "138",
-          "teamName": "豊田自動織機シャトルズ愛知",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/737.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/4334.html",
           "checkedOn": "2026-10-08",
           "fields": [
             "nameJa",
