@@ -31,6 +31,13 @@ public sealed class InfoPage : ContentPage
     private async Task LoadAsync()
     {
         _body.Children.Clear();
+        _body.Children.Add(new Button
+        {
+            Text = "選手検索を開く",
+            BackgroundColor = PageStyles.Navy,
+            TextColor = Colors.White,
+            Command = new Command(async () => await Shell.Current.GoToAsync(nameof(PlayersPage)))
+        });
         try
         {
             var summary = await AppServices.Database.GetSummaryAsync();
