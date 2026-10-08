@@ -6,6 +6,31 @@ namespace OneRugbyNavi2.Core.Tests;
 public sealed class PlayerCatalogTests
 {
     [Fact]
+    public void Bundled_catalog_has_sourced_players_for_catalogued_teams()
+    {
+        var json = File.ReadAllText(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+
+        Assert.True(PlayerCatalogParser.TryParse(json, out var catalog, out var errors), string.Join(Environment.NewLine, errors));
+        Assert.Equal("2026-27", catalog.Season);
+        Assert.True(catalog.Players.Count >= 1000);
+
+        var playersByTeam = catalog.Players.GroupBy(player => player.CurrentTeamId).ToArray();
+        Assert.Equal(21, playersByTeam.Length);
+        Assert.Equal(catalog.Players.Count, catalog.Players.Select(player => player.PlayerId).Distinct().Count());
+
+        foreach (var teamPlayers in playersByTeam)
+        {
+            var team = Assert.Single(SeasonCatalog.Teams2026, item => item.LeagueOneTeamId == teamPlayers.Key);
+            Assert.All(teamPlayers, player =>
+            {
+                Assert.Equal(team.TeamName, player.CurrentTeamName);
+                Assert.Equal(team.DivisionCode, player.Division);
+                Assert.NotEmpty(player.Sources);
+            });
+        }
+    }
+
+    [Fact]
     public void Search_matches_names_aliases_positions_and_past_teams()
     {
         var player = new PlayerRecord
@@ -36,7 +61,7 @@ public sealed class PlayerCatalogTests
         };
 
         Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "たろう")));
-        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "URAYASU")));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "浦安D-Rocks")));
         Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "ctb 日本代表")));
         Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "大阪大学")));
     }

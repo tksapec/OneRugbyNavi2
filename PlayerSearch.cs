@@ -17,8 +17,10 @@ public static class PlayerSearch
         return allPlayers
             .Where(player =>
             {
-                var searchableText = Normalize(string.Join(" ", GetSearchFields(player)));
-                return tokens.All(token => searchableText.Contains(token, StringComparison.Ordinal));
+                var searchableFields = GetSearchFields(player).Select(Normalize).Where(value => value.Length > 0).ToArray();
+                return tokens.All(token => searchableFields.Any(field =>
+                    field.Contains(token, StringComparison.Ordinal) ||
+                    NormalizeKana(field).Contains(NormalizeKana(token), StringComparison.Ordinal)));
             })
             .ToArray();
     }
@@ -67,6 +69,33 @@ public static class PlayerSearch
         foreach (var character in normalized)
         {
             if (char.IsLetterOrDigit(character))
+            {
+                builder.Append(character);
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static string NormalizeKana(string value)
+    {
+        var builder = new StringBuilder(value.Length);
+        foreach (var character in value)
+        {
+            if (character is >= '\u30A1' and <= '\u30F6')
+            {
+                var hiragana = (char)(character - 0x60);
+                builder.Append(hiragana switch
+                {
+                    'ぁ' => 'あ', 'ぃ' => 'い', 'ぅ' => 'う', 'ぇ' => 'え', 'ぉ' => 'お',
+                    'ゃ' => 'や', 'ゅ' => 'ゆ', 'ょ' => 'よ', 'っ' => 'つ', 'ゎ' => 'わ', _ => hiragana
+                });
+            }
+            else if (character == 'ー')
+            {
+                continue;
+            }
+            else
             {
                 builder.Append(character);
             }

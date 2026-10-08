@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <None Include="../../MainPage.xaml" Link="Fixtures/MainPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Resources/Raw/league-one-players-2026-27.json" Link="Fixtures/league-one-players-2026-27.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
