@@ -9,6 +9,14 @@ public sealed class PlayersPage : ContentPage
     private IReadOnlyList<PlayerRecord> _players = [];
     private readonly SearchBar _searchBar = new() { Placeholder = "選手名、所属、ポジション、出身校など" };
     private readonly Label _status = PageStyles.MutedLabel("選手データを読み込み中...");
+    private readonly Label _empty = new()
+    {
+        Text = "該当する選手はいません。",
+        TextColor = PageStyles.Muted,
+        HorizontalTextAlignment = TextAlignment.Center,
+        VerticalTextAlignment = TextAlignment.Center,
+        IsVisible = false
+    };
     private bool _loaded;
     private bool _loading;
 
@@ -17,8 +25,8 @@ public sealed class PlayersPage : ContentPage
         Title = "選手検索";
         BackgroundColor = PageStyles.Background;
         Shell.SetNavBarIsVisible(this, false);
-
         _searchBar.TextChanged += OnSearchTextChanged;
+
         var list = new CollectionView
         {
             ItemsSource = _results,
@@ -40,7 +48,8 @@ public sealed class PlayersPage : ContentPage
                 PageStyles.NavigationTitle(this, "選手検索"),
                 _searchBar.Row(1).Margin(new Thickness(16, 0, 16, 8)),
                 _status.Row(2).Margin(new Thickness(16, 0, 16, 8)),
-                list.Row(3)
+                list.Row(3),
+                _empty.Row(3)
             }
         };
     }
@@ -48,10 +57,7 @@ public sealed class PlayersPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (!_loaded && !_loading)
-        {
-            await LoadAsync();
-        }
+        if (!_loaded && !_loading) await LoadAsync();
     }
 
     private async Task LoadAsync()
@@ -81,18 +87,14 @@ public sealed class PlayersPage : ContentPage
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
         RefreshResults(e.NewTextValue);
-        _status.Text = _players.Count == 0
-            ? "選手データはありません。"
-            : $"検索結果: {_results.Count}名";
+        _status.Text = _players.Count == 0 ? "選手データはありません。" : $"検索結果: {_results.Count}名";
     }
 
     private void RefreshResults(string? query)
     {
         _results.Clear();
-        foreach (var player in PlayerSearch.Search(_players, query))
-        {
-            _results.Add(player);
-        }
+        foreach (var player in PlayerSearch.Search(_players, query)) _results.Add(player);
+        _empty.IsVisible = _players.Count > 0 && _results.Count == 0;
     }
 
     private View CreatePlayerCard()
@@ -106,57 +108,35 @@ public sealed class PlayersPage : ContentPage
         };
         portrait.BindingContextChanged += (_, _) =>
         {
-            portrait.Source = portrait.BindingContext is PlayerRecord player
-                ? AssetImageResolver.CreateImageSource(player.Portrait?.AssetPath)
+            portrait.Source = portrait.BindingContext is PlayerRecord p
+                ? AssetImageResolver.CreateImageSource(p.Portrait?.AssetPath)
                 : null;
         };
 
-        var name = new Label
-        {
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = PageStyles.Navy
-        };
+        var name = new Label { FontSize = 16, FontAttributes = FontAttributes.Bold, TextColor = PageStyles.Navy };
         name.BindingContextChanged += (_, _) =>
-        {
-            name.Text = name.BindingContext is PlayerRecord player
-                ? string.IsNullOrWhiteSpace(player.NameJa) ? player.NameEn : player.NameJa
-                : "";
-        };
+            name.Text = name.BindingContext is PlayerRecord p ? (string.IsNullOrWhiteSpace(p.NameJa) ? p.NameEn : p.NameJa) : "";
 
-        var meta = new Label
-        {
-            FontSize = 13,
-            TextColor = PageStyles.Muted,
-            LineBreakMode = LineBreakMode.WordWrap
-        };
+        var meta = new Label { FontSize = 13, TextColor = PageStyles.Muted, LineBreakMode = LineBreakMode.WordWrap };
         meta.BindingContextChanged += (_, _) =>
-        {
-            meta.Text = meta.BindingContext is PlayerRecord player
-                ? $"{player.CurrentTeamName} · {string.Join("/", player.Positions)}"
-                : "";
-        };
+            meta.Text = meta.BindingContext is PlayerRecord p ? $"{p.CurrentTeamName} · {string.Join("/", p.Positions)}" : "";
 
-        var details = new VerticalStackLayout { Spacing = 4, Children = { name, meta } };
         var row = new Grid
         {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition(GridLength.Auto),
-                new ColumnDefinition(GridLength.Star)
-            },
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star) },
             ColumnSpacing = 12,
-            Children = { portrait.Column(0), details.Column(1) }
+            Children =
+            {
+                portrait.Column(0),
+                new VerticalStackLayout { Spacing = 4, Children = { name, meta } }.Column(1)
+            }
         };
         var card = PageStyles.Card(row);
         card.SetBinding(BindableObject.BindingContextProperty, ".");
         var tap = new TapGestureRecognizer();
         tap.Tapped += async (_, _) =>
         {
-            if (card.BindingContext is PlayerRecord player)
-            {
-                await ShowPlayerAsync(player);
-            }
+            if (card.BindingContext is PlayerRecord player) await ShowPlayerAsync(player);
         };
         card.GestureRecognizers.Add(tap);
         return card;
@@ -164,11 +144,9 @@ public sealed class PlayersPage : ContentPage
 
     private async Task ShowPlayerAsync(PlayerRecord player)
     {
-        var lines = new List<string>
-        {
-            $"{player.CurrentTeamName} ({player.Division})",
-            $"ポジション: {string.Join("/", player.Positions)}"
-        };
+        var lines = new List<string> { $"{player.CurrentTeamName} ({player.Division})", $"ポジション: {string.Join("/", player.Positions)}" };
+        if (!string.IsNullOrWhiteSpace(player.NameEn)) lines.Add($"英語名: {player.NameEn}");
+
         if (player.BirthDate is { } birthDate)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
@@ -177,26 +155,30 @@ public sealed class PlayersPage : ContentPage
             lines.Add($"生年月日: {birthDate:yyyy-MM-dd} ({age}歳)");
         }
 
-        if (player.HeightCm is { } height || player.WeightKg is { })
-        {
+        if (player.HeightCm.HasValue || player.WeightKg.HasValue)
             lines.Add($"身長/体重: {(player.HeightCm is { } h ? $"{h}cm" : "-")} / {(player.WeightKg is { } w ? $"{w}kg" : "-")}");
-        }
 
         if (player.Schools.Count > 0) lines.Add($"出身校: {string.Join(" / ", player.Schools)}");
         if (player.TeamHistory.Count > 0)
         {
             lines.Add("所属歴:");
-            lines.AddRange(player.TeamHistory.Select(item =>
-                $"・{item.TeamName} ({item.FromSeason}～{item.ToSeason})"));
+            lines.AddRange(player.TeamHistory.Select(item => $"・{item.TeamName} ({item.FromSeason}～{item.ToSeason})"));
         }
 
         if (player.RepresentativeHistory.Count > 0)
         {
             lines.Add("代表歴:");
             lines.AddRange(player.RepresentativeHistory.Select(item =>
-                $"・{item.TeamName}{(item.Caps is { } caps ? $" ({caps} caps)" : "")}"));
+                $"・{item.TeamName}{(item.Caps is { } caps ? $" ({caps} caps)" : "")}{(item.Seasons.Count > 0 ? $" [{string.Join(", ", item.Seasons)}]" : "")}"));
         }
 
-        await DisplayAlert(player.NameJa, string.Join(Environment.NewLine, lines), "閉じる");
+        if (player.Sources.Count > 0)
+        {
+            lines.Add("出典:");
+            lines.AddRange(player.Sources.Select(source => $"・{source.Publisher}: {source.Url}"));
+        }
+
+        var title = string.IsNullOrWhiteSpace(player.NameJa) ? player.NameEn : player.NameJa;
+        await DisplayAlert(title, string.Join(Environment.NewLine, lines), "閉じる");
     }
 }
