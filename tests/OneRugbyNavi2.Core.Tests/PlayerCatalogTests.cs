@@ -15,7 +15,8 @@ public sealed class PlayerCatalogTests
         Assert.True(catalog.Players.Count >= 1000);
 
         var playersByTeam = catalog.Players.GroupBy(player => player.CurrentTeamId).ToArray();
-        Assert.Equal(21, playersByTeam.Length);
+        Assert.Equal(27, playersByTeam.Length);
+        Assert.Equal(SeasonCatalog.Teams2026.Count, playersByTeam.Length);
         Assert.Equal(catalog.Players.Count, catalog.Players.Select(player => player.PlayerId).Distinct().Count());
 
         foreach (var teamPlayers in playersByTeam)
