@@ -1,6 +1,6 @@
 # Player History and Search Design
 
-Status: approved design, pending document review
+Status: approved design, reviewed with RugbyDB source direction
 Date: 2026-10-10
 
 ## Goal
@@ -18,7 +18,7 @@ Enrich the 2026-27 player catalog with sourced rugby affiliations and make the p
 
 ## Source policy
 
-Use official League One rosters, archived season pages, club announcements, and school or university pages as primary sources when available. Use a player's Rugby Database page as a discovery source and as a cited secondary source when it explicitly supports a team and season. A record for one season supports that season only; it does not prove continuous membership in missing seasons.
+Use RugbyDB as the main discovery and reference source for historical team, university, high-school, and season entries, as requested. Check the season-level records rather than relying only on a profile header: a player's profile affiliation can disagree with the season table. Cite RugbyDB as a secondary source when it is the only explicit record. Cross-check current club and explicit transfer or tenure dates against official League One, club, school, or university sources when available. A record for one season supports that season only; it does not prove continuous membership in missing seasons.
 
 Keep publisher, URL, checked date, and supported fields in the player's `sources` list. Sources supporting an affiliation list `teamHistory` in `fields`. Prefer a direct transfer or departure notice when it states a tenure range. If no source supports a period, keep the affiliation date empty and display it as unconfirmed.
 
