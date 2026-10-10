@@ -12,6 +12,8 @@ public sealed class PlayerDetailPage : ContentPage
         ["currentTeamName"] = "現所属",
         ["division"] = "ディビジョン",
         ["positions"] = "ポジション",
+        ["nationalities"] = "国籍",
+        ["registrationCategories"] = "リーグ登録区分",
         ["birthDate"] = "生年月日",
         ["heightCm"] = "身長",
         ["weightKg"] = "体重",
@@ -74,6 +76,16 @@ public sealed class PlayerDetailPage : ContentPage
         {
             var age = GetAge(birthDate, DateOnly.FromDateTime(DateTime.Today));
             AddRow(rows, "生年月日", $"{birthDate:yyyy年M月d日}（{age}歳）");
+        }
+        if (player.Nationalities is { Count: > 0 } nationalities)
+            AddRow(rows, "国籍", string.Join(" / ", nationalities));
+        if (player.RegistrationCategories is { Count: > 0 } categories)
+        {
+            var categoryText = categories.Where(category => category is not null)
+                .OrderByDescending(category => category.Season, StringComparer.Ordinal)
+                .Select(category => $"{category.Season} カテゴリ{category.Category}");
+            var value = string.Join(" / ", categoryText);
+            if (value.Length > 0) AddRow(rows, "リーグ登録区分", value);
         }
         if (player.HeightCm.HasValue || player.WeightKg.HasValue)
         {
