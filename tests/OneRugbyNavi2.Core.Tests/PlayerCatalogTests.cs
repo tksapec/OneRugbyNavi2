@@ -99,6 +99,76 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Sakita_appears_once_with_official_positions_and_the_rugbydb_variant_as_an_alias()
+    {
+        var catalog = LoadBundledCatalog();
+        var player = Assert.Single(catalog.Players, item => item.NameEn == "Raito Sakita");
+
+        Assert.Contains(player.Positions, position => position.Contains("SO", StringComparison.Ordinal));
+        Assert.Contains(player.Positions, position => position.Contains("FB", StringComparison.Ordinal));
+        Assert.Contains("嶋田士人", player.Aliases);
+        Assert.DoesNotContain(catalog.Players, item => item.PlayerId == "rugbydb-140-16680");
+        Assert.Single(PlayerSearch.Search(catalog.Players, "嶋田士人"));
+    }
+
+    [Fact]
+    public void Panasonic_player_positions_exclude_newcomer_badges_and_use_verified_positions()
+    {
+        var catalog = LoadBundledCatalog();
+        var expected = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["leagueone-128-takata_kaito"] = "PR",
+            ["leagueone-128-juan_oosthuyzen"] = "LO",
+            ["leagueone-128-naramoto_kanjiro"] = "SO",
+            ["leagueone-128-malakye_enasio"] = "CTB",
+            ["leagueone-128-toshi_kurita_butlin"] = "WTB"
+        };
+
+        foreach (var (playerId, position) in expected)
+        {
+            var player = Assert.Single(catalog.Players, item => item.PlayerId == playerId);
+            Assert.Equal(position, Assert.Single(player.Positions));
+            Assert.DoesNotContain(player.Positions, item => item.StartsWith("NEW ", StringComparison.Ordinal));
+        }
+
+        var grassmann = Assert.Single(catalog.Players, item => item.PlayerId == "leagueone-141-wynand-grassmann");
+        Assert.Equal("Wynand Grassmann", grassmann.NameEn);
+
+        var displayNames = new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["leagueone-140-peter_umaga_jensen"] = "ピーター・ウマガ＝ジェンセン",
+            ["leagueone-141-wynand-grassmann"] = "ワイナンド・グラスマン",
+            ["leagueone-141-aj-woulf"] = "AJ・ウルフ",
+            ["rugbydb-137-9812"] = "オルビン・レジャー",
+            ["rugbydb-146-50602"] = "クレイグランガ・テイン"
+        };
+        foreach (var (playerId, displayName) in displayNames)
+            Assert.Equal(displayName, Assert.Single(catalog.Players, item => item.PlayerId == playerId).NameJa);
+    }
+
+    [Fact]
+    public void Catalog_parses_nationalities_and_season_scoped_registration_categories()
+    {
+        const string json = """
+        {"schemaVersion":1,"season":"2026-27","players":[{
+          "playerId":"one","currentTeamId":"team-1","currentTeamName":"Club","nameJa":"選手",
+          "nationalities":["New Zealand"],
+          "registrationCategories":[{"season":"2025-26","category":"C"}],
+          "sources":[{"publisher":"League One","url":"https://league-one.jp/player/1","checkedOn":"2026-10-10","fields":["nationalities","registrationCategories"]}]
+        }]}
+        """;
+
+        Assert.True(PlayerCatalogParser.TryParse(json, out var catalog, out var errors), string.Join(Environment.NewLine, errors));
+        var player = Assert.Single(catalog.Players);
+        Assert.Equal("New Zealand", Assert.Single(player.Nationalities));
+        var category = Assert.Single(player.RegistrationCategories);
+        Assert.Equal("2025-26", category.Season);
+        Assert.Equal("C", category.Category);
+        Assert.Same(player, Assert.Single(PlayerSearch.Search(catalog.Players, "New Zealand")));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search(catalog.Players, "2025-26 C")));
+    }
+
+    [Fact]
     public void Search_matches_names_aliases_positions_and_past_teams()
     {
         var player = new PlayerRecord
@@ -220,6 +290,10 @@ public sealed class PlayerCatalogTests
         {
             valid.Replace("\"aliases\": []", "\"aliases\": null", StringComparison.Ordinal),
             valid.Replace("\"positions\": []", "\"positions\": null", StringComparison.Ordinal),
+            valid.Replace("\"nationalities\": []", "\"nationalities\": null", StringComparison.Ordinal),
+            valid.Replace("\"registrationCategories\": []", "\"registrationCategories\": null", StringComparison.Ordinal),
+            valid.Replace("\"registrationCategories\": []", "\"registrationCategories\": [null]", StringComparison.Ordinal),
+            valid.Replace("\"registrationCategories\": []", "\"registrationCategories\": [{\"season\":\"2025-26\",\"category\":\"D\"}]", StringComparison.Ordinal),
             valid.Replace("\"schools\": []", "\"schools\": null", StringComparison.Ordinal),
             valid.Replace("\"teamHistory\": []", "\"teamHistory\": null", StringComparison.Ordinal),
             valid.Replace("\"teamHistory\": []", "\"teamHistory\": [null]", StringComparison.Ordinal),
@@ -246,6 +320,8 @@ public sealed class PlayerCatalogTests
             NameJa = "確認対象",
             Aliases = null!,
             Positions = null!,
+            Nationalities = null!,
+            RegistrationCategories = null!,
             Schools = null!,
             TeamHistory = [null!],
             RepresentativeHistory = [null!]
@@ -333,6 +409,8 @@ public sealed class PlayerCatalogTests
         "nameJa": "Player",
         "aliases": [],
         "positions": [],
+        "nationalities": [],
+        "registrationCategories": [],
         "schools": [],
         "teamHistory": [],
         "representativeHistory": [],

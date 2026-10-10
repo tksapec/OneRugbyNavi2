@@ -21,11 +21,19 @@ public sealed class PlayerRecord
     public DateOnly? BirthDate { get; init; }
     public int? HeightCm { get; init; }
     public int? WeightKg { get; init; }
+    public List<string> Nationalities { get; init; } = [];
+    public List<PlayerRegistrationCategory> RegistrationCategories { get; init; } = [];
     public List<string> Schools { get; init; } = [];
     public List<PlayerTeamHistory> TeamHistory { get; init; } = [];
     public List<PlayerRepresentativeHistory> RepresentativeHistory { get; init; } = [];
     public PlayerPortrait? Portrait { get; init; }
     public List<PlayerSource> Sources { get; init; } = [];
+}
+
+public sealed class PlayerRegistrationCategory
+{
+    public string Season { get; init; } = "";
+    public string Category { get; init; } = "";
 }
 
 public sealed class PlayerTeamHistory

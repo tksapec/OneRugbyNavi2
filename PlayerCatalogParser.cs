@@ -73,7 +73,29 @@ public static partial class PlayerCatalogParser
 
         ValidateStringList(player.Aliases, "aliases", player.PlayerId, errors);
         ValidateStringList(player.Positions, "positions", player.PlayerId, errors);
+        ValidateStringList(player.Nationalities, "nationalities", player.PlayerId, errors);
         ValidateStringList(player.Schools, "schools", player.PlayerId, errors);
+
+        if (player.RegistrationCategories is null)
+        {
+            errors.Add($"Player {player.PlayerId} has a null registrationCategories list.");
+        }
+        else
+        {
+            var categorySeasons = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var category in player.RegistrationCategories)
+            {
+                if (category is null || !IsValidSeason(category.Season) ||
+                    category.Category is not ("A" or "A-1" or "A-2" or "B" or "C"))
+                {
+                    errors.Add($"Player {player.PlayerId} has an invalid registration category.");
+                    continue;
+                }
+
+                if (!categorySeasons.Add(category.Season))
+                    errors.Add($"Player {player.PlayerId} has multiple registration categories for {category.Season}.");
+            }
+        }
 
         if (player.TeamHistory is null)
         {
