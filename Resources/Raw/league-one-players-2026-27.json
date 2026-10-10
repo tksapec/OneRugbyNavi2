@@ -646,7 +646,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -671,7 +672,13 @@
       ],
       "birthDate": "2001-09-03",
       "heightCm": 180,
-      "weightKg": 108
+      "weightKg": 108,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-123-katsuya-okuma",
@@ -819,11 +826,22 @@
             "nameJa",
             "positions"
           ]
+        },
+        {
+          "publisher": "Wikipedia（英語版・選手略歴）",
+          "url": "https://en.wikipedia.org/wiki/Malcolm_Marx",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "nationalities"
+          ]
         }
       ],
       "birthDate": "1994-07-13",
       "heightCm": 189,
-      "weightKg": 117
+      "weightKg": 117,
+      "nationalities": [
+        "South Africa"
+      ]
     },
     {
       "playerId": "leagueone-123-rikuto-fukuda",
@@ -4477,11 +4495,22 @@
             "nameJa",
             "positions"
           ]
+        },
+        {
+          "publisher": "Wikipedia（英語版・選手略歴）",
+          "url": "https://en.wikipedia.org/wiki/Shaun_Stevenson",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "nationalities"
+          ]
         }
       ],
       "birthDate": "1996-11-14",
       "heightCm": 190,
-      "weightKg": 92
+      "weightKg": 92,
+      "nationalities": [
+        "New Zealand"
+      ]
     },
     {
       "playerId": "leagueone-124-13695",
@@ -10378,11 +10407,22 @@
             "nameJa",
             "positions"
           ]
+        },
+        {
+          "publisher": "Wikipedia（英語版・選手略歴）",
+          "url": "https://en.wikipedia.org/wiki/Sam_Cane",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "nationalities"
+          ]
         }
       ],
       "birthDate": "1992-01-13",
       "heightCm": 189,
-      "weightKg": 103
+      "weightKg": 103,
+      "nationalities": [
+        "New Zealand"
+      ]
     },
     {
       "playerId": "leagueone-125-pierich.html",
@@ -13474,7 +13514,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -13499,7 +13540,13 @@
       ],
       "birthDate": "2003-02-19",
       "heightCm": 188,
-      "weightKg": 103
+      "weightKg": 103,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1156",
@@ -13780,7 +13827,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -13805,7 +13853,13 @@
       ],
       "birthDate": "1996-06-05",
       "heightCm": 200,
-      "weightKg": 112
+      "weightKg": 112,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1456",
@@ -14179,7 +14233,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -14204,7 +14259,13 @@
       ],
       "birthDate": "1997-04-26",
       "heightCm": 186,
-      "weightKg": 120
+      "weightKg": 120,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1174",
@@ -14330,7 +14391,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -14355,7 +14417,13 @@
       ],
       "birthDate": "1995-10-21",
       "heightCm": 190,
-      "weightKg": 120
+      "weightKg": 120,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "C"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1683",
@@ -14406,7 +14474,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -14431,7 +14500,13 @@
       ],
       "birthDate": "2002-07-22",
       "heightCm": 188,
-      "weightKg": 115
+      "weightKg": 115,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1175",
@@ -14789,7 +14864,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -14814,7 +14890,13 @@
       ],
       "birthDate": "2002-08-19",
       "heightCm": 175,
-      "weightKg": 83
+      "weightKg": 83,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1322",
@@ -15597,7 +15679,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -15622,7 +15705,13 @@
       ],
       "birthDate": "2002-10-20",
       "heightCm": 172,
-      "weightKg": 85
+      "weightKg": 85,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1182",
@@ -15751,7 +15840,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -15776,7 +15866,13 @@
       ],
       "birthDate": "2002-07-02",
       "heightCm": 174,
-      "weightKg": 77
+      "weightKg": 77,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1891",
@@ -15984,7 +16080,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -16009,7 +16106,13 @@
       ],
       "birthDate": "1997-07-08",
       "heightCm": 184,
-      "weightKg": 96
+      "weightKg": 96,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1186",
@@ -16272,7 +16375,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -16297,7 +16401,13 @@
       ],
       "birthDate": "1988-06-22",
       "heightCm": 188,
-      "weightKg": 96
+      "weightKg": 96,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-126-1886",
@@ -16431,7 +16541,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -16456,7 +16567,13 @@
       ],
       "birthDate": "1995-05-30",
       "heightCm": 183,
-      "weightKg": 95
+      "weightKg": 95,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-127-hiroshi_yamashita",
@@ -17484,11 +17601,22 @@
             "nameJa",
             "positions"
           ]
+        },
+        {
+          "publisher": "Wikipedia（英語版・選手略歴）",
+          "url": "https://en.wikipedia.org/wiki/Brodie_Retallick",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "nationalities"
+          ]
         }
       ],
       "birthDate": "1991-05-31",
       "heightCm": 204,
-      "weightKg": 120
+      "weightKg": 120,
+      "nationalities": [
+        "New Zealand"
+      ]
     },
     {
       "playerId": "leagueone-127-gerard_cowley_tuioti",
@@ -20868,7 +20996,7 @@
         "16851"
       ],
       "positions": [
-        "NEW PROP"
+        "PR"
       ],
       "schools": [],
       "teamHistory": [
@@ -20884,7 +21012,7 @@
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
           "url": "https://panasonic.co.jp/sports/wildknights/team/player/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -20905,7 +21033,7 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/16851.html",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "positions"
@@ -21772,7 +21900,7 @@
         "21666"
       ],
       "positions": [
-        "NEW LOCK"
+        "LO"
       ],
       "schools": [
         "東洋大学"
@@ -21790,7 +21918,7 @@
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
           "url": "https://panasonic.co.jp/sports/wildknights/team/player/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -21824,7 +21952,7 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/21666.html",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "positions"
@@ -22994,7 +23122,7 @@
         "15268"
       ],
       "positions": [
-        "NEW STAND OFF"
+        "SO"
       ],
       "schools": [
         "草ヶ江YRクラブ",
@@ -23013,7 +23141,7 @@
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
           "url": "https://panasonic.co.jp/sports/wildknights/team/player/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -23047,7 +23175,7 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/15268.html",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "positions"
@@ -23590,7 +23718,7 @@
         "40138"
       ],
       "positions": [
-        "NEW CENTER"
+        "CTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -23606,7 +23734,7 @@
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
           "url": "https://panasonic.co.jp/sports/wildknights/team/player/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -23627,7 +23755,7 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/40138.html",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "positions"
@@ -23956,7 +24084,7 @@
         "52245"
       ],
       "positions": [
-        "NEW WING"
+        "WTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -23972,7 +24100,7 @@
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
           "url": "https://panasonic.co.jp/sports/wildknights/team/player/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -23993,7 +24121,7 @@
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
           "url": "https://rugbydb.tokyo/player/52245.html",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "positions"
@@ -32461,7 +32589,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -32486,7 +32615,13 @@
       ],
       "birthDate": "1994-03-20",
       "heightCm": 187,
-      "weightKg": 137
+      "weightKg": 137,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-132-tomoaki-ishii.html",
@@ -35220,7 +35355,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -35245,7 +35381,13 @@
       ],
       "birthDate": "1993-11-28",
       "heightCm": 186,
-      "weightKg": 97
+      "weightKg": 97,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "C"
+        }
+      ]
     },
     {
       "playerId": "leagueone-132-matt-vaega.html",
@@ -52543,7 +52685,7 @@
       "currentTeamId": "140",
       "currentTeamName": "花園近鉄ライナーズ",
       "division": "DIV2",
-      "nameJa": "ピーター・ ウマガ＝ジェンセン",
+      "nameJa": "ピーター・ウマガ＝ジェンセン",
       "nameEn": "Peter Umaga-Jensen",
       "aliases": [
         "ピーター・ウマガ=ジェンセン",
@@ -53250,17 +53392,26 @@
     },
     {
       "playerId": "leagueone-140-raito_sakita",
-      "leagueOnePlayerId": "",
+      "leagueOnePlayerId": "493603",
       "currentTeamId": "140",
       "currentTeamName": "花園近鉄ライナーズ",
       "division": "DIV2",
       "nameJa": "﨑田 士人",
       "nameEn": "Raito Sakita",
-      "aliases": [],
-      "positions": [
-        "FB"
+      "aliases": [
+        "16680",
+        "さきた らいと",
+        "さきたらいと",
+        "崎田士人",
+        "嶋田士人"
       ],
-      "schools": [],
+      "positions": [
+        "SO / FB"
+      ],
+      "schools": [
+        "石見智翠館高等学校",
+        "関西大学"
+      ],
       "teamHistory": [
         {
           "teamId": "140",
@@ -53281,6 +53432,58 @@
             "currentTeamName",
             "positions"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2026/01/27/new-player-announcement/",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "nameJa",
+            "positions",
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "schools",
+            "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/player/493603",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "leagueOnePlayerId",
+            "registrationCategories"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/player/16680.html",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "aliases",
+            "positions",
+            "schools"
+          ]
+        },
+        {
+          "publisher": "RUGBY DATABASE（独立系二次データベース）",
+          "url": "https://rugbydb.tokyo/team/731.html",
+          "checkedOn": "2026-10-10",
+          "fields": [
+            "aliases",
+            "positions",
+            "currentTeamName"
+          ]
+        }
+      ],
+      "birthDate": "2003-09-25",
+      "heightCm": 182,
+      "weightKg": 90,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
         }
       ]
     },
@@ -66346,7 +66549,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -66371,7 +66575,13 @@
       ],
       "birthDate": "1999-05-23",
       "heightCm": 175,
-      "weightKg": 95
+      "weightKg": 95,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-145-128",
@@ -74080,13 +74290,20 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         }
       ],
       "birthDate": "1997-06-26",
       "heightCm": 187,
-      "weightKg": 104
+      "weightKg": 104,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "A"
+        }
+      ]
     },
     {
       "playerId": "leagueone-148-123",
@@ -79097,8 +79314,8 @@
       "currentTeamId": "141",
       "currentTeamName": "日野レッドドルフィンズ",
       "division": "DIV3",
-      "nameJa": "ワイナンド ・ グラスマン",
-      "nameEn": "Wynand  Grassmann",
+      "nameJa": "ワイナンド・グラスマン",
+      "nameEn": "Wynand Grassmann",
       "aliases": [],
       "positions": [
         "LO ロック"
@@ -79119,7 +79336,7 @@
         {
           "publisher": "日野レッドドルフィンズ",
           "url": "https://hino-reddolphins.com/api/v1/members?group=players",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-10-10",
           "fields": [
             "nameJa",
             "nameEn",
@@ -79199,7 +79416,8 @@
             "heightCm",
             "weightKg",
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "registrationCategories"
           ]
         },
         {
@@ -79224,7 +79442,13 @@
       ],
       "birthDate": "1994-11-25",
       "heightCm": 202,
-      "weightKg": 122
+      "weightKg": 122,
+      "registrationCategories": [
+        {
+          "season": "2025-26",
+          "category": "B"
+        }
+      ]
     },
     {
       "playerId": "leagueone-141-yujiro-yano",
@@ -79287,7 +79511,7 @@
       "currentTeamId": "141",
       "currentTeamName": "日野レッドドルフィンズ",
       "division": "DIV3",
-      "nameJa": "AJ ・ウルフ",
+      "nameJa": "AJ・ウルフ",
       "nameEn": "AJ Woulf",
       "aliases": [
         "エイジェイ・ウルフ"
@@ -96160,7 +96384,7 @@
       "currentTeamId": "137",
       "currentTeamName": "清水建設江東ブルーシャークス",
       "division": "DIV2",
-      "nameJa": "オルビン・ レジャー",
+      "nameJa": "オルビン・レジャー",
       "nameEn": "",
       "aliases": [
         "9812"
@@ -97443,52 +97667,6 @@
       ]
     },
     {
-      "playerId": "rugbydb-140-16680",
-      "leagueOnePlayerId": "",
-      "currentTeamId": "140",
-      "currentTeamName": "花園近鉄ライナーズ",
-      "division": "DIV2",
-      "nameJa": "嶋田士人",
-      "nameEn": "",
-      "aliases": [
-        "16680"
-      ],
-      "positions": [
-        "SO"
-      ],
-      "schools": [],
-      "teamHistory": [
-        {
-          "teamId": "140",
-          "teamName": "花園近鉄ライナーズ",
-          "fromSeason": "",
-          "toSeason": ""
-        }
-      ],
-      "representativeHistory": [],
-      "sources": [
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/team/731.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions",
-            "currentTeamName"
-          ]
-        },
-        {
-          "publisher": "RUGBY DATABASE（独立系二次データベース）",
-          "url": "https://rugbydb.tokyo/player/16680.html",
-          "checkedOn": "2026-10-08",
-          "fields": [
-            "nameJa",
-            "positions"
-          ]
-        }
-      ]
-    },
-    {
       "playerId": "rugbydb-142-2472",
       "leagueOnePlayerId": "",
       "currentTeamId": "142",
@@ -98322,7 +98500,7 @@
       "currentTeamId": "146",
       "currentTeamName": "マツダスカイアクティブズ広島",
       "division": "DIV2",
-      "nameJa": "クレイグランガ ・テイン",
+      "nameJa": "クレイグランガ・テイン",
       "nameEn": "",
       "aliases": [
         "50602"

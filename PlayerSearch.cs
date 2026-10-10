@@ -64,6 +64,13 @@ public static class PlayerSearch
         yield return player.CurrentTeamName;
         foreach (var value in player.Aliases ?? []) yield return value;
         foreach (var value in player.Positions ?? []) yield return value;
+        foreach (var nationality in player.Nationalities ?? []) yield return nationality;
+        foreach (var category in player.RegistrationCategories ?? [])
+        {
+            if (category is null) continue;
+            yield return category.Season;
+            yield return category.Category;
+        }
         foreach (var value in player.Schools ?? []) yield return value;
         foreach (var history in player.TeamHistory ?? [])
             if (history is not null) yield return history.TeamName;
