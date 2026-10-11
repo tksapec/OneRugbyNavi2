@@ -1,21 +1,34 @@
-using System.Text;
-
 namespace OneRugbyNavi2;
 
 public sealed class PlayerCatalogLoader
 {
-    public const string CatalogFileName = "league-one-players-2026-27.json";
+    private const string ManifestFileName = "player-catalog-manifest.json";
 
     public async Task<PlayerCatalogDocument> LoadAsync(CancellationToken cancellationToken = default)
     {
-        await using var stream = await FileSystem.OpenAppPackageFileAsync(CatalogFileName);
-        using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
-        var json = await reader.ReadToEndAsync(cancellationToken);
-        if (!PlayerCatalogParser.TryParse(json, out var catalog, out var errors))
-        {
-            throw new InvalidDataException(string.Join(Environment.NewLine, errors));
-        }
+        var cachePath = Path.Combine(FileSystem.AppDataDirectory, PlayerCatalogCache.CacheFileName);
+        return await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, LoadBundledCatalogJsonAsync, cancellationToken);
+    }
 
-        return catalog;
+    private static async Task<string> LoadBundledCatalogJsonAsync(CancellationToken cancellationToken)
+    {
+        var manifestJson = await LoadBundledManifestJsonAsync(cancellationToken);
+        if (!PlayerCatalogManifest.TryParse(manifestJson, out var manifest, out var error))
+            throw new InvalidDataException(error);
+
+        if (!manifest.TryGetPackageAssetPath(out var assetPath))
+            throw new InvalidDataException("Manifest catalog path is not a valid package asset path.");
+
+        return await ReadPackageFileAsync(assetPath, cancellationToken);
+    }
+
+    public static Task<string> LoadBundledManifestJsonAsync(CancellationToken cancellationToken = default)
+        => ReadPackageFileAsync(ManifestFileName, cancellationToken);
+
+    private static async Task<string> ReadPackageFileAsync(string fileName, CancellationToken cancellationToken)
+    {
+        await using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
+        using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        return await reader.ReadToEndAsync(cancellationToken);
     }
 }

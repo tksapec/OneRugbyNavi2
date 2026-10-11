@@ -40,6 +40,7 @@ public sealed class PlayerTeamHistory
 {
     public string TeamId { get; init; } = "";
     public string TeamName { get; init; } = "";
+    public string Type { get; init; } = "club";
     public string FromSeason { get; init; } = "";
     public string ToSeason { get; init; } = "";
 }

@@ -38,6 +38,40 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Bundled_team_history_is_normalized_and_school_university_club_ordered()
+    {
+        var catalog = LoadBundledCatalog();
+
+        foreach (var player in catalog.Players)
+        {
+            var expected = PlayerTeamHistoryDeduplicator.Normalize(player)
+                .Select(HistoryFingerprint).ToArray();
+            var actual = player.TeamHistory.Select(HistoryFingerprint).ToArray();
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fact]
+    public void Bundled_catalog_merges_reviewed_cross_source_player_duplicates_and_preserves_positions()
+    {
+        var catalog = LoadBundledCatalog();
+        var duplicateIds = new[]
+        {
+            "rugbydb-123-13482", "rugbydb-129-38262", "rugbydb-138-26208",
+            "rugbydb-143-32449", "rugbydb-146-34389", "rugbydb-149-11680", "rugbydb-149-19632"
+        };
+        Assert.DoesNotContain(catalog.Players, player => duplicateIds.Contains(player.PlayerId, StringComparer.Ordinal));
+
+        var kauri = Assert.Single(PlayerSearch.Search(catalog.Players, "カウリ・ティペネグレース"));
+
+        Assert.Equal("leagueone-143-%e3%82%ab%e3%82%a6%e3%83%aa%e3%83%bb%e3%83%86%e3%82%a3%e3%83%9a%e3%83%8d%e3%82%b0%e3%83%ac%e3%83%bc%e3%82%b9", kauri.PlayerId);
+        Assert.Contains(kauri.Positions, position => position.Contains("FB", StringComparison.Ordinal));
+        Assert.Contains(kauri.Positions, position => position.Contains("WTB", StringComparison.Ordinal));
+        Assert.Contains(kauri.Sources, source => source.Url == "https://rugbydb.tokyo/player/32449.html");
+        Assert.Contains(kauri.Aliases, alias => alias.Contains("32449", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Reviewed_name_variants_resolve_to_one_correct_player_and_bad_identity_names_are_not_aliases()
     {
         var catalog = LoadBundledCatalog();
@@ -81,9 +115,27 @@ public sealed class PlayerCatalogTests
     public void Corrected_club_history_uses_only_sourced_periods()
     {
         var catalog = LoadBundledCatalog();
+        var maruyama = Assert.Single(catalog.Players, player => player.PlayerId == "leagueone-131-rintaro-maruyama");
+        Assert.Contains(maruyama.TeamHistory, history => history.TeamName == "トヨタヴェルブリッツ" &&
+            history.FromSeason == "2022-23" && history.ToSeason == "2023-24");
+        Assert.Contains(maruyama.TeamHistory, history => history.TeamName == "花園近鉄ライナーズ" &&
+            history.FromSeason == "2024-25" && history.ToSeason == "2025-26");
+        Assert.Contains(maruyama.TeamHistory, history => history.TeamName == "栃木ホンダヒート" &&
+            history.FromSeason == "2026-27" && history.Type == "club");
+        Assert.Contains(maruyama.TeamHistory, history => history.TeamName == "東福岡高校" && history.Type == "highSchool");
+        Assert.Contains(maruyama.TeamHistory, history => history.TeamName == "東海大学" && history.Type == "university");
+
+        var waqa = Assert.Single(catalog.Players, player => player.NameEn == "Sanaila Waqa");
+        Assert.Contains(waqa.TeamHistory, history => history.TeamName == "NECグリーンロケッツ" &&
+            history.FromSeason == "2017-18" && history.ToSeason == "2019-20");
+        var waqaKintetsu = Assert.Single(waqa.TeamHistory, history => history.Type == "club" &&
+            history.TeamName == "花園近鉄ライナーズ");
+        Assert.Equal("2020-21", waqaKintetsu.FromSeason);
+        Assert.Equal(string.Empty, waqaKintetsu.ToSeason);
+
         var ochi = Assert.Single(catalog.Players, player => player.NameJa == "落 和史");
         Assert.Contains(ochi.TeamHistory, history => history.TeamName == "日本製鉄釜石シーウェイブス" &&
-            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
+            history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
 
         var shigematsu = Assert.Single(catalog.Players, player => player.NameJa == "繁松 哲大");
         Assert.Contains(shigematsu.TeamHistory, history => history.TeamName == "レッドハリケーンズ大阪" &&
@@ -169,6 +221,18 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Legacy_transfer_list_adds_previous_club_and_last_season()
+    {
+        var catalog = LoadBundledCatalog();
+        var boshier = Assert.Single(catalog.Players, player => player.NameEn == "Lachlan Boshier");
+
+        Assert.Contains(boshier.TeamHistory, history => history.TeamName == "チーフス" &&
+            history.Type == "club" && history.FromSeason == "" && history.ToSeason == "2020-21");
+        Assert.Contains(boshier.Sources, source => source.Url == "https://rugbydb.tokyo/list/transfer21.html" &&
+            source.Fields.Contains("teamHistory"));
+    }
+
+    [Fact]
     public void Search_matches_names_aliases_positions_and_past_teams()
     {
         var player = new PlayerRecord
@@ -239,6 +303,153 @@ public sealed class PlayerCatalogTests
         };
 
         Assert.Equal(2, PlayerSearch.Search(players, "  ").Count);
+    }
+
+    [Fact]
+    public void Search_matches_known_season_and_ranges_but_not_undated_history()
+    {
+        var ranged = new PlayerRecord
+        {
+            PlayerId = "ranged", TeamHistory = [new PlayerTeamHistory { TeamId = "club", TeamName = "Club", FromSeason = "2022-23", ToSeason = "2024-25" }]
+        };
+        var undated = new PlayerRecord
+        {
+            PlayerId = "undated", TeamHistory = [new PlayerTeamHistory { TeamId = "club2", TeamName = "Other Club" }]
+        };
+
+        Assert.Same(ranged, Assert.Single(PlayerSearch.Search([ranged, undated], "2023-24")));
+        Assert.Same(ranged, Assert.Single(PlayerSearch.Search([ranged, undated], "2022-23")));
+        Assert.Empty(PlayerSearch.Search([ranged, undated], "2025-26"));
+        Assert.Empty(PlayerSearch.Search([ranged], "2023-24", PlayerSearchScope.CurrentTeam));
+    }
+
+    [Fact]
+    public void End_only_history_preserves_last_known_season_without_inventing_start()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "end-only",
+            TeamHistory = [new PlayerTeamHistory { TeamId = "club", TeamName = "Club", ToSeason = "2020-21" }]
+        };
+        var json = ValidPlayerJson().Replace("\"teamHistory\": []",
+            "\"teamHistory\": [{\"teamId\":\"club\",\"teamName\":\"Club\",\"toSeason\":\"2020-21\"}]", StringComparison.Ordinal);
+
+        Assert.True(PlayerCatalogParser.TryParse(json, out _, out var errors), string.Join(Environment.NewLine, errors));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "2020-21")));
+        Assert.Empty(PlayerSearch.Search([player], "2019-20"));
+    }
+
+    [Fact]
+    public void Team_history_merges_overlapping_rows_for_the_same_club_but_keeps_separate_stints()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "history-duplicates",
+            CurrentTeamId = "official-current-id",
+            CurrentTeamName = "Current Club",
+            TeamHistory =
+            [
+                new PlayerTeamHistory { TeamId = "official-current-id", TeamName = "Current Club", FromSeason = "2025-26" },
+                new PlayerTeamHistory { TeamId = "rugbydb:team:1", TeamName = "Current Club", FromSeason = "2022-23", ToSeason = "2025-26" },
+                new PlayerTeamHistory { TeamId = "rugbydb:team:2", TeamName = "Former Club", FromSeason = "2020-21", ToSeason = "2021-22" },
+                new PlayerTeamHistory { TeamId = "former-alias", TeamName = "Former Club", FromSeason = "2024-25", ToSeason = "2024-25" },
+                new PlayerTeamHistory { TeamId = "other", TeamName = "Current Club", Type = "university", FromSeason = "2018-19" }
+            ]
+        };
+
+        var result = PlayerTeamHistoryDeduplicator.Normalize(player);
+
+        Assert.Equal(4, result.Count);
+        var current = Assert.Single(result, history => history.Type == "club" && history.TeamName == "Current Club");
+        Assert.Equal("official-current-id", current.TeamId);
+        Assert.Equal("2022-23", current.FromSeason);
+        Assert.Equal("", current.ToSeason);
+        Assert.Equal(2, result.Count(history => history.Type == "club" && history.TeamName == "Former Club"));
+        Assert.Contains(result, history => history.Type == "university");
+    }
+
+    [Fact]
+    public void Team_history_merges_adjacent_seasons_for_same_team_and_sorts_school_before_university_before_club()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "history-order",
+            CurrentTeamId = "pro",
+            CurrentTeamName = "Pro Club",
+            TeamHistory =
+            [
+                new PlayerTeamHistory { TeamId = "pro", TeamName = "Pro Club", FromSeason = "2023-24" },
+                new PlayerTeamHistory { TeamId = "hs", TeamName = "High School", Type = "highSchool", FromSeason = "2017-18", ToSeason = "2019-20" },
+                new PlayerTeamHistory { TeamId = "pro-alias", TeamName = "Pro Club", FromSeason = "2021-22", ToSeason = "2022-23" },
+                new PlayerTeamHistory { TeamId = "uni", TeamName = "University", Type = "university", FromSeason = "2020-21", ToSeason = "2020-21" }
+            ]
+        };
+
+        var result = PlayerTeamHistoryDeduplicator.Normalize(player);
+
+        Assert.Equal(new[] { "highSchool", "university", "club" }, result.Select(history => history.Type));
+        var pro = Assert.Single(result, history => history.Type == "club");
+        Assert.Equal("2021-22", pro.FromSeason);
+        Assert.Equal("", pro.ToSeason);
+    }
+
+    [Fact]
+    public void Team_history_display_groups_repeat_stints_once_and_orders_school_university_then_professional_teams()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "display-order",
+            CurrentTeamId = "pro",
+            CurrentTeamName = "Pro Club",
+            TeamHistory =
+            [
+                new PlayerTeamHistory { TeamId = "pro", TeamName = "Pro Club", FromSeason = "2023-24" },
+                new PlayerTeamHistory { TeamId = "old-club", TeamName = "Former Club", FromSeason = "2020-21", ToSeason = "2020-21" },
+                new PlayerTeamHistory { TeamId = "hs", TeamName = "High School", Type = "highSchool" },
+                new PlayerTeamHistory { TeamId = "uni", TeamName = "University", Type = "university", FromSeason = "2019-20" },
+                new PlayerTeamHistory { TeamId = "pro-old", TeamName = "Pro Club", FromSeason = "2021-22", ToSeason = "2021-22" }
+            ]
+        };
+
+        var groups = PlayerTeamHistoryDisplayGroup.Create(player);
+
+        Assert.Equal(new[] { "highSchool", "university", "club", "club" }, groups.Select(group => group.Type));
+        Assert.Equal("High School", groups[0].TeamName);
+        Assert.Equal("University", groups[1].TeamName);
+        var pro = Assert.Single(groups, group => group.TeamName == "Pro Club");
+        Assert.Equal(2, pro.Stints.Count);
+        Assert.Equal("2021-22 / 2023-24〜現在", pro.Periods);
+    }
+
+    [Fact]
+    public void Team_history_display_keeps_end_only_period_without_inventing_start_or_duplicate_unknown_rows()
+    {
+        var player = new PlayerRecord
+        {
+            PlayerId = "end-only-display",
+            CurrentTeamId = "current",
+            CurrentTeamName = "Current Club",
+            TeamHistory =
+            [
+                new PlayerTeamHistory { TeamId = "former", TeamName = "Former Club" },
+                new PlayerTeamHistory { TeamId = "former-rugbydb", TeamName = "Former Club", ToSeason = "2020-21" }
+            ]
+        };
+
+        var former = Assert.Single(PlayerTeamHistoryDisplayGroup.Create(player), group => group.TeamName == "Former Club");
+
+        Assert.Equal("〜2020-21", former.Periods);
+    }
+
+    [Fact]
+    public void Parser_defaults_missing_history_type_to_club_and_rejects_unknown_type()
+    {
+        var legacy = ValidPlayerJson().Replace("\"teamHistory\": []", "\"teamHistory\": [{\"teamId\":\"club\",\"teamName\":\"Club\"}]", StringComparison.Ordinal);
+        Assert.True(PlayerCatalogParser.TryParse(legacy, out var catalog, out var errors), string.Join(Environment.NewLine, errors));
+        Assert.Equal("club", Assert.Single(catalog.Players[0].TeamHistory).Type);
+
+        var invalid = legacy.Replace("\"teamName\":\"Club\"", "\"teamName\":\"Club\",\"type\":\"school\"", StringComparison.Ordinal);
+        Assert.False(PlayerCatalogParser.TryParse(invalid, out _, out _));
     }
 
     [Fact]
@@ -396,6 +607,9 @@ public sealed class PlayerCatalogTests
         Assert.True(PlayerCatalogParser.TryParse(json, out var catalog, out var errors), string.Join(Environment.NewLine, errors));
         return catalog;
     }
+
+    private static string HistoryFingerprint(PlayerTeamHistory history)
+        => $"{history.TeamId}|{history.TeamName}|{history.Type}|{history.FromSeason}|{history.ToSeason}";
 
     private static string ValidPlayerJson() => """
     {

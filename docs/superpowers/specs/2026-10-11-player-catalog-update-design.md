@@ -17,6 +17,7 @@ Let users refresh the player catalog from the current OneRugbyNavi2 GitHub repos
 - Add a stable manifest at `Resources/Raw/player-catalog-manifest.json` and include it in the app package as a bootstrap/fallback resource.
 - The manifest contains a format version and a repository-relative path to the active catalog JSON. Updating the manifest and JSON on `main` is the publishing operation; the JSON filename can then change without an app update.
 - The client accepts only HTTPS raw content from the configured `tksapec/OneRugbyNavi2` repository and only repository paths under `Resources/Raw/` that end in `.json`. It does not follow arbitrary URLs supplied by the manifest.
+- If the remote manifest returns HTTP 404 because it has not yet been published, use the validated manifest packaged with the app as a compatibility pointer. Other HTTP failures and invalid remote manifests fail without changing the cache. This fallback cannot discover a renamed remote JSON until the manifest is published.
 - The initial manifest points to `Resources/Raw/league-one-players-2026-27.json`.
 
 ## Components

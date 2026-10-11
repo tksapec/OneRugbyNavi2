@@ -111,10 +111,11 @@ public static partial class PlayerCatalogParser
                     continue;
                 }
 
+                if (history.Type is not ("club" or "university" or "highSchool"))
+                    errors.Add($"Player {player.PlayerId} has an unsupported teamHistory type.");
+
                 if (!IsValidOptionalSeason(history.FromSeason) || !IsValidOptionalSeason(history.ToSeason))
                     errors.Add($"Player {player.PlayerId} has an invalid teamHistory season.");
-                if (!string.IsNullOrWhiteSpace(history.ToSeason) && string.IsNullOrWhiteSpace(history.FromSeason))
-                    errors.Add($"Player {player.PlayerId} has a teamHistory end season without a start season.");
                 if (IsValidSeason(history.FromSeason) && IsValidSeason(history.ToSeason) &&
                     SeasonStartYear(history.FromSeason) > SeasonStartYear(history.ToSeason))
                     errors.Add($"Player {player.PlayerId} has a reversed teamHistory range.");

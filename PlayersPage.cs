@@ -15,18 +15,27 @@ public sealed class PlayersPage : ContentPage
     ];
     private static readonly string[] PositionFilters =
     ["PR", "HO", "LO", "FL", "No.8", "SH", "SO", "CTB", "WTB", "FB", "UTB"];
+    private const string LastCatalogCheckPreferenceKey = "player-catalog-last-check-utc";
+    private static readonly HttpClient CatalogHttpClient = new(new HttpClientHandler { AllowAutoRedirect = false });
 
     private readonly PlayerCatalogLoader _loader = new();
+    private readonly PlayerCatalogUpdateService _updateService = new(
+        CatalogHttpClient,
+        PlayerCatalogUpdateService.DefaultManifestUri,
+        Path.Combine(FileSystem.AppDataDirectory, PlayerCatalogCache.CacheFileName));
     private readonly ObservableCollection<PlayerRecord> _results = [];
-    private readonly List<Button> _divisionButtons = [];
     private readonly SearchBar _searchBar = new()
     {
-        Placeholder = "選手名・チーム・出身校などを入力",
+        Placeholder = "選手名・所属歴・出身校・シーズンを入力",
+        TextColor = PageStyles.Navy,
+        PlaceholderColor = PageStyles.Muted,
+        BackgroundColor = PageStyles.Surface,
         CancelButtonColor = PageStyles.Blue
     };
-    private readonly Picker _searchScopePicker = PageStyles.Picker("検索対象を選択");
     private readonly Picker _teamPicker = PageStyles.Picker(AllTeams);
     private readonly Picker _positionPicker = PageStyles.Picker(AllPositions);
+    private readonly Button _filterButton = PageStyles.SecondaryButton("絞り込み");
+    private readonly Label _filterSummary = PageStyles.MutedLabel("絞り込み条件はありません");
     private readonly Label _catalogStatus = PageStyles.MutedLabel("選手データを読み込み中...");
     private readonly Label _resultCount = new()
     {
@@ -45,9 +54,20 @@ public sealed class PlayersPage : ContentPage
         Margin = new Thickness(32)
     };
     private readonly Button _retryButton = PageStyles.SecondaryButton("再読み込み");
-    private readonly Button _clearFiltersButton = PageStyles.SecondaryButton("絞り込みを解除");
+    private readonly Button _updateButton = PageStyles.SecondaryButton("選手データを更新");
+    private readonly ActivityIndicator _updateActivity = new()
+    {
+        Color = PageStyles.Blue,
+        IsVisible = false,
+        IsRunning = false,
+        WidthRequest = 24,
+        HeightRequest = 24,
+        VerticalOptions = LayoutOptions.Center
+    };
+    private readonly Button _clearFiltersButton = PageStyles.SecondaryButton("検索条件をすべて解除");
     private IReadOnlyList<PlayerRecord> _players = [];
     private string _selectedDivision = "";
+    private string _selectedAffiliationType = "";
     private bool _loaded;
     private bool _loading;
     private bool _updatingFilters;
@@ -57,16 +77,16 @@ public sealed class PlayersPage : ContentPage
         Title = "選手検索";
         BackgroundColor = PageStyles.Background;
         Shell.SetNavBarIsVisible(this, false);
-        _searchScopePicker.ItemsSource = new[] { "すべての項目", "現所属チーム", "過去の所属チーム", "出身校" };
-        _searchScopePicker.SelectedIndex = 0;
-        _searchScopePicker.SelectedIndexChanged += OnSearchScopeChanged;
         _searchBar.TextChanged += OnSearchTextChanged;
         _teamPicker.SelectedIndexChanged += OnFilterChanged;
         _positionPicker.SelectedIndexChanged += OnFilterChanged;
         _retryButton.IsVisible = false;
         _clearFiltersButton.IsVisible = false;
+        _filterButton.IsEnabled = false;
         _retryButton.Clicked += async (_, _) => await LoadAsync();
+        _updateButton.Clicked += async (_, _) => await UpdateCatalogAsync();
         _clearFiltersButton.Clicked += (_, _) => ClearFilters();
+        _filterButton.Clicked += async (_, _) => await ShowFiltersAsync();
 
         var list = new CollectionView
         {
@@ -77,12 +97,12 @@ public sealed class PlayersPage : ContentPage
             Margin = new Thickness(0, 0, 0, 8)
         };
 
-        var divisionPicker = BuildDivisionPicker();
-        var filters = new VerticalStackLayout
+        var filterBar = new Grid
         {
-            Spacing = 0,
+            ColumnDefinitions = { new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) },
+            ColumnSpacing = 8,
             Margin = new Thickness(16, 0, 16, 4),
-            Children = { _teamPicker, _positionPicker }
+            Children = { _filterButton.Column(0), _filterSummary.Column(1), _clearFiltersButton.Column(2) }
         };
         var resultHeader = new Grid
         {
@@ -94,12 +114,19 @@ public sealed class PlayersPage : ContentPage
                 _resultCount.Column(1)
             }
         };
+        var updateBar = new HorizontalStackLayout
+        {
+            Spacing = 8,
+            HorizontalOptions = LayoutOptions.End,
+            Margin = new Thickness(16, 0, 16, 4),
+            Children = { _updateActivity, _updateButton }
+        };
         var emptyState = new VerticalStackLayout
         {
             Spacing = 12,
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center,
-            Children = { _empty, _clearFiltersButton, _retryButton }
+            Children = { _empty, _retryButton }
         };
 
         Content = new Grid
@@ -111,22 +138,28 @@ public sealed class PlayersPage : ContentPage
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
-                new RowDefinition(GridLength.Auto),
-                new RowDefinition(GridLength.Star)
+                new RowDefinition(GridLength.Star),
             },
             Children =
             {
                 PageStyles.NavigationTitle(this, "選手検索"),
-                _searchScopePicker.Row(1).Margin(new Thickness(16, 0, 16, 0)),
-                _searchBar.Row(2).Margin(new Thickness(16, 0, 16, 4)),
-                divisionPicker.Row(3),
-                filters.Row(4),
-                resultHeader.Row(5),
-                list.Row(6),
-                emptyState.Row(6)
+                new Border
+                {
+                    BackgroundColor = PageStyles.Surface,
+                    Stroke = PageStyles.Stroke,
+                    StrokeThickness = 1,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 12 },
+                    Padding = new Thickness(8, 0),
+                    Margin = new Thickness(16, 0, 16, 4),
+                    Content = _searchBar
+                }.Row(1),
+                filterBar.Row(2),
+                resultHeader.Row(3),
+                updateBar.Row(4),
+                list.Row(5),
+                emptyState.Row(5)
             }
         };
-        UpdateDivisionButtons();
     }
 
     protected override async void OnAppearing()
@@ -135,63 +168,11 @@ public sealed class PlayersPage : ContentPage
         if (!_loaded && !_loading) await LoadAsync();
     }
 
-    private View BuildDivisionPicker()
-    {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition(GridLength.Star),
-                new ColumnDefinition(GridLength.Star),
-                new ColumnDefinition(GridLength.Star),
-                new ColumnDefinition(GridLength.Star)
-            },
-            ColumnSpacing = 6,
-            Margin = new Thickness(16, 0, 16, 2)
-        };
-
-        for (var i = 0; i < Divisions.Length; i++)
-        {
-            var divisionIndex = i;
-            var button = PageStyles.SecondaryButton(Divisions[i].Label);
-            button.FontSize = 12;
-            button.Padding = new Thickness(4, 7);
-            button.Clicked += (_, _) => SelectDivision(divisionIndex);
-            SemanticProperties.SetHint(button, Divisions[i].Code.Length == 0
-                ? "全ディビジョンの選手を表示"
-                : $"{Divisions[i].Label}の選手に絞り込む");
-            _divisionButtons.Add(button);
-            grid.Add(button, i, 0);
-        }
-
-        return grid;
-    }
-
-    private void SelectDivision(int index)
-    {
-        _selectedDivision = Divisions[index].Code;
-        PopulateTeamPicker();
-        UpdateDivisionButtons();
-        RefreshResults();
-    }
-
-    private void UpdateDivisionButtons()
-    {
-        var selectedIndex = Array.FindIndex(Divisions, division => division.Code == _selectedDivision);
-        for (var i = 0; i < _divisionButtons.Count; i++)
-        {
-            var selected = i == selectedIndex;
-            _divisionButtons[i].BackgroundColor = selected ? PageStyles.Blue : PageStyles.ChipBackground;
-            _divisionButtons[i].TextColor = selected ? Colors.White : PageStyles.Blue;
-            _divisionButtons[i].FontAttributes = selected ? FontAttributes.Bold : FontAttributes.None;
-            SemanticProperties.SetDescription(_divisionButtons[i], selected ? "選択中" : "タップして選択");
-        }
-    }
-
     private async Task LoadAsync()
     {
         if (_loading) return;
         _loading = true;
+        _updateButton.IsEnabled = false;
         _retryButton.IsVisible = false;
         _catalogStatus.Text = "選手データを読み込み中...";
         try
@@ -199,9 +180,10 @@ public sealed class PlayersPage : ContentPage
             var catalog = await _loader.LoadAsync();
             _players = catalog.Players;
             _loaded = true;
+            _filterButton.IsEnabled = true;
             PopulateTeamPicker();
             RefreshResults();
-            _catalogStatus.Text = $"{catalog.Season}シーズン · 全{_players.Count:N0}人";
+            _catalogStatus.Text = BuildCatalogStatus(catalog);
         }
         catch (Exception ex)
         {
@@ -213,7 +195,68 @@ public sealed class PlayersPage : ContentPage
         finally
         {
             _loading = false;
+            _updateButton.IsEnabled = true;
         }
+    }
+
+    private async Task UpdateCatalogAsync()
+    {
+        if (_loading || !_updateButton.IsEnabled) return;
+        _updateButton.IsEnabled = false;
+        _updateActivity.IsVisible = true;
+        _updateActivity.IsRunning = true;
+        _catalogStatus.Text = "GitHubから選手データを確認しています...";
+
+        try
+        {
+            var bundledManifestJson = await PlayerCatalogLoader.LoadBundledManifestJsonAsync();
+            var result = await _updateService.UpdateAsync(bundledManifestJson);
+            Preferences.Set(LastCatalogCheckPreferenceKey, result.CheckedAtUtc.ToString("O"));
+            _players = result.Catalog.Players;
+            _loaded = true;
+            _filterButton.IsEnabled = true;
+
+            if (_selectedDivision.Length > 0 && !_players.Any(player => player.Division == _selectedDivision))
+                _selectedDivision = "";
+            if (_selectedAffiliationType.Length > 0 &&
+                !_players.Any(player => (player.TeamHistory ?? []).Any(history => history is not null && history.Type == _selectedAffiliationType)))
+                _selectedAffiliationType = "";
+
+            PopulateTeamPicker();
+            if (_positionPicker.SelectedItem is string position && position != AllPositions &&
+                !_players.Any(player => HasPosition(player, position)))
+                _positionPicker.SelectedIndex = 0;
+            RefreshResults();
+
+            var checkedAt = result.CheckedAtUtc.ToLocalTime().ToString("yyyy/M/d H:mm");
+            _catalogStatus.Text = $"{result.Catalog.Season}シーズン · 全{_players.Count:N0}人 · {checkedAt}に" +
+                (result.Changed ? "更新しました" : "確認済みです") +
+                (result.UsedBundledManifest ? " (同梱のファイル一覧)" : "");
+        }
+        catch (Exception ex)
+        {
+            var reason = ex switch
+            {
+                InvalidDataException => "GitHubの選手データを検証できませんでした。",
+                HttpRequestException or TaskCanceledException => "通信を確認して、もう一度お試しください。",
+                _ => "時間をおいて、もう一度お試しください。"
+            };
+            _catalogStatus.Text = $"選手データを更新できませんでした。現在の表示は維持されています。{reason}";
+        }
+        finally
+        {
+            _updateActivity.IsRunning = false;
+            _updateActivity.IsVisible = false;
+            _updateButton.IsEnabled = true;
+        }
+    }
+
+    private static string BuildCatalogStatus(PlayerCatalogDocument catalog)
+    {
+        var lastCheck = Preferences.Get(LastCatalogCheckPreferenceKey, "");
+        if (DateTimeOffset.TryParse(lastCheck, out var checkedAt))
+            return $"{catalog.Season}シーズン · 全{catalog.Players.Count:N0}人 · 最終確認 {checkedAt.ToLocalTime():yyyy/M/d H:mm}";
+        return $"{catalog.Season}シーズン · 全{catalog.Players.Count:N0}人";
     }
 
     private void PopulateTeamPicker()
@@ -241,18 +284,6 @@ public sealed class PlayersPage : ContentPage
 
     private void OnSearchTextChanged(object? sender, TextChangedEventArgs e) => RefreshResults();
 
-    private void OnSearchScopeChanged(object? sender, EventArgs e)
-    {
-        _searchBar.Placeholder = _searchScopePicker.SelectedIndex switch
-        {
-            1 => "現所属チーム名を入力",
-            2 => "過去に所属したチーム名を入力",
-            3 => "出身校名を入力",
-            _ => "選手名・チーム・出身校などを入力"
-        };
-        RefreshResults();
-    }
-
     private void OnFilterChanged(object? sender, EventArgs e)
     {
         if (!_updatingFilters) RefreshResults();
@@ -275,44 +306,85 @@ public sealed class PlayersPage : ContentPage
         _empty.Text = "条件に合う選手はいません。\n検索語や絞り込み条件を変えてみてください。";
         var team = _teamPicker.SelectedItem as string;
         var position = _positionPicker.SelectedItem as string;
-        var searchScope = _searchScopePicker.SelectedIndex switch
-        {
-            1 => PlayerSearchScope.CurrentTeam,
-            2 => PlayerSearchScope.PreviousTeam,
-            3 => PlayerSearchScope.School,
-            _ => PlayerSearchScope.All
-        };
-        var matches = PlayerSearch.Search(_players, _searchBar.Text, searchScope)
+        var matches = PlayerSearch.Search(_players, _searchBar.Text)
             .Where(player => _selectedDivision.Length == 0 || player.Division == _selectedDivision)
             .Where(player => string.IsNullOrWhiteSpace(team) || team == AllTeams || player.CurrentTeamName == team)
             .Where(player => string.IsNullOrWhiteSpace(position) || position == AllPositions || HasPosition(player, position))
+            .Where(player => string.IsNullOrEmpty(_selectedAffiliationType) ||
+                (player.TeamHistory ?? []).Any(history => history is not null && history.Type == _selectedAffiliationType))
             .OrderBy(player => string.IsNullOrWhiteSpace(player.NameJa) ? player.NameEn : player.NameJa, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
 
         foreach (var player in matches) _results.Add(player);
         _resultCount.Text = $"{matches.Length:N0}人を表示";
+        var activeFilters = ActiveFilterCount();
+        _filterButton.Text = activeFilters == 0 ? "絞り込み" : $"絞り込み ({activeFilters})";
+        _filterSummary.Text = BuildFilterSummary();
         _empty.IsVisible = matches.Length == 0;
-        _clearFiltersButton.IsVisible = matches.Length == 0 && HasActiveFilters();
+        _clearFiltersButton.IsVisible = HasActiveFilters();
     }
 
     private bool HasActiveFilters()
         => !string.IsNullOrWhiteSpace(_searchBar.Text) ||
            _selectedDivision.Length > 0 ||
+           _selectedAffiliationType.Length > 0 ||
            (_teamPicker.SelectedItem is string team && team != AllTeams) ||
            (_positionPicker.SelectedItem is string position && position != AllPositions);
 
     private void ClearFilters()
     {
         _searchBar.Text = "";
-        _searchScopePicker.SelectedIndex = 0;
         _selectedDivision = "";
+        _selectedAffiliationType = "";
         _updatingFilters = true;
         PopulateTeamPicker();
         _teamPicker.SelectedIndex = 0;
         _positionPicker.SelectedIndex = 0;
         _updatingFilters = false;
-        UpdateDivisionButtons();
         RefreshResults();
+    }
+
+    private int ActiveFilterCount()
+        => (_selectedDivision.Length > 0 ? 1 : 0) + (_selectedAffiliationType.Length > 0 ? 1 : 0) +
+           (_teamPicker.SelectedItem is string team && team != AllTeams ? 1 : 0) +
+           (_positionPicker.SelectedItem is string position && position != AllPositions ? 1 : 0);
+
+    private string BuildFilterSummary()
+    {
+        var values = new List<string>();
+        if (!string.IsNullOrWhiteSpace(_searchBar.Text)) values.Add($"検索: {_searchBar.Text.Trim()}");
+        if (_selectedDivision.Length > 0) values.Add(Divisions.First(item => item.Code == _selectedDivision).Label);
+        if (_teamPicker.SelectedItem is string team && team != AllTeams) values.Add(team);
+        if (_positionPicker.SelectedItem is string position && position != AllPositions) values.Add(position);
+        if (_selectedAffiliationType.Length > 0)
+            values.Add(_selectedAffiliationType switch { "university" => "大学歴あり", "highSchool" => "高校歴あり", _ => "クラブ歴あり" });
+        return values.Count == 0 ? "絞り込み条件はありません" : string.Join(" · ", values);
+    }
+
+    private async Task ShowFiltersAsync()
+    {
+        var selection = new PlayerFilterSelection(
+            _selectedDivision,
+            _teamPicker.SelectedItem as string is { } team && team != AllTeams ? team : "",
+            _positionPicker.SelectedItem as string is { } position && position != AllPositions ? position : "",
+            _selectedAffiliationType);
+        await Navigation.PushModalAsync(new NavigationPage(new PlayerFiltersPage(_players, selection, selected =>
+        {
+            _selectedDivision = selected.Division;
+            _selectedAffiliationType = selected.AffiliationType;
+            _updatingFilters = true;
+            PopulateTeamPicker();
+            _teamPicker.SelectedIndex = string.IsNullOrEmpty(selected.Team) ? 0 :
+                Math.Max(Array.IndexOf(_teamPicker.ItemsSource.Cast<string>().ToArray(), selected.Team), 0);
+            _positionPicker.SelectedIndex = string.IsNullOrEmpty(selected.Position) ? 0 :
+                Math.Max(Array.IndexOf(_positionPicker.ItemsSource.Cast<string>().ToArray(), selected.Position), 0);
+            _updatingFilters = false;
+            RefreshResults();
+        }))
+        {
+            BarBackgroundColor = PageStyles.Surface,
+            BarTextColor = PageStyles.Navy
+        });
     }
 
     internal static bool HasPosition(PlayerRecord player, string position)
@@ -346,6 +418,9 @@ public sealed class PlayersPage : ContentPage
 
     internal static string PositionBadgeFor(PlayerRecord player)
         => PositionFilters.FirstOrDefault(position => HasPosition(player, position)) ?? "選手";
+
+    internal static string HistoryTypeLabel(string? type)
+        => type switch { "university" => "大学", "highSchool" => "高校", _ => "クラブ" };
 
     private View CreatePlayerCard()
     {
@@ -440,10 +515,16 @@ internal sealed class PlayerPastTeamsConverter : IValueConverter
     }
     internal static string[] GetPastTeams(object? value)
         => value is PlayerRecord player
-            ? (player.TeamHistory ?? []).Where(history => history is not null &&
-                  (history.TeamId != player.CurrentTeamId || history.TeamName != player.CurrentTeamName))
-                .Select(history => history.TeamName).Distinct(StringComparer.Ordinal).ToArray()
+            ? PlayerTeamHistoryDisplayGroup.Create(player)
+                .Where(group => group.Type != "club" ||
+                    !group.Stints.Any(history => history.TeamId == player.CurrentTeamId || history.TeamName == player.CurrentTeamName))
+                .OrderByDescending(group => group.Stints.Max(history => SeasonYear(
+                    string.IsNullOrWhiteSpace(history.FromSeason) ? history.ToSeason : history.FromSeason)))
+                .Select(group => $"{PlayersPage.HistoryTypeLabel(group.Type)} {group.TeamName} ({group.Periods})")
+                .Take(2).ToArray()
             : [];
+    private static int SeasonYear(string? season)
+        => !string.IsNullOrWhiteSpace(season) && int.TryParse(season.AsSpan(0, Math.Min(4, season.Length)), out var year) ? year : 0;
     public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
 }
 

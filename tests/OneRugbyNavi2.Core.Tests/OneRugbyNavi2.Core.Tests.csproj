@@ -21,10 +21,16 @@
   <ItemGroup>
     <None Include="../../MainPage.xaml" Link="Fixtures/MainPage.xaml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Resources/Raw/league-one-players-2026-27.json" Link="Fixtures/league-one-players-2026-27.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Resources/Raw/player-catalog-manifest.json" Link="Fixtures/player-catalog-manifest.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="../../PlayerCatalogModels.cs" Link="Production/PlayerCatalogModels.cs" />
+    <Compile Include="../../PlayerCatalogUpdateModels.cs" Link="Production/PlayerCatalogUpdateModels.cs" />
+    <Compile Include="../../PlayerCatalogCache.cs" Link="Production/PlayerCatalogCache.cs" />
+    <Compile Include="../../PlayerCatalogUpdateService.cs" Link="Production/PlayerCatalogUpdateService.cs" />
+    <Compile Include="../../PlayerTeamHistoryDeduplicator.cs" Link="Production/PlayerTeamHistoryDeduplicator.cs" />
+    <Compile Include="../../PlayerTeamHistoryDisplayGroup.cs" Link="Production/PlayerTeamHistoryDisplayGroup.cs" />
     <Compile Include="../../PlayerCatalogDuplicateDetector.cs" Link="Production/PlayerCatalogDuplicateDetector.cs" />
     <Compile Include="../../PlayerSearch.cs" Link="Production/PlayerSearch.cs" />
     <Compile Include="../../PlayerCatalogParser.cs" Link="Production/PlayerCatalogParser.cs" />

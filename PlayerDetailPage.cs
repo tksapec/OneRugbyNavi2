@@ -91,7 +91,12 @@ public sealed class PlayerDetailPage : ContentPage
         {
             AddRow(rows, "身長・体重", $"{Format(player.HeightCm, "cm")} / {Format(player.WeightKg, "kg")}");
         }
-        if (player.Schools is { Count: > 0 } schools) AddRow(rows, "出身校", string.Join(" / ", schools));
+        var schoolsNotInHistory = (player.Schools ?? []).Where(school => !string.IsNullOrWhiteSpace(school))
+            .Where(school => !(player.TeamHistory ?? []).Any(history => history is not null &&
+                (history.Type is "highSchool" or "university") &&
+                PlayerTeamHistoryDisplayGroup.SameInstitutionName(school, history.TeamName)))
+            .Distinct(StringComparer.Ordinal).ToArray();
+        if (schoolsNotInHistory.Length > 0) AddRow(rows, "出身校", string.Join(" / ", schoolsNotInHistory));
         if (player.Aliases is { Count: > 0 } aliases) AddRow(rows, "別表記・検索語", string.Join(" / ", aliases));
         if (!string.IsNullOrWhiteSpace(player.LeagueOnePlayerId)) AddRow(rows, "リーグワン選手ID", player.LeagueOnePlayerId);
         content.Add(Section("プロフィール", rows));
@@ -99,23 +104,21 @@ public sealed class PlayerDetailPage : ContentPage
 
     private static void AddTeamHistory(VerticalStackLayout content, PlayerRecord player)
     {
-        var histories = (player.TeamHistory ?? []).Where(history => history is not null).ToArray();
+        var histories = PlayerTeamHistoryDisplayGroup.Create(player);
         var rows = new VerticalStackLayout { Spacing = 8 };
-        if (histories.Length == 0)
+        if (histories.Count == 0)
         {
             AddRow(rows, "所属歴", "このデータで確認できる所属期間はありません。");
         }
         else foreach (var history in histories)
         {
-            var period = GetPeriod(history.FromSeason, history.ToSeason);
-            var row = new Grid
+            var row = new VerticalStackLayout
             {
-                ColumnDefinitions = { new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) },
-                ColumnSpacing = 8,
+                Spacing = 2,
                 Children =
                 {
-                    new Label { Text = history.TeamName, FontSize = 14, TextColor = PageStyles.Text, VerticalTextAlignment = TextAlignment.Center },
-                    new Label { Text = period, FontSize = 12, TextColor = PageStyles.Muted, VerticalTextAlignment = TextAlignment.Center }.Column(1)
+                    new Label { Text = $"{PlayersPage.HistoryTypeLabel(history.Type)} · {history.TeamName}", FontSize = 14, TextColor = PageStyles.Text },
+                    new Label { Text = history.Periods, FontSize = 12, TextColor = PageStyles.Muted }
                 }
             };
             rows.Add(row);
@@ -126,7 +129,7 @@ public sealed class PlayerDetailPage : ContentPage
             FontSize = 12,
             TextColor = PageStyles.Muted
         });
-        content.Add(Section("確認できた所属チーム歴", rows));
+        content.Add(Section("経歴（高校・大学・クラブ）", rows));
     }
 
     private static void AddRepresentativeHistory(VerticalStackLayout content, PlayerRecord player)
@@ -234,10 +237,4 @@ public sealed class PlayerDetailPage : ContentPage
 
     private static string Format(int? value, string suffix) => value is { } number ? $"{number}{suffix}" : "未登録";
 
-    private static string GetPeriod(string? from, string? to)
-    {
-        if (string.IsNullOrWhiteSpace(from)) return "時期未確認";
-        if (string.IsNullOrWhiteSpace(to)) return $"{from}〜現在";
-        return from == to ? from : $"{from}〜{to}";
-    }
 }
