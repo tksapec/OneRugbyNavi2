@@ -26,7 +26,7 @@ class PlayerCatalogDeduplicatorTests(unittest.TestCase):
             "currentTeamId": "team",
             "nameJa": "カウリ・ティペネグレース",
             "positions": ["WTB"],
-            "aliases": ["32449"],
+            "aliases": ["カウリ・ティペネグレース", "32449"],
             "schools": ["School B"],
             "teamHistory": [{"teamName": "Current Team", "type": "club", "fromSeason": "2025-26"}],
             "representativeHistory": [{"teamName": "Country B", "seasons": ["2023-24"]}],
@@ -42,7 +42,8 @@ class PlayerCatalogDeduplicatorTests(unittest.TestCase):
 
         self.assertEqual([primary], players)
         self.assertEqual(["FB/フルバック", "WTB"], primary["positions"])
-        self.assertIn("32449", primary["aliases"])
+        self.assertNotIn("32449", primary["aliases"])
+        self.assertIn("カウリ・ティペネグレース", primary["aliases"])
         self.assertEqual(2, len(primary["teamHistory"]))
         self.assertEqual(2, len(primary["representativeHistory"]))
         self.assertEqual(["teamHistory", "positions"], primary["sources"][0]["fields"])

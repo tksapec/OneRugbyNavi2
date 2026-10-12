@@ -18,6 +18,8 @@ public sealed class PlayerCatalogTests
         Assert.Equal(27, playersByTeam.Length);
         Assert.Equal(SeasonCatalog.Teams2026.Count, playersByTeam.Length);
         Assert.Equal(catalog.Players.Count, catalog.Players.Select(player => player.PlayerId).Distinct().Count());
+        Assert.DoesNotContain(catalog.Players.SelectMany(player => player.Aliases), alias =>
+            System.Text.RegularExpressions.Regex.IsMatch(alias ?? "", @"^\d+$"));
         var duplicateCandidates = PlayerCatalogDuplicateDetector.FindCandidates(catalog.Players);
         Assert.True(duplicateCandidates.Count == 0, string.Join(Environment.NewLine, duplicateCandidates.Select(candidate =>
             $"{candidate.First.PlayerId} {candidate.First.NameJa} / {candidate.Second.PlayerId} {candidate.Second.NameJa}: {string.Join(",", candidate.Reasons)}")));
@@ -52,6 +54,69 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Reviewed_history_corrections_remove_duplicate_current_and_renamed_team_entries()
+    {
+        var catalog = LoadBundledCatalog();
+        var ochi = Assert.Single(catalog.Players, player => player.NameJa == "落 和史");
+        Assert.Contains(ochi.TeamHistory, history => history.TeamId == "884" &&
+            history.TeamName == "日本製鉄釜石シーウェイブス" &&
+            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
+        Assert.Contains(ochi.Sources, source => source.Url == "https://league-one.jp/news/6091" &&
+            source.Fields.Contains("teamHistory"));
+
+        var shigematsu = Assert.Single(catalog.Players, player => player.NameJa == "繁松 哲大");
+        Assert.Contains(shigematsu.TeamHistory, history => history.TeamName == "レッドハリケーンズ大阪" &&
+            history.FromSeason == "2021-22" && history.ToSeason == "2021-22");
+        Assert.Contains(shigematsu.TeamHistory, history => history.TeamName == "浦安D-Rocks" &&
+            history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
+        Assert.DoesNotContain(shigematsu.TeamHistory, history => history.TeamName == "NTTドコモレッドハリケーンズ大阪");
+        Assert.Contains(shigematsu.Sources, source => source.Url == "https://league-one.jp/news/6091" &&
+            source.Fields.Contains("teamHistory"));
+
+        var johnny = Assert.Single(catalog.Players, player => player.NameJa == "ジョニー・ファアウリ");
+        Assert.Equal(100, johnny.WeightKg);
+        Assert.Contains(johnny.TeamHistory, history => history.TeamName == "三重ホンダヒート" && history.FromSeason == "2024-25" && history.ToSeason == "2025-26");
+        Assert.DoesNotContain(johnny.TeamHistory, history => history.TeamName == "栃木ホンダヒート");
+
+        var oyama = Assert.Single(catalog.Players, player => player.NameJa == "大山 祥平");
+        Assert.Equal(115, oyama.WeightKg);
+        Assert.Contains(oyama.TeamHistory, history => history.TeamName == "リコーブラックラムズ東京" &&
+            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
+
+        var yamazaki = Assert.Single(catalog.Players, player => player.NameJa == "山崎 昇悟");
+        Assert.Contains(yamazaki.Sources, source => source.Url == "https://league-one.jp/news/6091" &&
+            source.Fields.Contains("positions") && source.Fields.Contains("registrationCategories"));
+
+        foreach (var pair in new[]
+        {
+            ("109", "rugbydb:team:718"), ("105", "rugbydb:team:734"), ("118", "144"),
+            ("116", "rugbydb:team:720"), ("142", "rugbydb:team:720"),
+            ("127", "rugbydb:team:729"), ("124", "rugbydb:team:723"), ("145", "rugbydb:team:808")
+        })
+        {
+            Assert.DoesNotContain(catalog.Players, player => HasOverlappingHistory(player, pair.Item1, pair.Item2));
+        }
+    }
+
+    private static bool HasOverlappingHistory(PlayerRecord player, string firstTeamId, string secondTeamId)
+    {
+        var first = player.TeamHistory.Where(history => history.TeamId == firstTeamId).ToArray();
+        var second = player.TeamHistory.Where(history => history.TeamId == secondTeamId).ToArray();
+        return first.Any(left => second.Any(right =>
+            Overlap(HistoryYears(left), HistoryYears(right))));
+    }
+
+    private static HashSet<int> HistoryYears(PlayerTeamHistory history)
+    {
+        static int? Year(string? season) => season?.Length >= 4 && int.TryParse(season.AsSpan(0, 4), out var value) ? value : null;
+        var start = Year(history.FromSeason) ?? Year(history.ToSeason);
+        var end = Year(history.ToSeason) ?? Year(history.FromSeason);
+        return start is null || end is null ? [] : Enumerable.Range(start.Value, Math.Max(1, end.Value - start.Value + 1)).ToHashSet();
+    }
+
+    private static bool Overlap(HashSet<int> left, HashSet<int> right) => left.Overlaps(right);
+
+    [Fact]
     public void Bundled_catalog_merges_reviewed_cross_source_player_duplicates_and_preserves_positions()
     {
         var catalog = LoadBundledCatalog();
@@ -68,7 +133,7 @@ public sealed class PlayerCatalogTests
         Assert.Contains(kauri.Positions, position => position.Contains("FB", StringComparison.Ordinal));
         Assert.Contains(kauri.Positions, position => position.Contains("WTB", StringComparison.Ordinal));
         Assert.Contains(kauri.Sources, source => source.Url == "https://rugbydb.tokyo/player/32449.html");
-        Assert.Contains(kauri.Aliases, alias => alias.Contains("32449", StringComparison.Ordinal));
+        Assert.DoesNotContain(kauri.Aliases, alias => alias.Contains("32449", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -100,13 +165,13 @@ public sealed class PlayerCatalogTests
         }
 
         var dalton = Assert.Single(catalog.Players, item => item.NameEn == "Matthew Dalton");
-        Assert.Contains("37805", dalton.Aliases);
+        Assert.DoesNotContain("37805", dalton.Aliases);
         Assert.Contains(dalton.Sources, source => source.Url == "https://rugbydb.tokyo/player/37805.html");
         Assert.DoesNotContain(catalog.Players, item => item.PlayerId == "rugbydb-127-37805");
 
         var takahashi = Assert.Single(catalog.Players, item => item.LeagueOnePlayerId == "484434");
         Assert.Contains("高橋信之", takahashi.Aliases);
-        Assert.Contains("4334", takahashi.Aliases);
+        Assert.DoesNotContain("4334", takahashi.Aliases);
         Assert.Contains(takahashi.Sources, source => source.Url == "https://rugbydb.tokyo/player/4334.html");
         Assert.DoesNotContain(catalog.Players, item => item.PlayerId == "rugbydb-138-4334");
     }
@@ -135,11 +200,12 @@ public sealed class PlayerCatalogTests
 
         var ochi = Assert.Single(catalog.Players, player => player.NameJa == "落 和史");
         Assert.Contains(ochi.TeamHistory, history => history.TeamName == "日本製鉄釜石シーウェイブス" &&
-            history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
+            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
 
         var shigematsu = Assert.Single(catalog.Players, player => player.NameJa == "繁松 哲大");
         Assert.Contains(shigematsu.TeamHistory, history => history.TeamName == "レッドハリケーンズ大阪" &&
             history.FromSeason == "2021-22" && history.ToSeason == "2021-22");
+        Assert.DoesNotContain(shigematsu.TeamHistory, history => history.TeamName == "NTTドコモレッドハリケーンズ大阪");
         Assert.Contains(shigematsu.TeamHistory, history => history.TeamName == "浦安D-Rocks" &&
             history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
 
@@ -147,6 +213,12 @@ public sealed class PlayerCatalogTests
         Assert.Contains(oyama.TeamHistory, history => history.TeamName == "リコーブラックラムズ東京" &&
             history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
         Assert.Contains(oyama.Sources, source => source.Url == "https://rugbydb.tokyo/player/4052.html" &&
+            source.Fields.Contains("teamHistory"));
+
+        var yokoi = Assert.Single(catalog.Players, player => player.NameJa == "横井 隼");
+        Assert.Contains(yokoi.TeamHistory, history => history.TeamId == "rugbydb:team:806" &&
+            history.TeamName == "宗像サニックスブルーズ" && history.FromSeason == "" && history.ToSeason == "");
+        Assert.Contains(yokoi.Sources, source => source.Url == "https://rugbydb.tokyo/player/3296.html" &&
             source.Fields.Contains("teamHistory"));
     }
 

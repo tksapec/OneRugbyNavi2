@@ -66,7 +66,22 @@ def normalize_player(player: dict) -> list[dict]:
             while index < len(dated):
                 next_history, next_start, next_end, next_has_start = dated[index]
                 overlaps = next_start <= end
-                adjacent = next_start <= end + 1 and has_start and next_has_start
+                # Open-ended rows with a known start represent an active
+                # affiliation. They can safely absorb a preceding adjacent
+                # stint, but must not bridge a gap to a later rejoin.
+                adjacent = next_start <= end + 1 and (has_start or next_has_start)
+                # A player's return to the current club after a documented
+                # stint elsewhere must remain a separate period. Current-team
+                # identity is a display canonicalization, not evidence that
+                # two non-overlapping affiliations are continuous.
+                current_alias_rejoin = (
+                    (next_history.get("teamId") == current_id or
+                     normalized_name(next_history.get("teamName", "")) == current_name) and
+                    first.get("teamId") != current_id and
+                    normalized_name(first.get("teamName", "")) != current_name
+                )
+                if current_alias_rejoin and not overlaps:
+                    break
                 if not overlaps and not adjacent:
                     break
                 index += 1
@@ -74,8 +89,7 @@ def normalize_player(player: dict) -> list[dict]:
                     earliest_start = next_history.get("fromSeason", "")
                 has_start = has_start or next_has_start
                 end = max(end, next_end)
-                if (next_history.get("teamId") == current_id or
-                        normalized_name(next_history.get("teamName", "")) == current_name):
+                if not current_alias_rejoin and (next_history.get("teamId") == current_id or normalized_name(next_history.get("teamName", "")) == current_name):
                     team_id = current_id
                     team_name = player.get("currentTeamName", team_name)
 

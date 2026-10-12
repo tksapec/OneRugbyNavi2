@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import re
 import unicodedata
 from pathlib import Path
 
@@ -45,7 +46,15 @@ def merge_record(primary: dict, duplicate: dict) -> None:
             primary.setdefault("aliases", []).append(value)
     for field in ("aliases", "positions", "schools", "teamHistory", "representativeHistory"):
         primary.setdefault(field, [])
-        append_unique(primary[field], duplicate.get(field, []))
+        values = duplicate.get(field, [])
+        if field == "aliases":
+            # RugbyDB IDs belong in source URLs, not in searchable alternate
+            # names. Keep genuine textual spellings only.
+            values = [value for value in values if not (isinstance(value, str) and re.fullmatch(r"\d+", value.strip()))]
+            primary[field] = [value for value in primary[field] if not (
+                isinstance(value, str) and re.fullmatch(r"\d+", value.strip())
+            )]
+        append_unique(primary[field], values)
 
     sources_by_url = {source.get("url"): source for source in primary.setdefault("sources", [])}
     for source in duplicate.get("sources", []):

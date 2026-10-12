@@ -22,12 +22,10 @@ from normalize_player_history import normalize_player
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "Resources" / "Raw" / "league-one-players-2026-27.json"
-# Use the official names in effect for the archived League One seasons. These
-# RugbyDB pages use current names/aliases that do not match historical rosters.
-TEAM_NAME_OVERRIDES = {
-    "725": "東芝ブレイブルーパス東京",
-    "731": "花園近鉄ライナーズ",
-}
+# RugbyDB's `team/{id}.html` pages expose the current team name, while a
+# player's season section links to that team's stable ID and its historical
+# display name. Always use the season-scoped name from the player page. Never
+# substitute the current SportsTeam JSON-LD name into past seasons.
 PLAYER_URL = re.compile(r"^https://rugbydb\.tokyo/player/(\d+)\.html$")
 SEASON_HEADING = re.compile(r"(?is)<h2\b[^>]*>\s*(20\d{2})年シーズン\s*</h2>")
 LEAGUE_TEAM = re.compile(
@@ -163,8 +161,7 @@ def apply_records(catalog: dict, histories: dict, team_names: dict, checked_on: 
         player = player_map[player_id]
         by_team: dict[tuple[str, str], set[str]] = {}
         for source in source_rows:
-            team = team_names.get(source["teamId"], {})
-            canonical = TEAM_NAME_OVERRIDES.get(source["teamId"]) or team.get("name") or source["teamName"]
+            canonical = source["teamName"]
             team_key = (source["teamId"], canonical)
             by_team.setdefault(team_key, set()).add(source["year"])
 

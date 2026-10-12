@@ -6,6 +6,8 @@ RugbyDB player profiles and annual transfer lists (`/list/transfer26.html` throu
 
 When a roster source introduces a second record for a player already present from another source, verify identity against the team, profile URL, name, and available player facts. Add only reviewed pairs to `tools/deduplicate_player_catalog.py`; do not merge on fuzzy name similarity alone. The tool combines positions, aliases, history, and sources into the retained player record.
 
+`aliases` is for alternate human-readable name spellings used by player search. Do not store RugbyDB or other provider record numbers there; keep those identifiers in the profile source URL. Run `python tools/validate_player_catalog.py` to check IDs, team/division consistency, source metadata and field coverage, history formats, and duplicate candidates before accepting a catalog edit.
+
 After editing or enriching team history, deduplicate reviewed player records and normalize/sort the catalog before using it:
 
 ```sh
