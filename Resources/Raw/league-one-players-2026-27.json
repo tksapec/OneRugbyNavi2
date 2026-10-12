@@ -63564,8 +63564,25 @@
       "positions": [
         "WTB"
       ],
-      "schools": [],
+      "schools": [
+        "東福岡高校",
+        "同志社大学"
+      ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:東福岡高校",
+          "teamName": "東福岡高校",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "university:同志社大学",
+          "teamName": "同志社大学",
+          "type": "university",
+          "fromSeason": "",
+          "toSeason": ""
+        },
         {
           "teamId": "140",
           "teamName": "花園近鉄ライナーズ",
@@ -63604,6 +63621,25 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory",
+            "schools"
+          ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ（選手公式プロフィール）",
+          "url": "https://hanazono-liners.jp/members/48_ren_takano/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "schools",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE（2023-24選手プロフィール）",
+          "url": "https://league-one.jp/player/420718",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "schools",
             "teamHistory"
           ]
         }
