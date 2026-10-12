@@ -499,7 +499,7 @@
           "teamId": "rugbydb:team:806",
           "teamName": "宗像サニックスブルーズ",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2017-18",
           "toSeason": "2021-22"
         },
         {
@@ -560,6 +560,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "J SPORTS（選手プロフィール）",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20540/?webview=1",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -3070,6 +3078,13 @@
           "toSeason": ""
         },
         {
+          "teamId": "142",
+          "teamName": "レッドハリケーンズ大阪",
+          "type": "club",
+          "fromSeason": "2020-21",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "rugbydb:team:1008",
           "teamName": "浦安D-Rocks",
           "type": "club",
@@ -3081,13 +3096,6 @@
           "teamName": "クボタスピアーズ船橋・東京ベイ",
           "type": "club",
           "fromSeason": "2024-25",
-          "toSeason": ""
-        },
-        {
-          "teamId": "142",
-          "teamName": "レッドハリケーンズ大阪",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -3141,6 +3149,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer24.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "レッドハリケーンズ大阪（クラブ公式退団コメント）",
+          "url": "https://docomo-rugby.jp/news/detail.html?id=5985",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13153/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -5331,8 +5355,8 @@
           "teamId": "124",
           "teamName": "静岡ブルーレヴズ",
           "type": "club",
-          "fromSeason": "2022-23",
-          "toSeason": ""
+          "fromSeason": "2013-14",
+          "toSeason": "2025-26"
         }
       ],
       "representativeHistory": [],
@@ -5378,6 +5402,30 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/3715",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/team/29?t1=2",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/team/98",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -6662,8 +6710,8 @@
           "teamId": "124",
           "teamName": "静岡ブルーレヴズ",
           "type": "club",
-          "fromSeason": "2022-23",
-          "toSeason": ""
+          "fromSeason": "2020-21",
+          "toSeason": "2025-26"
         }
       ],
       "representativeHistory": [],
@@ -6709,6 +6757,30 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "J SPORTS",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20076/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "静岡ブルーレヴズ",
+          "url": "https://www.shizuoka-bluerevs.com/game/info/46",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "静岡ブルーレヴズ",
+          "url": "https://www.shizuoka-bluerevs.com/member",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -7777,8 +7849,8 @@
           "teamId": "124",
           "teamName": "静岡ブルーレヴズ",
           "type": "club",
-          "fromSeason": "2022-23",
-          "toSeason": ""
+          "fromSeason": "2018-19",
+          "toSeason": "2025-26"
         }
       ],
       "representativeHistory": [],
@@ -7824,6 +7896,30 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "静岡ブルーレヴズ",
+          "url": "https://www.shizuoka-bluerevs.com/news/2788",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "静岡ブルーレヴズ",
+          "url": "https://www.shizuoka-bluerevs.com/game/info/46",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "静岡ブルーレヴズ",
+          "url": "https://www.shizuoka-bluerevs.com/member",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -10548,6 +10644,13 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2020-21",
+          "toSeason": "2020-21"
+        },
+        {
           "teamId": "rugbydb:team:1008",
           "teamName": "浦安D-Rocks",
           "type": "club",
@@ -10560,13 +10663,6 @@
           "fromSeason": "2025-26",
           "toSeason": "",
           "type": "club"
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -10619,6 +10715,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "日本ラグビーフットボール協会",
+          "url": "https://www.rugby-japan.jp/player/472154",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -10757,13 +10861,13 @@
           "teamId": "105",
           "teamName": "三重ホンダヒート",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2021-22",
           "toSeason": "2021-22"
         },
         {
           "teamId": "108",
           "teamName": "リコーブラックラムズ東京",
-          "fromSeason": "2023-24",
+          "fromSeason": "2022-23",
           "toSeason": "2025-26",
           "type": "club"
         },
@@ -10835,6 +10939,38 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "三重ホンダヒート",
+          "url": "https://www.honda-heat.jp/member/2021/3997/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/1492",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "RICOH BlackRams Tokyo",
+          "url": "https://blackrams-tokyo.com/news/information/2022-2023/20220725.html",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "RICOH BlackRams Tokyo",
+          "url": "https://blackrams-tokyo.com/news/members/2026-2027/20260716a.html",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -11096,6 +11232,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -11486,6 +11630,13 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "rugbydb:team:1008",
           "teamName": "浦安D-Rocks",
           "type": "club",
@@ -11512,13 +11663,6 @@
           "fromSeason": "2025-26",
           "toSeason": "",
           "type": "club"
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -11587,6 +11731,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/198",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22578/print",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -14907,17 +15067,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "142",
+          "teamName": "レッドハリケーンズ大阪",
+          "type": "club",
+          "fromSeason": "2018-19",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "142",
-          "teamName": "レッドハリケーンズ大阪",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -14964,6 +15124,30 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "レッドハリケーンズ大阪（クラブ公式退団コメント）",
+          "url": "https://docomo-rugby.jp/news/detail.html?id=5985",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11873/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13153/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -15112,17 +15296,17 @@
       ],
       "teamHistory": [
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2019-20",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -15169,6 +15353,22 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/5230",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22549/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -15516,17 +15716,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -15573,6 +15773,14 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "J SPORTS",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20281/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -15744,17 +15952,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -15801,6 +16009,22 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2021/03/18/nttcom-2021-4/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22549/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -16114,18 +16338,18 @@
           "toSeason": ""
         },
         {
+          "teamId": "142",
+          "teamName": "レッドハリケーンズ大阪",
+          "type": "club",
+          "fromSeason": "2019-20",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
           "toSeason": "2023-24"
-        },
-        {
-          "teamId": "142",
-          "teamName": "レッドハリケーンズ大阪",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -16171,6 +16395,30 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "レッドハリケーンズ大阪（クラブ公式退団コメント）",
+          "url": "https://docomo-rugby.jp/news/detail.html?id=5985",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11873/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13153/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -17476,17 +17724,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -17533,6 +17781,22 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/1149",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/player/369699",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -17749,17 +18013,17 @@
           "toSeason": "2020-21"
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -17813,6 +18077,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer21.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/198",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22549/print",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -18593,17 +18873,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2016-17",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -18650,6 +18930,62 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2016/06/22/id35232/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22578/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13152/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11872/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10592/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9332/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8022/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -18940,17 +19276,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2018-19",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -18997,6 +19333,22 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2018/04/01/nttcom-2018-2/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22578/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -19580,17 +19932,17 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2019-20",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -19637,6 +19989,22 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2019/03/01/nttcom-2019/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22578/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -20786,7 +21154,7 @@
           "teamId": "rugbydb:team:724",
           "teamName": "東京サントリーサンゴリアス",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2015-16",
           "toSeason": "2021-22"
         },
         {
@@ -20847,6 +21215,54 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13157/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11879/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10599/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9338/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8028/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/7049/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -22944,7 +23360,7 @@
           "teamId": "rugbydb:team:805",
           "teamName": "三菱重工相模原ダイナボアーズ",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2019-20",
           "toSeason": "2021-22"
         },
         {
@@ -23005,6 +23421,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13163/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11928/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -30525,7 +30957,7 @@
           "teamId": "rugbydb:team:719",
           "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2021-22",
           "toSeason": "2021-22"
         },
         {
@@ -30614,6 +31046,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22549/print",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "東京サントリーサンゴリアス",
+          "url": "https://www.suntory.co.jp/culture-sports/sungoliath/news/2022c/1209NR.html",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -43310,7 +43758,7 @@
           "teamId": "rugbydb:team:725",
           "teamName": "東芝ブレイブルーパス東京",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2019-20",
           "toSeason": "2021-22"
         },
         {
@@ -43401,6 +43849,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13158/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11880/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -49786,6 +50250,13 @@
       ],
       "teamHistory": [
         {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "2020-21",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "rugbydb:team:1008",
           "teamName": "浦安D-Rocks",
           "type": "club",
@@ -49797,13 +50268,6 @@
           "teamName": "リコーブラックラムズ東京",
           "type": "club",
           "fromSeason": "2024-25",
-          "toSeason": ""
-        },
-        {
-          "teamId": "rugbydb:team:719",
-          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
-          "type": "club",
-          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -49857,6 +50321,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer24.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "RICOH BlackRams Tokyo",
+          "url": "https://blackrams-tokyo.com/news/members/2024-2025/20240805a.html",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/match/22557/print",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -60613,6 +61093,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1994-11-05",
@@ -61121,18 +61609,18 @@
           "toSeason": ""
         },
         {
-          "teamId": "140",
-          "teamName": "花園近鉄ライナーズ",
-          "type": "club",
-          "fromSeason": "2022-23",
-          "toSeason": "2023-24"
-        },
-        {
           "teamId": "rugbydb:team:806",
           "teamName": "宗像サニックスブルーズ",
           "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
+          "teamId": "140",
+          "teamName": "花園近鉄ライナーズ",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2023-24"
         }
       ],
       "representativeHistory": [],
@@ -61178,6 +61666,38 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2021/04/09/sanix-2021/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト",
+          "url": "https://www.top-league.jp/2021/07/12/sanix-2021-5/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/300",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ラグビーリパブリック（ラグビー専門メディア）",
+          "url": "https://rugby-rp.com/2021/09/02/domestic/70780",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -64970,7 +65490,7 @@
           "teamId": "rugbydb:team:728",
           "teamName": "リコーブラックラムズ東京",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2019-20",
           "toSeason": "2021-22"
         },
         {
@@ -65031,6 +65551,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13166/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11888/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -67974,18 +68510,18 @@
           "toSeason": ""
         },
         {
+          "teamId": "rugbydb:team:806",
+          "teamName": "宗像サニックスブルーズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "118",
           "teamName": "狭山セコムラガッツ",
           "fromSeason": "2024-25",
           "toSeason": "2025-26",
           "type": "club"
-        },
-        {
-          "teamId": "rugbydb:team:806",
-          "teamName": "宗像サニックスブルーズ",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -68030,6 +68566,14 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -69019,14 +69563,8 @@
           "teamId": "rugbydb:team:805",
           "teamName": "三菱重工相模原ダイナボアーズ",
           "type": "club",
-          "fromSeason": "2022-23",
+          "fromSeason": "2019-20",
           "toSeason": "2025-26"
-        },
-        {
-          "teamId": "118",
-          "teamName": "狭山セコムラガッツ",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -69078,6 +69616,30 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "川越狭山セコムラガッツ（クラブ公式新加入発表）",
+          "url": "https://www.rugguts.secom.co.jp/2026/08/2026-27-1.html",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11928/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13163/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -71466,12 +72028,6 @@
           "type": "club",
           "fromSeason": "2022-23",
           "toSeason": "2025-26"
-        },
-        {
-          "teamId": "118",
-          "teamName": "狭山セコムラガッツ",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -71523,6 +72079,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "川越狭山セコムラガッツ（クラブ公式新加入発表）",
+          "url": "https://www.rugguts.secom.co.jp/2026/08/2026-27-1.html",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -81289,17 +81853,17 @@
           "toSeason": "2020-21"
         },
         {
-          "teamId": "142",
-          "teamName": "レッドハリケーンズ大阪",
-          "type": "club",
-          "fromSeason": "2022-23",
-          "toSeason": ""
-        },
-        {
           "teamId": "rugbydb:team:806",
           "teamName": "宗像サニックスブルーズ",
           "type": "club",
           "fromSeason": "",
+          "toSeason": "2021-22"
+        },
+        {
+          "teamId": "142",
+          "teamName": "レッドハリケーンズ大阪",
+          "type": "club",
+          "fromSeason": "2022-23",
           "toSeason": ""
         }
       ],
@@ -81353,6 +81917,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer21_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "日本ラグビーフットボール協会（公式試合記録）",
+          "url": "https://www.rugby-japan.jp/match/22650/print",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -88546,7 +89126,7 @@
           "teamId": "rugbydb:team:727",
           "teamName": "横浜キヤノンイーグルス",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2016-17",
           "toSeason": "2021-22"
         },
         {
@@ -88616,6 +89196,46 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13154/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11874/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10594/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9333/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8023/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -89364,18 +89984,18 @@
       "schools": [],
       "teamHistory": [
         {
+          "teamId": "rugbydb:team:885",
+          "teamName": "日野レッドドルフィンズ",
+          "type": "club",
+          "fromSeason": "2018-19",
+          "toSeason": "2022-23"
+        },
+        {
           "teamId": "149",
           "teamName": "丸和MOMOTARO’S成田",
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
-        },
-        {
-          "teamId": "rugbydb:team:885",
-          "teamName": "日野レッドドルフィンズ",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -89408,6 +90028,38 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビー リーグワン（日野レッドドルフィンズ退団発表）",
+          "url": "https://league-one.jp/news/2237",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビー トップリーグ公式アーカイブ",
+          "url": "https://www.top-league.jp/team/profile/10612/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビー トップリーグ公式アーカイブ",
+          "url": "https://www.top-league.jp/team/profile/11884/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビー トップリーグ公式アーカイブ",
+          "url": "https://www.top-league.jp/team/profile/13161/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -90670,6 +91322,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer24.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE（三菱重工相模原ダイナボアーズ退団発表）",
+          "url": "https://league-one.jp/news/3260",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE（コベルコ神戸スティーラーズ退団発表）",
+          "url": "https://league-one.jp/news/1446",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -92441,7 +93109,7 @@
           "teamId": "rugbydb:team:719",
           "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2019-20",
           "toSeason": "2021-22"
         },
         {
@@ -92516,6 +93184,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13152/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11872/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -92720,7 +93404,7 @@
           "teamId": "rugbydb:team:722",
           "teamName": "埼玉パナソニックワイルドナイツ",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2016-17",
           "toSeason": "2021-22"
         },
         {
@@ -92783,6 +93467,46 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13160/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11883/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10603/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9342/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8032/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -96579,7 +97303,7 @@
           "teamId": "127",
           "teamName": "コベルコ神戸スティーラーズ",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2020-21",
           "toSeason": "2021-22"
         },
         {
@@ -96655,6 +97379,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer23_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE（九州電力キューデンヴォルテクス新加入発表）",
+          "url": "https://league-one.jp/news/2524",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -97070,6 +97802,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1990-09-28",
@@ -97358,6 +98098,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "日本ラグビーフットボール協会（公式試合記録）",
+          "url": "https://www.rugby-japan.jp/match/22650/print",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -99461,7 +100217,7 @@
           "teamId": "rugbydb:team:719",
           "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2018-19",
           "toSeason": "2021-22"
         },
         {
@@ -99537,6 +100293,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer24_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "喜連航平 公式サイト",
+          "url": "https://www.kirekohei.com/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/1519",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -101291,7 +102063,7 @@
           "teamId": "rugbydb:team:725",
           "teamName": "東芝ブレイブルーパス東京",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2018-19",
           "toSeason": "2021-22"
         },
         {
@@ -101398,6 +102170,30 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13158/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11880/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10600/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -106142,7 +106938,7 @@
           "teamId": "rugbydb:team:719",
           "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2017-18",
           "toSeason": "2021-22"
         },
         {
@@ -106209,6 +107005,22 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "豊田自動織機シャトルズ愛知",
+          "url": "https://league-one.jp/news/1548",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "JAPAN RUGBY LEAGUE ONE",
+          "url": "https://league-one.jp/news/1519",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -108062,7 +108874,7 @@
           "teamId": "rugbydb:team:725",
           "teamName": "東芝ブレイブルーパス東京",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2016-17",
           "toSeason": "2021-22"
         },
         {
@@ -108129,6 +108941,46 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13158/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11880/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10600/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9339/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8029/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -110093,6 +110945,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22_2.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -115263,6 +116123,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "サニックス（チーム活動終了のお知らせ）",
+          "url": "https://hd.sanix.jp/files/optionallink/00000186_file.pdf",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
         }
       ]
     },
@@ -116455,12 +117323,6 @@
           "type": "club",
           "fromSeason": "2024-25",
           "toSeason": "2025-26"
-        },
-        {
-          "teamId": "118",
-          "teamName": "狭山セコムラガッツ",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -116497,6 +117359,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer26_3.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "川越狭山セコムラガッツ（クラブ公式新加入発表）",
+          "url": "https://www.rugguts.secom.co.jp/2026/08/2026-27-1.html",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
@@ -117495,18 +118365,18 @@
       "schools": [],
       "teamHistory": [
         {
+          "teamId": "142",
+          "teamName": "レッドハリケーンズ大阪",
+          "type": "club",
+          "fromSeason": "2016-17",
+          "toSeason": "2021-22"
+        },
+        {
           "teamId": "147",
           "teamName": "ヤクルトレビンズ戸田",
           "fromSeason": "2024-25",
           "toSeason": "2025-26",
           "type": "club"
-        },
-        {
-          "teamId": "142",
-          "teamName": "レッドハリケーンズ大阪",
-          "type": "club",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -117528,6 +118398,38 @@
           "fields": [
             "nameJa",
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "レッドハリケーンズ大阪（クラブ公式退団コメント）",
+          "url": "https://docomo-rugby.jp/news/detail.html?id=5922",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9371/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11873/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13153/",
+          "checkedOn": "2026-10-12",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -117779,7 +118681,7 @@
           "teamId": "rugbydb:team:727",
           "teamName": "横浜キヤノンイーグルス",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2018-19",
           "toSeason": "2021-22"
         },
         {
@@ -117819,6 +118721,30 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13154/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11874/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10594/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
         }
       ]
     },
@@ -117840,7 +118766,7 @@
           "teamId": "109",
           "teamName": "NECグリーンロケッツ東葛",
           "type": "club",
-          "fromSeason": "",
+          "fromSeason": "2015-16",
           "toSeason": "2021-22"
         },
         {
@@ -117877,6 +118803,54 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer22.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/13151/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/11871/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/10591/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/9331/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/8021/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビートップリーグ公式サイト（過年度チーム選手一覧）",
+          "url": "https://www.top-league.jp/team/profile/7041/",
+          "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
           ]
