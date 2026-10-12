@@ -7187,7 +7187,10 @@
       "positions": [
         "ロック"
       ],
-      "schools": [],
+      "schools": [
+        "Lincoln High School",
+        "Lincoln University"
+      ],
       "teamHistory": [
         {
           "teamId": "rugbydb:team:256",
@@ -7242,6 +7245,15 @@
           "url": "https://rugbydb.tokyo/list/transfer26.html",
           "checkedOn": "2026-10-10",
           "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Crusaders Rugby（公式クラブプロフィール）",
+          "url": "https://crusaders.co.nz/antonio-shalfoon/",
+          "checkedOn": "2026-10-12",
+          "fields": [
+            "schools",
             "teamHistory"
           ]
         }
