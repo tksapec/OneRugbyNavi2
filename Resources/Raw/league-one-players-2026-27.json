@@ -10030,7 +10030,9 @@
       "positions": [
         "フルバック"
       ],
-      "schools": [],
+      "schools": [
+        "St. Peter’s College"
+      ],
       "teamHistory": [
         {
           "teamId": "124",
@@ -10044,13 +10046,15 @@
       "sources": [
         {
           "publisher": "静岡ブルーレヴズ",
-          "url": "https://www.shizuoka-bluerevs.com/member",
-          "checkedOn": "2026-10-08",
+          "url": "https://www.shizuoka-bluerevs.com/member/13785",
+          "checkedOn": "2026-10-12",
           "fields": [
             "nameJa",
             "nameEn",
             "currentTeamName",
-            "positions"
+            "positions",
+            "schools",
+            "teamHistory"
           ]
         },
         {
@@ -34860,7 +34864,7 @@
       "currentTeamId": "129",
       "currentTeamName": "東芝ブレイブルーパス武蔵",
       "division": "DIV1",
-      "nameJa": "チームディレクター",
+      "nameJa": "高木 貴裕",
       "nameEn": "TAKAHIRO TAKAKI",
       "aliases": [],
       "positions": [],
@@ -34894,7 +34898,7 @@
       "currentTeamId": "129",
       "currentTeamName": "東芝ブレイブルーパス武蔵",
       "division": "DIV1",
-      "nameJa": "採用",
+      "nameJa": "向久保 孝",
       "nameEn": "TAKASHI MUKAIKUBO",
       "aliases": [],
       "positions": [],
@@ -34928,7 +34932,7 @@
       "currentTeamId": "129",
       "currentTeamName": "東芝ブレイブルーパス武蔵",
       "division": "DIV1",
-      "nameJa": "アンバサダー",
+      "nameJa": "大野 均",
       "nameEn": "HITOSHI OHNO",
       "aliases": [],
       "positions": [],
