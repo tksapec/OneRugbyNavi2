@@ -81,7 +81,7 @@ public sealed class PlayerCatalogTests
         var oyama = Assert.Single(catalog.Players, player => player.NameJa == "大山 祥平");
         Assert.Equal(115, oyama.WeightKg);
         Assert.Contains(oyama.TeamHistory, history => history.TeamName == "リコーブラックラムズ東京" &&
-            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
+            history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
 
         var yamazaki = Assert.Single(catalog.Players, player => player.NameJa == "山崎 昇悟");
         Assert.Contains(yamazaki.Sources, source => source.Url == "https://league-one.jp/news/6091" &&
@@ -211,13 +211,13 @@ public sealed class PlayerCatalogTests
 
         var oyama = Assert.Single(catalog.Players, player => player.NameJa == "大山 祥平");
         Assert.Contains(oyama.TeamHistory, history => history.TeamName == "リコーブラックラムズ東京" &&
-            history.FromSeason == "2023-24" && history.ToSeason == "2025-26");
+            history.FromSeason == "2022-23" && history.ToSeason == "2025-26");
         Assert.Contains(oyama.Sources, source => source.Url == "https://rugbydb.tokyo/player/4052.html" &&
             source.Fields.Contains("teamHistory"));
 
         var yokoi = Assert.Single(catalog.Players, player => player.NameJa == "横井 隼");
         Assert.Contains(yokoi.TeamHistory, history => history.TeamId == "rugbydb:team:806" &&
-            history.TeamName == "宗像サニックスブルーズ" && history.FromSeason == "" && history.ToSeason == "");
+            history.TeamName == "宗像サニックスブルーズ" && history.FromSeason == "2020-21" && history.ToSeason == "2020-21");
         Assert.Contains(yokoi.Sources, source => source.Url == "https://rugbydb.tokyo/player/3296.html" &&
             source.Fields.Contains("teamHistory"));
     }
