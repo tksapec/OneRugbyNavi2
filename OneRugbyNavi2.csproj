@@ -43,4 +43,11 @@
     <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.10" />
   </ItemGroup>
 
+  <Target Name="CopyVersionedAndroidReleaseApk"
+          AfterTargets="Publish"
+          Condition="'$(Configuration)' == 'Release' and '$(TargetFramework)' == 'net9.0-android'">
+    <Copy SourceFiles="$(OutDir)$(ApplicationId)-Signed.apk"
+          DestinationFiles="$(OutDir)OneRugbyNavi2-v$(ApplicationDisplayVersion).apk" />
+  </Target>
+
 </Project>
