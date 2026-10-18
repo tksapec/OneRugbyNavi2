@@ -56,6 +56,19 @@ namespace OneRugbyNavi2
             "狭山セコムラガッツ", "AZ-COM丸和MOMOTARO’S", "AZ-COM丸和MOMOTARO'S"
         };
 
+        private static readonly Dictionary<string, string> CurrentSeasonLogos = new()
+        {
+            ["埼玉パナソニックワイルドナイツ"] = "saitama_panasonic_wild_knights_2026.png",
+            ["東京サントリーサンゴリアス"] = "tokyo_suntory_sungoliath_2026.png",
+            ["東芝ブレイブルーパス武蔵"] = "toshiba_brave_lupus_musashi_2026.png",
+            ["栃木ホンダヒート"] = "tochigi_honda_heat_2026.png",
+            ["リコーブラックラムズ東京"] = "ricoh_blackrams_tokyo_2026.png",
+            ["マツダスカイアクティブズ広島"] = "mazda_skyactivs_hiroshima_2026.png",
+            ["JR東日本グリーンウォリアーズ東葛"] = "jr_east_green_warriors_tokatsu_2026.png",
+            ["川越狭山セコムラガッツ"] = "kawagoe_sayama_secom_rugguts_2026.png",
+            ["丸和MOMOTARO’S成田"] = "maruwa_momotaros_narita_2026.png"
+        };
+
         private static readonly Dictionary<string, string> Logos = new()
         {
             ["\u6D66\u5B89D-Rocks"] = "urayasu_d_rocks.jpg",
@@ -106,6 +119,8 @@ namespace OneRugbyNavi2
                     var currentLogo = ImageAssetCache.GetCachedPath(teamId);
                     if (!string.IsNullOrWhiteSpace(currentLogo)) return currentLogo;
                 }
+
+                if (CurrentSeasonLogos.TryGetValue(name, out var currentSeasonLogo)) return currentSeasonLogo;
 
                 if (ChangedOrRenamedCurrentNames.Contains(name)) return null;
             }
