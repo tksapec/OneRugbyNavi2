@@ -54,7 +54,7 @@ public sealed class PlayersPage : ContentPage
         Margin = new Thickness(32)
     };
     private readonly Button _retryButton = PageStyles.SecondaryButton("再読み込み");
-    private readonly Button _updateButton = PageStyles.SecondaryButton("選手データを更新");
+    private readonly Button _updateButton = PageStyles.SecondaryButton("データ更新");
     private readonly ActivityIndicator _updateActivity = new()
     {
         Color = PageStyles.Blue,
@@ -85,6 +85,7 @@ public sealed class PlayersPage : ContentPage
         _filterButton.IsEnabled = false;
         _retryButton.Clicked += async (_, _) => await LoadAsync();
         _updateButton.Clicked += async (_, _) => await UpdateCatalogAsync();
+        SemanticProperties.SetHint(_updateButton, "GitHubから選手データを確認して更新します");
         _clearFiltersButton.Clicked += (_, _) => ClearFilters();
         _filterButton.Clicked += async (_, _) => await ShowFiltersAsync();
 
@@ -110,16 +111,18 @@ public sealed class PlayersPage : ContentPage
             Margin = new Thickness(16, 0, 16, 4),
             Children =
             {
-                _catalogStatus,
-                _resultCount.Column(1)
+                new VerticalStackLayout
+                {
+                    Spacing = 0,
+                    Children = { _catalogStatus, _resultCount }
+                },
+                new HorizontalStackLayout
+                {
+                    Spacing = 6,
+                    VerticalOptions = LayoutOptions.Center,
+                    Children = { _updateActivity, _updateButton }
+                }.Column(1)
             }
-        };
-        var updateBar = new HorizontalStackLayout
-        {
-            Spacing = 8,
-            HorizontalOptions = LayoutOptions.End,
-            Margin = new Thickness(16, 0, 16, 4),
-            Children = { _updateActivity, _updateButton }
         };
         var emptyState = new VerticalStackLayout
         {
@@ -133,7 +136,6 @@ public sealed class PlayersPage : ContentPage
         {
             RowDefinitions =
             {
-                new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
                 new RowDefinition(GridLength.Auto),
@@ -155,9 +157,8 @@ public sealed class PlayersPage : ContentPage
                 }.Row(1),
                 filterBar.Row(2),
                 resultHeader.Row(3),
-                updateBar.Row(4),
-                list.Row(5),
-                emptyState.Row(5)
+                list.Row(4),
+                emptyState.Row(4)
             }
         };
     }

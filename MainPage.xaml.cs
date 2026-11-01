@@ -155,7 +155,7 @@ namespace OneRugbyNavi2
                     var statusMessage = fetchResult?.DataConsistencyWarning is { Length: > 0 } warning
                         ? $"{FetchedOfficialScheduleMessage}\n{warning}"
                         : FetchedOfficialScheduleMessage;
-                    SetMessage(statusMessage, true, autoHide: true);
+                        SetMessage(statusMessage, true, autoHide: string.IsNullOrWhiteSpace(fetchResult?.DataConsistencyWarning));
                 }
                 else
                 {
@@ -176,7 +176,7 @@ namespace OneRugbyNavi2
                         RefreshPickers(preserveSelection: false);
                         _databaseBuildTimestampText = "-";
                         UpdateLastUpdatedLabel();
-                        SetMessage(FetchFailedMessage, true, autoHide: true);
+                        SetMessage(FetchFailedMessage, true, autoHide: false);
                         UpdateEmptyState();
                         UpdateFavoriteUi();
                         UpdateFilterSummaryUi();
@@ -193,7 +193,7 @@ namespace OneRugbyNavi2
                     _selectedSeasonLabel = cache.SeasonLabel;
                     UpdateSeasonTitle();
                     _databaseBuildTimestampText = cache.LastUpdated.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
-                    SetMessage(ShowingScheduleCacheMessage, true, autoHide: true);
+                    SetMessage(ShowingScheduleCacheMessage, true, autoHide: false);
                 }
 
                 _vm.SetItems(div1, div2, div3, replacement, other);
@@ -274,7 +274,7 @@ namespace OneRugbyNavi2
                 RefreshPickers(preserveSelection: false);
                 _databaseBuildTimestampText = "-";
                 UpdateLastUpdatedLabel();
-                SetMessage(FetchFailedMessage, true, autoHide: true);
+                SetMessage(FetchFailedMessage, true, autoHide: false);
                 UpdateEmptyState();
                 UpdateFavoriteUi();
                 UpdateFilterSummaryUi();
@@ -768,7 +768,7 @@ namespace OneRugbyNavi2
             UpdateFilterSummaryUi();
         }
 
-        private void OnFavoriteFilterLabelTapped(object sender, TappedEventArgs e)
+        private void OnFavoriteQuickFilterClicked(object sender, EventArgs e)
         {
             if (_favoriteTeams.Count == 0)
             {
@@ -899,39 +899,18 @@ namespace OneRugbyNavi2
             UpdateFilterSummaryUi();
             SetMessage(wasFavorite ? $"お気に入りから解除しました: {team}" : $"お気に入りに登録しました: {team}", true, autoHide: true);
         }
-        private void OnInfoClicked(object sender, EventArgs e)
+        private async void OnInfoClicked(object sender, EventArgs e)
         {
-            menuOverlay.IsVisible = true;
-        }
-
-        private void CloseMenuOverlay()
-        {
-            if (!menuOverlay.IsVisible)
+            var additionalActions = new Dictionary<string, Func<Task>>
             {
-                return;
-            }
-
-            menuOverlay.IsVisible = false;
+                ["更新状況"] = ShowStatusAsync,
+                ["キャッシュ削除"] = DeleteCacheAsync
+            };
+            await PageStyles.ShowNavigationMenuAsync(this, additionalActions);
         }
 
-        private void OnMenuBackdropTapped(object sender, TappedEventArgs e) => CloseMenuOverlay();
-
-        private void OnMenuCloseClicked(object sender, EventArgs e) => CloseMenuOverlay();
-
-        protected override bool OnBackButtonPressed()
+        private async Task ShowStatusAsync()
         {
-            if (menuOverlay.IsVisible)
-            {
-                CloseMenuOverlay();
-                return true;
-            }
-
-            return base.OnBackButtonPressed();
-        }
-
-        private async void OnMenuStatusClicked(object sender, EventArgs e)
-        {
-            CloseMenuOverlay();
             var cacheState = _isShowingCache ? "前回取得データを表示中" : "最新取得データを表示中";
             var body =
                 $"対象シーズン: {_selectedSeasonLabel}\n" +
@@ -946,51 +925,6 @@ namespace OneRugbyNavi2
                 "取得元: JAPAN RUGBY LEAGUE ONE公式サイト\n" +
                 "使用ライブラリとライセンスの詳細は、配布物内のLICENSES.txtを参照してください。";
             await DisplayAlert("更新状況", body, "OK");
-        }
-
-        private async void OnMenuScheduleClicked(object sender, EventArgs e)
-        {
-            CloseMenuOverlay();
-            await Shell.Current.GoToAsync("//SchedulePage");
-        }
-
-        private async void OnMenuTeamsClicked(object sender, EventArgs e)
-        {
-            await NavigateToMenuPageAsync(nameof(TeamListPage));
-        }
-
-        private async void OnMenuStandingsClicked(object sender, EventArgs e)
-        {
-            CloseMenuOverlay();
-            await OpenWebAsync("https://league-one.jp/standings/");
-        }
-
-        private async void OnMenuRankingClicked(object sender, EventArgs e)
-        {
-            await NavigateToMenuPageAsync(nameof(RankingPage));
-        }
-
-        private async void OnMenuPlayersClicked(object sender, EventArgs e)
-        {
-            await NavigateToMenuPageAsync(nameof(PlayersPage));
-        }
-
-        private async void OnMenuAboutClicked(object sender, EventArgs e)
-        {
-            await NavigateToMenuPageAsync(nameof(InfoPage));
-        }
-
-        private async Task NavigateToMenuPageAsync(string route)
-        {
-            CloseMenuOverlay();
-            await Shell.Current.GoToAsync("//SchedulePage");
-            await Shell.Current.GoToAsync(route);
-        }
-
-        private async void OnMenuClearCacheClicked(object sender, EventArgs e)
-        {
-            CloseMenuOverlay();
-            await DeleteCacheAsync();
         }
 
         private void SetLoading(bool isLoading)
@@ -1031,6 +965,12 @@ namespace OneRugbyNavi2
             catch (TaskCanceledException)
             {
             }
+        }
+
+        private void OnDismissMessageClicked(object sender, EventArgs e)
+        {
+            SetMessage("", false);
+            UpdateEmptyState();
         }
 
         private void UpdateLastUpdatedLabel()
@@ -1162,10 +1102,20 @@ namespace OneRugbyNavi2
                 .Select(favorite => FindCurrentTeamAlias(favorite) ?? favorite)
                 .Distinct(StringComparer.Ordinal)
                 .ToArray();
-            favoriteQuickFilterLabel.Text = $"{(_isFavoriteFilterActive ? "★" : "☆")} {string.Join("、", quickFilterNames)}";
-            favoriteQuickFilterBorder.IsVisible = _favoriteTeams.Count > 0;
-            favoriteQuickFilterBorder.IsEnabled = _favoriteTeams.Count > 0;
-            favoriteQuickFilterBorder.Opacity = _favoriteTeams.Count > 0 ? 1 : 0.65;
+            favoriteQuickFilterButton.Text = _favoriteTeams.Count == 0
+                ? "☆ お気に入り未登録"
+                : _isFavoriteFilterActive
+                    ? $"★ 絞り込み中 ({quickFilterNames.Length})"
+                    : $"☆ お気に入りで絞り込む ({quickFilterNames.Length})";
+            favoriteQuickFilterButton.IsVisible = true;
+            favoriteQuickFilterButton.IsEnabled = _favoriteTeams.Count > 0;
+            favoriteQuickFilterButton.BackgroundColor = _isFavoriteFilterActive ? PageStyles.Blue : PageStyles.WarningBackground;
+            favoriteQuickFilterButton.TextColor = _isFavoriteFilterActive ? Colors.White : PageStyles.WarningText;
+            SemanticProperties.SetHint(favoriteQuickFilterButton, _favoriteTeams.Count == 0
+                ? "お気に入りチームは登録されていません"
+                : _isFavoriteFilterActive
+                    ? "お気に入りの試合への絞り込みを解除します"
+                    : "お気に入りの試合に絞り込みます");
 
             favoriteButton.Text = isSelectedFavorite ? "お気に入り解除" : "お気に入り登録";
             favoriteButton.IsEnabled = hasSelection;

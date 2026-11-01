@@ -114,9 +114,20 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="12" />
                 </Border.StrokeShape>
-                <Label x:Name="messageLabel"
-                       LineBreakMode="WordWrap"
-                       TextColor="{StaticResource AppNavy}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                    <Label x:Name="messageLabel"
+                           LineBreakMode="WordWrap"
+                           TextColor="{StaticResource AppNavy}" />
+                    <Button Grid.Column="1"
+                            Text="閉じる"
+                            FontSize="12"
+                            Padding="8,4"
+                            MinimumHeightRequest="44"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            Clicked="OnDismissMessageClicked"
+                            SemanticProperties.Hint="この通知を閉じます" />
+                </Grid>
             </Border>
 
             <Border x:Name="cachePanel"
@@ -211,28 +222,19 @@
                                MaxLines="2"
                                VerticalTextAlignment="Center"
                                Text="フィルタなし" />
-                        <Border x:Name="favoriteQuickFilterBorder"
+                        <Button x:Name="favoriteQuickFilterButton"
                                 Grid.Row="1"
                                 IsVisible="False"
                                 HorizontalOptions="Start"
-                                Stroke="{StaticResource AppWarningBackground}"
+                                Text="☆ お気に入りで絞り込む"
                                 BackgroundColor="{StaticResource AppWarningBackground}"
-                                Padding="10,5">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="14" />
-                            </Border.StrokeShape>
-                            <Label x:Name="favoriteQuickFilterLabel"
-                                   Text="☆ お気に入りチーム"
-                                   FontSize="14"
-                                   FontAttributes="Bold"
-                                   TextColor="{StaticResource AppWarningText}"
-                                   LineBreakMode="WordWrap"
-                                   MaxLines="2">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnFavoriteFilterLabelTapped" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                        </Border>
+                                TextColor="{StaticResource AppWarningText}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                CornerRadius="14"
+                                Padding="12,7"
+                                Clicked="OnFavoriteQuickFilterClicked"
+                                SemanticProperties.Hint="選択中のDivisionでお気に入りチームの試合に絞り込みます" />
                     </Grid>
                 </Grid>
             </Border>
@@ -247,6 +249,8 @@
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="10">
+                    <ScrollView MaximumHeightRequest="360">
+                    <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,*"
                           ColumnSpacing="10">
                         <Border Stroke="{StaticResource AppStroke}"
@@ -311,11 +315,7 @@
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        TextColor="{StaticResource AppNavy}"
-                                       LineBreakMode="WordWrap">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnFavoriteFilterLabelTapped" />
-                                    </Label.GestureRecognizers>
-                                </Label>
+                                       LineBreakMode="WordWrap" />
                             </VerticalStackLayout>
                             <Button x:Name="favoriteButton"
                                     Grid.Column="1"
@@ -328,7 +328,8 @@
                                     Clicked="OnFavoriteClicked" />
                         </Grid>
                     </Border>
-
+                    </VerticalStackLayout>
+                    </ScrollView>
                     <Grid ColumnDefinitions="*,*"
                           ColumnSpacing="10">
                         <Button Text="クリア"
@@ -359,15 +360,18 @@
                             ItemSizingStrategy="MeasureFirstItem">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:MatchItem">
-                        <Border Margin="0,0,0,12"
+                            <Border Margin="0,0,0,12"
                                 Padding="14"
                                 Stroke="{StaticResource AppStroke}"
                                 StrokeThickness="1"
-                                BackgroundColor="White">
+                                BackgroundColor="White"
+                                SemanticProperties.Hint="試合詳細を表示します。チームロゴをタップすると公式ページを開きます。">
                             <Border.StrokeShape>
                                 <RoundRectangle CornerRadius="18" />
                             </Border.StrokeShape>
-
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMatchTapped" />
+                            </Border.GestureRecognizers>
                             <Grid RowDefinitions="Auto,Auto,Auto"
                                   ColumnDefinitions="*,Auto"
                                   RowSpacing="10">
@@ -486,19 +490,15 @@
                                            TextColor="{StaticResource AppMuted}"
                                            LineBreakMode="TailTruncation" />
                                 </VerticalStackLayout>
-
-                                <Label Grid.Row="1"
+                                <Label Grid.Row="2"
                                        Grid.Column="1"
-                                       Grid.RowSpan="2"
-                                       Text=">"
-                                       FontSize="34"
+                                       Text="詳細を見る ›"
+                                       FontSize="12"
+                                       FontAttributes="Bold"
                                        TextColor="{StaticResource Primary}"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalTextAlignment="End">
-                                    <Label.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnMatchTapped" />
-                                    </Label.GestureRecognizers>
-                                </Label>
+                                       VerticalTextAlignment="End"
+                                       HorizontalTextAlignment="End" />
+
                             </Grid>
                         </Border>
                     </DataTemplate>
@@ -527,74 +527,5 @@
                           ZIndex="10" />
         </Grid>
 
-        <Grid x:Name="menuOverlay"
-              Grid.RowSpan="4"
-              Margin="-14,-10"
-              IsVisible="False"
-              ZIndex="10">
-            <BoxView BackgroundColor="#660B1729">
-                <BoxView.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnMenuBackdropTapped" />
-                </BoxView.GestureRecognizers>
-            </BoxView>
-
-            <Border VerticalOptions="End"
-                    HorizontalOptions="Fill"
-                    Margin="6,0,6,8"
-                    Padding="16,15,16,18"
-                    BackgroundColor="{StaticResource AppSurface}"
-                    Stroke="{StaticResource AppStroke}"
-                    StrokeThickness="1">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="22" />
-                </Border.StrokeShape>
-                <VerticalStackLayout Spacing="0">
-                    <Label Text="メニュー"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource AppNavy}"
-                           Margin="0,0,0,8" />
-                    <Button Text="更新状況"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuStatusClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="日程・結果"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuScheduleClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="順位表"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuStandingsClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="チーム一覧"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuTeamsClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="ランキング"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuRankingClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="選手検索"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuPlayersClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="アプリ情報"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuAboutClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="キャッシュ削除"
-                            Style="{StaticResource MenuItemButton}"
-                            Clicked="OnMenuClearCacheClicked" />
-                    <BoxView HeightRequest="1" Color="{StaticResource AppStroke}" />
-                    <Button Text="閉じる"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource Primary}"
-                            FontAttributes="Bold"
-                            MinimumHeightRequest="42"
-                            Margin="0,4,0,0"
-                            Clicked="OnMenuCloseClicked" />
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
     </Grid>
 </ContentPage>

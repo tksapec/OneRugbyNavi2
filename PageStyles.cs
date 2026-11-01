@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls.Shapes;
+using Microsoft.Maui.ApplicationModel;
 
 namespace OneRugbyNavi2;
 
@@ -43,28 +44,7 @@ public static class PageStyles
             LineBreakMode = LineBreakMode.TailTruncation
         };
         var menu = SecondaryButton("メニュー");
-        menu.Clicked += async (_, _) =>
-        {
-            var choice = await page.DisplayActionSheet(
-                "メニュー", "閉じる", null,
-                "日程・結果", "チーム一覧", "ランキング", "選手検索", "アプリ情報");
-            var route = choice switch
-            {
-                "日程・結果" => "//SchedulePage",
-                "チーム一覧" => nameof(TeamListPage),
-                "ランキング" => nameof(RankingPage),
-                "選手検索" => nameof(PlayersPage),
-                "アプリ情報" => nameof(InfoPage),
-                _ => null
-            };
-            if (route is null) return;
-
-            await Shell.Current.GoToAsync("//SchedulePage");
-            if (route != "//SchedulePage")
-            {
-                await Shell.Current.GoToAsync(route);
-            }
-        };
+        menu.Clicked += async (_, _) => await ShowNavigationMenuAsync(page);
 
         return new Grid
         {
@@ -81,6 +61,44 @@ public static class PageStyles
                 menu.Column(1)
             }
         };
+    }
+
+    public static async Task ShowNavigationMenuAsync(
+        ContentPage page,
+        IReadOnlyDictionary<string, Func<Task>>? additionalActions = null)
+    {
+        var standardItems = new[] { "日程・結果", "順位表", "チーム一覧", "ランキング", "選手検索", "アプリ情報" };
+        var items = additionalActions is null
+            ? standardItems
+            : additionalActions.Keys.Concat(standardItems).ToArray();
+        var choice = await page.DisplayActionSheet("メニュー", "閉じる", null, items);
+        if (string.IsNullOrEmpty(choice)) return;
+
+        if (additionalActions is not null && additionalActions.TryGetValue(choice, out var action))
+        {
+            await action();
+            return;
+        }
+
+        if (choice == "順位表")
+        {
+            await Browser.Default.OpenAsync("https://league-one.jp/standings/");
+            return;
+        }
+
+        var route = choice switch
+        {
+            "日程・結果" => "//SchedulePage",
+            "チーム一覧" => nameof(TeamListPage),
+            "ランキング" => nameof(RankingPage),
+            "選手検索" => nameof(PlayersPage),
+            "アプリ情報" => nameof(InfoPage),
+            _ => null
+        };
+        if (route is null) return;
+
+        await Shell.Current.GoToAsync("//SchedulePage");
+        if (route != "//SchedulePage") await Shell.Current.GoToAsync(route);
     }
 
     public static Label MutedLabel(string text = "") => new()

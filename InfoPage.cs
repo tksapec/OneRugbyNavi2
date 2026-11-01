@@ -34,7 +34,7 @@ public sealed class InfoPage : ContentPage
         _body.Children.Add(new Button
         {
             Text = "選手検索を開く",
-            BackgroundColor = PageStyles.Navy,
+            BackgroundColor = PageStyles.Blue,
             TextColor = Colors.White,
             Command = new Command(async () => await Shell.Current.GoToAsync(nameof(PlayersPage)))
         });
