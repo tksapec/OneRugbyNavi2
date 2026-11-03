@@ -5,6 +5,160 @@ namespace OneRugbyNavi2.Core.Tests;
 
 public sealed class ScheduleParserTests
 {
+    [Fact]
+    public void Merges_2025_greens_rockets_schedule_alias_with_finished_match_result()
+    {
+        var annual = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Kickoff = "14:30",
+            Home = "花園近鉄ライナーズ",
+            Away = "NECグリーンロケッツ東葛",
+            Status = "試合前"
+        };
+        var result = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Kickoff = "14:30",
+            Home = "花園近鉄ライナーズ",
+            Away = "グリーンロケッツ東葛",
+            HomeScore = 40,
+            AwayScore = 10,
+            Status = "試合終了",
+            MatchId = "29367"
+        };
+
+        var merged = ScheduleFetcher.MergeRegularSeason(new[] { annual }, new[] { result });
+
+        var match = Assert.Single(merged);
+        Assert.Equal(40, match.HomeScore);
+        Assert.Equal(10, match.AwayScore);
+        Assert.Equal("試合終了", match.Status);
+        Assert.Equal("29367", match.MatchId);
+
+        var cached = ScheduleFetcher.NormalizeCachedMatches(new[] { annual, result });
+        var cachedMatch = Assert.Single(cached);
+        Assert.Equal(40, cachedMatch.HomeScore);
+        Assert.Equal(10, cachedMatch.AwayScore);
+        Assert.Equal("試合終了", cachedMatch.Status);
+    }
+
+    [Fact]
+    public void Refresh_preserves_cached_results_when_the_live_detail_page_is_unavailable()
+    {
+        var currentSchedule = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "NECグリーンロケッツ東葛",
+            Status = "試合前"
+        };
+        var cachedResult = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "グリーンロケッツ東葛",
+            HomeScore = 40,
+            AwayScore = 10,
+            Status = "試合終了",
+            MatchId = "29367"
+        };
+
+        var refreshed = ScheduleFetcher.EnrichWithCachedResults(
+            new[] { currentSchedule }, new[] { currentSchedule, cachedResult });
+
+        var match = Assert.Single(refreshed);
+        Assert.Equal(40, match.HomeScore);
+        Assert.Equal(10, match.AwayScore);
+        Assert.Equal("試合終了", match.Status);
+        Assert.Equal("29367", match.MatchId);
+    }
+
+    [Fact]
+    public void Refresh_does_not_apply_a_cached_result_to_a_postponed_fixture()
+    {
+        var postponed = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "NECグリーンロケッツ東葛",
+            Status = "延期"
+        };
+        var oldResult = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "グリーンロケッツ東葛",
+            HomeScore = 40,
+            AwayScore = 10,
+            Status = "試合終了",
+            MatchId = "29367"
+        };
+
+        var refreshed = ScheduleFetcher.EnrichWithCachedResults(new[] { postponed }, new[] { oldResult });
+
+        var match = Assert.Single(refreshed);
+        Assert.Null(match.HomeScore);
+        Assert.Null(match.AwayScore);
+        Assert.Equal("延期", match.Status);
+    }
+
+    [Fact]
+    public void Refresh_does_not_match_cached_results_to_a_new_date_in_the_same_round()
+    {
+        var rescheduled = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "1月10日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "NECグリーンロケッツ東葛",
+            Status = "試合前"
+        };
+        var oldResult = new ScheduleFetcher.Item
+        {
+            SeasonKey = "2025",
+            SeasonStartYear = 2025,
+            Round = "第2節",
+            Date = "12月20日(土)",
+            Home = "花園近鉄ライナーズ",
+            Away = "グリーンロケッツ東葛",
+            HomeScore = 40,
+            AwayScore = 10,
+            Status = "試合終了",
+            MatchId = "29367"
+        };
+
+        var normalizedCache = ScheduleFetcher.NormalizeCachedMatches(new[] { rescheduled, oldResult });
+        Assert.Equal(2, normalizedCache.Count);
+
+        var refreshed = ScheduleFetcher.EnrichWithCachedResults(new[] { rescheduled }, normalizedCache);
+
+        var match = Assert.Single(refreshed);
+        Assert.Null(match.HomeScore);
+        Assert.Null(match.AwayScore);
+        Assert.Equal("試合前", match.Status);
+    }
+
     [Theory]
     [InlineData("12月19or20日", "土or日")]
     [InlineData("4月30日or5月1or2日", "土or日or祝")]

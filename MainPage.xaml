@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -28,7 +28,7 @@
             <Setter Property="FontFamily" Value="OpenSansSemibold" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="Padding" Value="8,8" />
-            <Setter Property="MinimumHeightRequest" Value="44" />
+            <Setter Property="MinimumHeightRequest" Value="48" />
             <Setter Property="BorderWidth" Value="0" />
         </Style>
 
@@ -50,192 +50,115 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*"
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
           Padding="14,10"
           RowSpacing="10">
 
-        <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
-                <VerticalStackLayout Spacing="0" VerticalOptions="Center">
-                    <Label Text="One Rugby Navi2"
-                           FontSize="22"
-                           FontAttributes="Bold"
-                           LineBreakMode="NoWrap"
-                           TextColor="{StaticResource AppNavy}" />
-                    <Label x:Name="seasonTitleLabel"
-                           Text=""
-                           FontSize="12"
-                           TextColor="{StaticResource AppMuted}" />
-                </VerticalStackLayout>
-                <Button Grid.Column="1"
-                    Text="更新"
-                    Style="{StaticResource TopActionButton}"
-                    BackgroundColor="{StaticResource Primary}"
-                    TextColor="White"
-                    Clicked="OnRefreshClicked" />
-                <Button Grid.Column="2"
-                    Text="メニュー"
-                    Style="{StaticResource TopActionButton}"
-                    BackgroundColor="{StaticResource AppChipBackground}"
-                    TextColor="{StaticResource Primary}"
-                    Clicked="OnInfoClicked" />
-            </Grid>
-
-            <Border Stroke="{StaticResource AppStroke}"
-                    BackgroundColor="White"
-                    Padding="10,4">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="14" />
-                </Border.StrokeShape>
-                <Picker x:Name="seasonPicker"
-                        Title="シーズン"
-                        TextColor="{StaticResource AppNavy}"
-                        TitleColor="{StaticResource AppMuted}"
-                        BackgroundColor="Transparent"
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="4">
+            <Label x:Name="seasonTitleLabel" Text="日程・結果" FontSize="18"
+                   FontAttributes="Bold" VerticalTextAlignment="Center"
+                   TextColor="{StaticResource AppNavy}" />
+            <Border Grid.Column="1" Stroke="{StaticResource AppStroke}" BackgroundColor="White" Padding="6,0">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                <Picker x:Name="seasonPicker" Title="シーズン" MinimumHeightRequest="48"
+                        FontSize="14" TextColor="{StaticResource AppNavy}"
+                        TitleColor="{StaticResource AppMuted}" BackgroundColor="Transparent"
                         SelectedIndexChanged="OnSeasonChanged" />
             </Border>
-
-            <HorizontalStackLayout x:Name="loadingPanel"
-                                   Spacing="8"
-                                   VerticalOptions="Center"
-                                   IsVisible="False">
-                <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}" />
-                <Label Text="読み込み中..."
-                       VerticalTextAlignment="Center"
-                       TextColor="{StaticResource AppMuted}" />
-            </HorizontalStackLayout>
-
-            <Border x:Name="messagePanel"
-                    IsVisible="False"
-                    Stroke="{StaticResource AppInformationStroke}"
-                    StrokeThickness="1"
-                    BackgroundColor="{StaticResource AppInformationBackground}"
-                    Padding="12">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12" />
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
-                    <Label x:Name="messageLabel"
-                           LineBreakMode="WordWrap"
-                           TextColor="{StaticResource AppNavy}" />
-                    <Button Grid.Column="1"
-                            Text="閉じる"
-                            FontSize="12"
-                            Padding="8,4"
-                            MinimumHeightRequest="44"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource Primary}"
-                            Clicked="OnDismissMessageClicked"
-                            SemanticProperties.Hint="この通知を閉じます" />
-                </Grid>
-            </Border>
-
-            <Border x:Name="cachePanel"
-                    IsVisible="False"
-                    Stroke="{StaticResource AppWarningStroke}"
-                    StrokeThickness="1"
-                    BackgroundColor="{StaticResource AppWarningBackground}"
-                    Padding="12">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="12" />
-                </Border.StrokeShape>
-                <Label x:Name="cacheLabel"
-                       LineBreakMode="WordWrap"
-                       TextColor="{StaticResource AppWarningText}" />
-            </Border>
-        </VerticalStackLayout>
-
-        <Grid x:Name="divisionTabsGrid"
-              Grid.Row="1"
-              ColumnDefinitions="*,*,*,*,*"
-              Padding="4"
-              BackgroundColor="{StaticResource AppChipBackground}"
-              ColumnSpacing="4">
-            <Button x:Name="btnDiv1"
-                    Text="D1"
-                    Style="{StaticResource SegmentButton}"
-                    Clicked="OnDiv1Clicked" />
-            <Button x:Name="btnDiv2"
-                    Text="D2"
-                    Grid.Column="1"
-                    Style="{StaticResource SegmentButton}"
-                    Clicked="OnDiv2Clicked" />
-            <Button x:Name="btnDiv3"
-                    Text="D3"
-                    Grid.Column="2"
-                    Style="{StaticResource SegmentButton}"
-                    Clicked="OnDiv3Clicked" />
-            <Button x:Name="btnReplacement"
-                    Text="入替戦"
-                    Grid.Column="3"
-                    Style="{StaticResource SegmentButton}"
-                    Clicked="OnReplacementClicked" />
-            <Button x:Name="btnOther"
-                    Text="その他"
-                    Grid.Column="4"
-                    Style="{StaticResource SegmentButton}"
-                    IsVisible="False"
-                    Clicked="OnOtherClicked" />
-            <Grid.GestureRecognizers>
-                <SwipeGestureRecognizer Direction="Left" Swiped="OnDivisionTabsSwiped" />
-                <SwipeGestureRecognizer Direction="Right" Swiped="OnDivisionTabsSwiped" />
-            </Grid.GestureRecognizers>
+            <Button Grid.Column="2" Text="更新" Style="{StaticResource TopActionButton}"
+                    BackgroundColor="{StaticResource Primary}" TextColor="White" Clicked="OnRefreshClicked" />
         </Grid>
 
-        <VerticalStackLayout Grid.Row="2" Spacing="10">
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="6" Padding="4"
+              BackgroundColor="{StaticResource AppChipBackground}">
+            <Button x:Name="scopeAllButton" Text="すべて" Clicked="OnAllMatchesClicked" Style="{StaticResource SegmentButton}" />
+            <Button x:Name="scopeFavoritesButton" Grid.Column="1" Text="お気に入り" Clicked="OnFavoriteQuickFilterClicked" Style="{StaticResource SegmentButton}" />
+        </Grid>
+
+        <Grid x:Name="divisionTabsGrid" Grid.Row="2" ColumnDefinitions="*,*,*,*,*" Padding="4"
+              BackgroundColor="{StaticResource AppChipBackground}" ColumnSpacing="4">
+            <Button x:Name="btnDiv1" Text="D1" Style="{StaticResource SegmentButton}" Clicked="OnDiv1Clicked" />
+            <Button x:Name="btnDiv2" Text="D2" Grid.Column="1" Style="{StaticResource SegmentButton}" Clicked="OnDiv2Clicked" />
+            <Button x:Name="btnDiv3" Text="D3" Grid.Column="2" Style="{StaticResource SegmentButton}" Clicked="OnDiv3Clicked" />
+            <Button x:Name="btnReplacement" Text="入替戦" Grid.Column="3" Style="{StaticResource SegmentButton}" Clicked="OnReplacementClicked" />
+            <Button x:Name="btnOther" Text="その他" Grid.Column="4" Style="{StaticResource SegmentButton}" IsVisible="False" Clicked="OnOtherClicked" />
+            <Grid.GestureRecognizers><SwipeGestureRecognizer Direction="Left" Swiped="OnDivisionTabsSwiped" /><SwipeGestureRecognizer Direction="Right" Swiped="OnDivisionTabsSwiped" /></Grid.GestureRecognizers>
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="3" Spacing="8">
+            <HorizontalStackLayout x:Name="loadingPanel" Spacing="8" VerticalOptions="Center" IsVisible="False">
+                <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}" />
+                <Label Text="読み込み中..." VerticalTextAlignment="Center" TextColor="{StaticResource AppMuted}" />
+            </HorizontalStackLayout>
+            <Border x:Name="messagePanel" IsVisible="False" Stroke="{StaticResource AppInformationStroke}"
+                    StrokeThickness="1" BackgroundColor="{StaticResource AppInformationBackground}" Padding="12">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6" HeightRequest="34">
+                    <Label x:Name="messageLabel" LineBreakMode="TailTruncation" MaxLines="1"
+                           VerticalTextAlignment="Center" FontSize="12" TextColor="{StaticResource AppNavy}" />
+                    <Button Grid.Column="1" Text="詳細" FontSize="12" Padding="8,2" MinimumHeightRequest="32"
+                            BackgroundColor="Transparent" TextColor="{StaticResource Primary}"
+                            Clicked="OnShowStatusClicked" SemanticProperties.Hint="更新状況の詳細を表示します" />
+                </Grid>
+            </Border>
+            <Border x:Name="cachePanel" IsVisible="False" Stroke="{StaticResource AppWarningStroke}"
+                    StrokeThickness="1" BackgroundColor="{StaticResource AppWarningBackground}" Padding="12">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                <Label x:Name="cacheLabel" LineBreakMode="WordWrap" TextColor="{StaticResource AppWarningText}" />
+            </Border>
             <Border Stroke="{StaticResource AppStroke}"
                     BackgroundColor="White"
-                    Padding="12">
+                    Padding="10,6">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="16" />
                 </Border.StrokeShape>
 
-                <Grid RowDefinitions="Auto,Auto"
-                      ColumnDefinitions="Auto,*"
-                      RowSpacing="8"
-                      ColumnSpacing="10">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,*,Auto"
+                      RowSpacing="4" ColumnSpacing="6">
                     <Button x:Name="filterToggleButton"
-                            Text="フィルタを開く"
+                            Text="絞り込み"
+                            ImageSource="schedule_filter.svg"
+                            ContentLayout="Left,6"
                             BackgroundColor="{StaticResource AppChipBackground}"
                             TextColor="{StaticResource Primary}"
                             FontAttributes="Bold"
                             CornerRadius="14"
-                            Padding="14,8"
+                            MinimumHeightRequest="48"
+                            Padding="10,6"
                             Clicked="OnToggleFiltersClicked" />
 
-                    <Label x:Name="lastUpdatedLabel"
-                           Grid.Column="1"
-                           HorizontalTextAlignment="End"
-                           VerticalTextAlignment="Center"
-                           FontSize="12"
-                           TextColor="{StaticResource AppMuted}"
-                           Text="最終更新: -" />
+                    <Border x:Name="filterCountBadge" Grid.Column="1" IsVisible="False"
+                            WidthRequest="24" HeightRequest="24" Padding="0"
+                            BackgroundColor="{StaticResource Primary}" StrokeThickness="0"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                        <Label x:Name="filterCountLabel" FontSize="12" FontAttributes="Bold"
+                               TextColor="White" HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center" />
+                    </Border>
 
-                    <Grid Grid.Row="1"
-                          Grid.ColumnSpan="2"
-                          RowDefinitions="Auto,Auto"
-                          RowSpacing="6">
-                        <Label x:Name="filterSummaryLabel"
+                    <Button x:Name="clearQuickButton" Grid.Column="2" Text="解除"
+                            IsVisible="False" MinimumHeightRequest="44" Padding="4,6"
+                            BackgroundColor="Transparent" TextColor="{StaticResource Primary}"
+                            FontAttributes="Bold" Clicked="OnClearFilters" />
+
+                    <BoxView Grid.Column="3" WidthRequest="1" HeightRequest="26"
+                             HorizontalOptions="End" VerticalOptions="Center"
+                             BackgroundColor="{StaticResource AppStroke}" />
+
+                    <Button x:Name="nextMatchButton" Grid.Column="4" Text="次の試合へ ›"
+                            MinimumHeightRequest="48" Padding="10,6" CornerRadius="12"
+                            BackgroundColor="{StaticResource Primary}" TextColor="White"
+                            FontAttributes="Bold" Clicked="OnNextMatchClicked" />
+                    <Label x:Name="filterSummaryLabel"
+                               Grid.Row="1" Grid.ColumnSpan="5"
                                FontSize="13"
                                TextColor="{StaticResource AppNavy}"
                                LineBreakMode="TailTruncation"
                                MaxLines="2"
                                VerticalTextAlignment="Center"
                                Text="フィルタなし" />
-                        <Button x:Name="favoriteQuickFilterButton"
-                                Grid.Row="1"
-                                IsVisible="False"
-                                HorizontalOptions="Start"
-                                Text="☆ お気に入りで絞り込む"
-                                BackgroundColor="{StaticResource AppWarningBackground}"
-                                TextColor="{StaticResource AppWarningText}"
-                                FontSize="13"
-                                FontAttributes="Bold"
-                                CornerRadius="14"
-                                Padding="12,7"
-                                Clicked="OnFavoriteQuickFilterClicked"
-                                SemanticProperties.Hint="選択中のDivisionでお気に入りチームの試合に絞り込みます" />
-                    </Grid>
                 </Grid>
             </Border>
 
@@ -330,34 +253,23 @@
                     </Border>
                     </VerticalStackLayout>
                     </ScrollView>
-                    <Grid ColumnDefinitions="*,*"
-                          ColumnSpacing="10">
-                        <Button Text="クリア"
-                                BackgroundColor="{StaticResource AppChipBackground}"
-                                TextColor="{StaticResource Primary}"
-                                FontAttributes="Bold"
-                                CornerRadius="14"
-                                Padding="12,10"
-                                Clicked="OnClearFilters" />
-                        <Button Grid.Column="1"
-                                Text="フィルタを閉じる"
-                                BackgroundColor="{StaticResource AppSubtleBackground}"
-                                TextColor="{StaticResource AppNavy}"
-                                FontAttributes="Bold"
-                                CornerRadius="14"
-                                Padding="12,10"
-                                Clicked="OnToggleFiltersClicked" />
-                    </Grid>
                 </VerticalStackLayout>
             </Border>
         </VerticalStackLayout>
 
-        <Grid Grid.Row="3" IsClippedToBounds="True">
+        <Grid Grid.Row="4" IsClippedToBounds="True">
             <Grid x:Name="schedulePageContent">
-            <CollectionView x:Name="list"
-                            VerticalOptions="FillAndExpand"
-                            SelectionMode="None"
-                            ItemSizingStrategy="MeasureFirstItem">
+            <CollectionView x:Name="list" IsGrouped="True" VerticalOptions="FillAndExpand"
+                            SelectionMode="None" ItemSizingStrategy="MeasureAllItems">
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="{StaticResource AppChipBackground}" Stroke="{StaticResource AppStroke}" Padding="12,7" Margin="0,0,0,6">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                            <Label Text="{Binding DateLabel}" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource AppNavy}" />
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:MatchItem">
                             <Border Margin="0,0,0,12"
@@ -372,21 +284,15 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnMatchTapped" />
                             </Border.GestureRecognizers>
-                            <Grid RowDefinitions="Auto,Auto,Auto"
-                                  ColumnDefinitions="*,Auto"
-                                  RowSpacing="10">
-                                <HorizontalStackLayout Grid.Row="0" Grid.ColumnSpan="2" Spacing="8">
-                                    <Border BackgroundColor="{StaticResource Primary}" Padding="9,4">
-                                        <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="9" />
-                                        </Border.StrokeShape>
-                                        <Label Text="{Binding Section}"
-                                               FontSize="12"
-                                               FontAttributes="Bold"
-                                               TextColor="White" />
-                                    </Border>
+                            <VerticalStackLayout Spacing="6">
+                                <FlexLayout Wrap="Wrap" AlignItems="Center" Padding="0,10,0,4">
+                                    <Border BackgroundColor="{StaticResource Primary}" Padding="8,4" Margin="0,0,6,4">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="8" /></Border.StrokeShape>
+                                    <Label Text="{Binding CategoryLabel}" FontSize="12" FontAttributes="Bold" TextColor="White" />
+                                </Border>
+                                <Label Text="{Binding RoundTimeCompact}" FontSize="13" FontAttributes="Bold" Margin="0,0,8,4" TextColor="{StaticResource AppNavy}" />
                                     <Border BackgroundColor="{StaticResource AppSuccessBackground}"
-                                            Padding="9,4"
+                                            Padding="9,6" Margin="0,0,6,4"
                                             IsVisible="{Binding IsCompleted}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="9" />
@@ -397,7 +303,7 @@
                                                TextColor="{StaticResource AppSuccessText}" />
                                     </Border>
                                     <Border BackgroundColor="{StaticResource AppNoticeBackground}"
-                                            Padding="9,4"
+                                            Padding="9,6" Margin="0,0,6,4"
                                             IsVisible="{Binding HasSpecialStatus}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="9" />
@@ -410,19 +316,18 @@
                                     <Label Text="{Binding Conference}"
                                            FontSize="12"
                                            TextColor="{StaticResource AppMuted}"
+                                           Margin="0,0,0,4"
                                            VerticalTextAlignment="Center" />
-                                </HorizontalStackLayout>
+                                </FlexLayout>
 
-                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="10">
-                                    <Grid ColumnDefinitions="Auto,*"
-                                          ColumnSpacing="8">
-                                        <Grid WidthRequest="36" HeightRequest="36">
+                                <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="10">
+                                        <Grid WidthRequest="48" HeightRequest="48">
                                             <ImageButton Source="{Binding HomeLogoPath}"
                                                          BackgroundColor="{StaticResource AppBackground}"
                                                          BorderColor="{StaticResource AppStroke}"
                                                          BorderWidth="1"
-                                                         CornerRadius="18"
-                                                         Padding="6"
+                                                         CornerRadius="24"
+                                                         Padding="8"
                                                          Aspect="AspectFit"
                                                          Clicked="OnHomeTeamLogoClicked"
                                                          SemanticProperties.Hint="チームの公式ページを開く" />
@@ -442,30 +347,30 @@
                                                HorizontalTextAlignment="Start"
                                                VerticalTextAlignment="Center"
                                                LineBreakMode="WordWrap" />
-                                    </Grid>
-                                    <Label Grid.Column="1"
-                                           Text="{Binding ScoreText}"
+                                    <Label Grid.Column="2"
+                                           Text="{Binding HomeScoreText}"
+                                           SemanticProperties.Description="{Binding HomeScoreText, StringFormat='ホームの得点 {0}'}"
                                            FontSize="22"
                                            FontAttributes="Bold"
                                            TextColor="{StaticResource Primary}"
-                                           HorizontalTextAlignment="Center"
+                                           MinimumWidthRequest="32"
+                                           HorizontalTextAlignment="End"
                                            VerticalTextAlignment="Center" />
-                                    <Grid Grid.Column="2"
-                                          ColumnDefinitions="*,Auto"
-                                          ColumnSpacing="8">
-                                        <Label Text="{Binding AwayTeam}"
+                                </Grid>
+                                <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="10">
+                                        <Label Grid.Column="1" Text="{Binding AwayTeam}"
                                                FontSize="15"
                                                FontAttributes="Bold"
-                                               HorizontalTextAlignment="End"
+                                               HorizontalTextAlignment="Start"
                                                VerticalTextAlignment="Center"
                                                LineBreakMode="WordWrap" />
-                                        <Grid Grid.Column="1" WidthRequest="36" HeightRequest="36">
+                                        <Grid WidthRequest="48" HeightRequest="48">
                                             <ImageButton Source="{Binding AwayLogoPath}"
                                                          BackgroundColor="{StaticResource AppBackground}"
                                                          BorderColor="{StaticResource AppStroke}"
                                                          BorderWidth="1"
-                                                         CornerRadius="18"
-                                                         Padding="6"
+                                                         CornerRadius="24"
+                                                         Padding="8"
                                                          Aspect="AspectFit"
                                                          Clicked="OnAwayTeamLogoClicked"
                                                          SemanticProperties.Hint="チームの公式ページを開く" />
@@ -478,28 +383,36 @@
                                                    IsVisible="{Binding HasAwayBadge}"
                                                    InputTransparent="True" />
                                         </Grid>
-                                    </Grid>
+                                    <Label Grid.Column="2"
+                                           Text="{Binding AwayScoreText}"
+                                           SemanticProperties.Description="{Binding AwayScoreText, StringFormat='ビジターの得点 {0}'}"
+                                           FontSize="22"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource Primary}"
+                                           MinimumWidthRequest="32"
+                                           HorizontalTextAlignment="End"
+                                           VerticalTextAlignment="Center" />
                                 </Grid>
 
-                                <VerticalStackLayout Grid.Row="2" Spacing="2">
-                                    <Label Text="{Binding DateTimeCompact}"
-                                           FontSize="13"
-                                           TextColor="{StaticResource AppNavy}" />
+                                <Button Text="{Binding ResultVisibilityActionText}" IsVisible="{Binding HasResult}"
+                                        SemanticProperties.Description="{Binding ScoreVisibilityDescription}"
+                                        HorizontalOptions="End" MinimumHeightRequest="40" Padding="12,4"
+                                        CornerRadius="12" BackgroundColor="{StaticResource AppChipBackground}"
+                                        TextColor="{StaticResource Primary}" Clicked="OnResultVisibilityClicked" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                     <Label Text="{Binding VenueCompact}"
                                            FontSize="12"
                                            TextColor="{StaticResource AppMuted}"
-                                           LineBreakMode="TailTruncation" />
-                                </VerticalStackLayout>
-                                <Label Grid.Row="2"
-                                       Grid.Column="1"
+                                           LineBreakMode="WordWrap" />
+                                <Label Grid.Column="1"
                                        Text="詳細を見る ›"
                                        FontSize="12"
                                        FontAttributes="Bold"
                                        TextColor="{StaticResource Primary}"
                                        VerticalTextAlignment="End"
                                        HorizontalTextAlignment="End" />
-
-                            </Grid>
+                                </Grid>
+                            </VerticalStackLayout>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -521,11 +434,13 @@
                        Text="該当する試合はありません" />
             </Border>
             </Grid>
-            <GraphicsView x:Name="pageCurlOverlay"
+        </Grid>
+
+        <ContentView x:Name="bottomNavigationHost" Grid.Row="5" />
+
+        <GraphicsView x:Name="pageCurlOverlay" Grid.RowSpan="6"
                           IsVisible="False"
                           InputTransparent="True"
                           ZIndex="10" />
-        </Grid>
-
     </Grid>
 </ContentPage>

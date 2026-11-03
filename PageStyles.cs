@@ -31,7 +31,127 @@ public static class PageStyles
         Content = content
     };
 
-    public static View NavigationTitle(ContentPage page, string text)
+    public static View WithBottomNavigation(
+        ContentPage page,
+        View content,
+        BottomNavigationSection selected,
+        bool isModal = false,
+        Func<Task>? moreAction = null)
+    {
+        var layout = new Grid
+        {
+            RowDefinitions =
+            {
+                new RowDefinition(GridLength.Star),
+                new RowDefinition(GridLength.Auto)
+            }
+        };
+        layout.Add(content, 0, 0);
+        layout.Add(CreateBottomNavigation(page, selected, isModal, moreAction), 0, 1);
+        return layout;
+    }
+
+    public static View CreateBottomNavigation(
+        ContentPage page,
+        BottomNavigationSection selected,
+        bool isModal = false,
+        Func<Task>? moreAction = null)
+    {
+        moreAction ??= async () =>
+        {
+            if (isModal)
+            {
+                await page.Navigation.PopModalAsync();
+            }
+
+            var menuPage = Shell.Current.CurrentPage as ContentPage ?? page;
+            await ShowNavigationMenuAsync(menuPage);
+        };
+
+        var navigation = new Grid
+        {
+            HeightRequest = 66,
+            ColumnDefinitions =
+            {
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Star),
+                new ColumnDefinition(GridLength.Star)
+            },
+            ColumnSpacing = 2,
+            Padding = new Thickness(4, 3),
+            BackgroundColor = Navy
+        };
+
+        AddNavigationButton(navigation, page, BottomNavigationSection.Schedule, "日程", "nav_calendar.svg", selected, isModal, 0);
+        AddNavigationButton(navigation, page, BottomNavigationSection.Teams, "チーム", "nav_teams.svg", selected, isModal, 1);
+        AddNavigationButton(navigation, page, BottomNavigationSection.Players, "選手", "nav_jersey.svg", selected, isModal, 2);
+        AddNavigationButton(navigation, page, BottomNavigationSection.More, "その他", "nav_more.svg", selected, isModal, 3, moreAction);
+        return navigation;
+    }
+
+    private static void AddNavigationButton(
+        Grid navigation,
+        ContentPage page,
+        BottomNavigationSection section,
+        string label,
+        string icon,
+        BottomNavigationSection selected,
+        bool isModal,
+        int column,
+        Func<Task>? moreAction = null)
+    {
+        var button = new Button
+        {
+            Text = label,
+            ImageSource = icon,
+            ContentLayout = new Button.ButtonContentLayout(Button.ButtonContentLayout.ImagePosition.Top, 2),
+            CornerRadius = 12,
+            FontAttributes = FontAttributes.Bold,
+            FontSize = 12,
+            BorderWidth = 0,
+            MinimumHeightRequest = 58,
+            Padding = new Thickness(4, 2),
+            BackgroundColor = selected == section ? Blue : Colors.Transparent,
+            TextColor = Colors.White
+        };
+        SemanticProperties.SetDescription(button, label);
+        SemanticProperties.SetHint(button, $"{label}画面へ移動します");
+        button.Clicked += async (_, _) =>
+        {
+            if (section == BottomNavigationSection.More && moreAction is not null)
+            {
+                await moreAction();
+                return;
+            }
+
+            await NavigateFromBottomAsync(page, section, isModal);
+        };
+        navigation.Add(button, column, 0);
+    }
+
+    private static async Task NavigateFromBottomAsync(
+        ContentPage page,
+        BottomNavigationSection section,
+        bool isModal)
+    {
+        if (isModal)
+        {
+            await page.Navigation.PopModalAsync();
+        }
+
+        var route = BottomNavigationRoute.RouteFor(section);
+        if (section == BottomNavigationSection.Schedule)
+        {
+            await Shell.Current.GoToAsync(route);
+            return;
+        }
+
+        await Shell.Current.GoToAsync("//SchedulePage");
+        await Shell.Current.GoToAsync(route);
+    }
+
+    public static View NavigationTitle(string text)
     {
         var title = new Label
         {
@@ -43,23 +163,10 @@ public static class PageStyles
             VerticalTextAlignment = TextAlignment.Center,
             LineBreakMode = LineBreakMode.TailTruncation
         };
-        var menu = SecondaryButton("メニュー");
-        menu.Clicked += async (_, _) => await ShowNavigationMenuAsync(page);
-
         return new Grid
         {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition(GridLength.Star),
-                new ColumnDefinition(GridLength.Auto)
-            },
-            ColumnSpacing = 8,
             Margin = new Thickness(16, 8, 16, 8),
-            Children =
-            {
-                title,
-                menu.Column(1)
-            }
+            Children = { title }
         };
     }
 
@@ -67,10 +174,7 @@ public static class PageStyles
         ContentPage page,
         IReadOnlyDictionary<string, Func<Task>>? additionalActions = null)
     {
-        var standardItems = new[] { "日程・結果", "順位表", "チーム一覧", "ランキング", "選手検索", "アプリ情報" };
-        var items = additionalActions is null
-            ? standardItems
-            : additionalActions.Keys.Concat(standardItems).ToArray();
+        var items = SecondaryNavigationMenu.BuildItems(additionalActions?.Keys);
         var choice = await page.DisplayActionSheet("メニュー", "閉じる", null, items);
         if (string.IsNullOrEmpty(choice)) return;
 
@@ -88,10 +192,7 @@ public static class PageStyles
 
         var route = choice switch
         {
-            "日程・結果" => "//SchedulePage",
-            "チーム一覧" => nameof(TeamListPage),
             "ランキング" => nameof(RankingPage),
-            "選手検索" => nameof(PlayersPage),
             "アプリ情報" => nameof(InfoPage),
             _ => null
         };

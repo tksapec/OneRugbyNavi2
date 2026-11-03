@@ -63,6 +63,12 @@ public static class SeasonCatalog
             ["グリーンウォリアーズ東葛"] = "JR東日本グリーンウォリアーズ東葛"
         };
 
+    private static readonly IReadOnlyDictionary<string, string> TeamIdentityAliases2025 =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["グリーンロケッツ東葛"] = "NECグリーンロケッツ東葛"
+        };
+
     public static int CurrentSeasonStartYear => GetSeasonStartYear(DateTime.Today);
 
     public static string CurrentSeasonKey => CurrentSeasonStartYear.ToString();
@@ -126,6 +132,11 @@ public static class SeasonCatalog
     private static string GetTeamIdentityKey(string? teamName, int seasonStartYear)
     {
         var value = teamName?.Trim() ?? "";
+        if (seasonStartYear == 2025 && TeamIdentityAliases2025.TryGetValue(value, out var historicalCanonical))
+        {
+            return historicalCanonical;
+        }
+
         if (seasonStartYear == 2026 && TeamIdentityAliases2026.TryGetValue(value, out var canonical))
         {
             return canonical;

@@ -25,7 +25,7 @@ public sealed class TeamListPage : ContentPage
             GroupHeaderTemplate = new DataTemplate(CreateGroupHeader)
         };
 
-        Content = new Grid
+        Content = PageStyles.WithBottomNavigation(this, new Grid
         {
             RowDefinitions =
             {
@@ -35,11 +35,11 @@ public sealed class TeamListPage : ContentPage
             },
             Children =
             {
-                PageStyles.NavigationTitle(this, "チーム一覧"),
+                PageStyles.NavigationTitle("チーム一覧"),
                 _status.Row(1).Margin(new Thickness(16, 0, 16, 8)),
                 list.Row(2)
             }
-        };
+        }, BottomNavigationSection.Teams);
     }
 
     protected override async void OnAppearing()

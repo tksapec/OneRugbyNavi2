@@ -132,7 +132,7 @@ public sealed class PlayersPage : ContentPage
             Children = { _empty, _retryButton }
         };
 
-        Content = new Grid
+        Content = PageStyles.WithBottomNavigation(this, new Grid
         {
             RowDefinitions =
             {
@@ -144,7 +144,7 @@ public sealed class PlayersPage : ContentPage
             },
             Children =
             {
-                PageStyles.NavigationTitle(this, "選手検索"),
+                PageStyles.NavigationTitle("選手検索"),
                 new Border
                 {
                     BackgroundColor = PageStyles.Surface,
@@ -160,7 +160,7 @@ public sealed class PlayersPage : ContentPage
                 list.Row(4),
                 emptyState.Row(4)
             }
-        };
+        }, BottomNavigationSection.Players);
     }
 
     protected override async void OnAppearing()

@@ -53,6 +53,9 @@
     <Compile Include="../../MatchItem.cs" Link="Production/MatchItem.cs" />
     <Compile Include="../../FavoriteTeamLogic.cs" Link="Production/FavoriteTeamLogic.cs" />
     <Compile Include="../../ScheduleViewModel.cs" Link="Production/ScheduleViewModel.cs" />
+    <Compile Include="../../ScheduleDateGroup.cs" Link="Production/ScheduleDateGroup.cs" />
+    <Compile Include="../../BottomNavigationRoute.cs" Link="Production/BottomNavigationRoute.cs" />
+    <Compile Include="../../SecondaryNavigationMenu.cs" Link="Production/SecondaryNavigationMenu.cs" />
     <Compile Include="../../TeamLogoResolver.cs" Link="Production/TeamLogoResolver.cs" />
     <Compile Include="../../VenueNameResolver.cs" Link="Production/VenueNameResolver.cs" />
   </ItemGroup>

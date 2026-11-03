@@ -103,11 +103,17 @@ namespace OneRugbyNavi2
                     return null;
                 }
 
-                if (HasInvalidTeamCache(payload.Div1) ||
-                    HasInvalidTeamCache(payload.Div2) ||
-                    HasInvalidTeamCache(payload.Div3) ||
-                    HasInvalidTeamCache(payload.Replacement) ||
-                    HasInvalidTeamCache(payload.Other))
+                var div1 = ScheduleFetcher.NormalizeCachedMatches(payload.Div1 ?? new List<ScheduleFetcher.Item>());
+                var div2 = ScheduleFetcher.NormalizeCachedMatches(payload.Div2 ?? new List<ScheduleFetcher.Item>());
+                var div3 = ScheduleFetcher.NormalizeCachedMatches(payload.Div3 ?? new List<ScheduleFetcher.Item>());
+                var replacement = payload.Replacement ?? new List<ScheduleFetcher.Item>();
+                var other = payload.Other ?? new List<ScheduleFetcher.Item>();
+
+                if (HasInvalidTeamCache(div1) ||
+                    HasInvalidTeamCache(div2) ||
+                    HasInvalidTeamCache(div3) ||
+                    HasInvalidTeamCache(replacement) ||
+                    HasInvalidTeamCache(other))
                 {
                     return null;
                 }
@@ -118,11 +124,11 @@ namespace OneRugbyNavi2
                     SavedAt = payload.SavedAt,
                     SeasonKey = payload.SeasonKey,
                     SeasonLabel = payload.SeasonLabel,
-                    Div1 = payload.Div1 ?? new List<ScheduleFetcher.Item>(),
-                    Div2 = payload.Div2 ?? new List<ScheduleFetcher.Item>(),
-                    Div3 = payload.Div3 ?? new List<ScheduleFetcher.Item>(),
-                    Replacement = payload.Replacement ?? new List<ScheduleFetcher.Item>(),
-                    Other = payload.Other ?? new List<ScheduleFetcher.Item>()
+                    Div1 = div1,
+                    Div2 = div2,
+                    Div3 = div3,
+                    Replacement = replacement,
+                    Other = other
                 };
             }
             catch

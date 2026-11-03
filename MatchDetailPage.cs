@@ -57,7 +57,7 @@ namespace OneRugbyNavi2
                 }
             }.Row(1));
 
-            Content = root;
+            Content = PageStyles.WithBottomNavigation(this, root, BottomNavigationSection.Schedule);
         }
 
         private View BuildHeader()
@@ -291,9 +291,6 @@ namespace OneRugbyNavi2
             }
 
             AddQuickAction("共有", ShareAsync);
-            AddQuickAction("順位表", async () => await OpenWebAsync("https://league-one.jp/standings/"));
-            AddQuickAction("公式ランキング", async () => await Shell.Current.GoToAsync(nameof(RankingPage)));
-
             content.Children.Add(SectionTitle("その他の操作"));
             content.Children.Add(quickActions);
             return Card(content);

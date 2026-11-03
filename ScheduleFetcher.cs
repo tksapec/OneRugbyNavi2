@@ -291,7 +291,7 @@ namespace OneRugbyNavi2
             }
         }
 
-        private static List<Item> MergeRegularSeason(IEnumerable<Item> annualItems, IEnumerable<Item> detailItems)
+        internal static List<Item> MergeRegularSeason(IEnumerable<Item> annualItems, IEnumerable<Item> detailItems)
         {
             var result = annualItems.ToList();
             foreach (var detail in detailItems)
@@ -308,6 +308,109 @@ namespace OneRugbyNavi2
             }
 
             return Deduplicate(result);
+        }
+
+        internal static List<Item> NormalizeCachedMatches(IEnumerable<Item> items)
+        {
+            var result = new List<Item>();
+            foreach (var candidate in items)
+            {
+                NormalizeTeamNames(candidate);
+                var existing = result.FirstOrDefault(item =>
+                    IsSameFixture(item, candidate) && HasSameFixtureDateOrId(item, candidate));
+                if (existing == null)
+                {
+                    result.Add(candidate);
+                    continue;
+                }
+
+                MergeCachedMatch(existing, candidate);
+            }
+
+            return result;
+        }
+
+        private static void MergeCachedMatch(Item target, Item incoming)
+        {
+            if (string.IsNullOrWhiteSpace(target.SeasonKey)) target.SeasonKey = incoming.SeasonKey;
+            if (string.IsNullOrWhiteSpace(target.SeasonLabel)) target.SeasonLabel = incoming.SeasonLabel;
+            if (target.SeasonStartYear <= 0) target.SeasonStartYear = incoming.SeasonStartYear;
+            if (string.IsNullOrWhiteSpace(target.CategoryCode)) target.CategoryCode = incoming.CategoryCode;
+            if (string.IsNullOrWhiteSpace(target.CategoryLabel)) target.CategoryLabel = incoming.CategoryLabel;
+            if (string.IsNullOrWhiteSpace(target.Division)) target.Division = incoming.Division;
+            if (string.IsNullOrWhiteSpace(target.Date)) target.Date = incoming.Date;
+            if (string.IsNullOrWhiteSpace(target.Round)) target.Round = incoming.Round;
+            if (string.IsNullOrWhiteSpace(target.Kickoff)) target.Kickoff = incoming.Kickoff;
+            if (string.IsNullOrWhiteSpace(target.Conference)) target.Conference = incoming.Conference;
+            if (string.IsNullOrWhiteSpace(target.Pref)) target.Pref = incoming.Pref;
+            if (string.IsNullOrWhiteSpace(target.Venue)) target.Venue = incoming.Venue;
+            target.HomeScore ??= incoming.HomeScore;
+            target.AwayScore ??= incoming.AwayScore;
+            if (string.IsNullOrWhiteSpace(target.Status) || target.Status == "未定")
+                target.Status = incoming.Status;
+            if (string.IsNullOrWhiteSpace(target.MatchId)) target.MatchId = incoming.MatchId;
+            if (string.IsNullOrWhiteSpace(target.MatchCode)) target.MatchCode = incoming.MatchCode;
+            if (string.IsNullOrWhiteSpace(target.MatchInfoUrl)) target.MatchInfoUrl = incoming.MatchInfoUrl;
+            if (string.IsNullOrWhiteSpace(target.ReportUrl)) target.ReportUrl = incoming.ReportUrl;
+            if (string.IsNullOrWhiteSpace(target.PreviewUrl)) target.PreviewUrl = incoming.PreviewUrl;
+            if (string.IsNullOrWhiteSpace(target.BroadcastText)) target.BroadcastText = incoming.BroadcastText;
+            if (target.BroadcastLinks.Count == 0 && incoming.BroadcastLinks.Count > 0)
+                target.BroadcastLinks = incoming.BroadcastLinks;
+            if (string.IsNullOrWhiteSpace(target.SourceUrl)) target.SourceUrl = incoming.SourceUrl;
+        }
+
+        internal static List<Item> EnrichWithCachedResults(
+            IEnumerable<Item> currentSchedule,
+            IEnumerable<Item> cachedItems)
+        {
+            var previous = cachedItems.ToArray();
+            var result = currentSchedule.ToList();
+            foreach (var match in result)
+            {
+                if ((match.HomeScore.HasValue && match.AwayScore.HasValue) || !CanRestoreCachedResult(match.Status))
+                {
+                    continue;
+                }
+
+                var cachedResult = previous.FirstOrDefault(cached =>
+                    cached.HomeScore.HasValue && cached.AwayScore.HasValue &&
+                    IsSameFixture(match, cached) && HasSameFixtureDateOrId(match, cached));
+                if (cachedResult == null)
+                {
+                    continue;
+                }
+
+                match.HomeScore ??= cachedResult.HomeScore;
+                match.AwayScore ??= cachedResult.AwayScore;
+                match.Status = cachedResult.Status;
+                if (string.IsNullOrWhiteSpace(match.MatchId)) match.MatchId = cachedResult.MatchId;
+                if (string.IsNullOrWhiteSpace(match.MatchCode)) match.MatchCode = cachedResult.MatchCode;
+                if (string.IsNullOrWhiteSpace(match.MatchInfoUrl)) match.MatchInfoUrl = cachedResult.MatchInfoUrl;
+                if (string.IsNullOrWhiteSpace(match.ReportUrl)) match.ReportUrl = cachedResult.ReportUrl;
+                if (string.IsNullOrWhiteSpace(match.PreviewUrl)) match.PreviewUrl = cachedResult.PreviewUrl;
+            }
+
+            return result;
+        }
+
+        private static bool CanRestoreCachedResult(string? status)
+        {
+            var value = status?.Trim() ?? "";
+            return value.Length == 0 || value is "試合前" or "未定" or "試合終了" or "Full-Time";
+        }
+
+        private static bool HasSameFixtureDateOrId(Item left, Item right)
+        {
+            if (!string.IsNullOrWhiteSpace(left.MatchId) &&
+                !string.IsNullOrWhiteSpace(right.MatchId) &&
+                string.Equals(left.MatchId, right.MatchId, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            var leftDate = NormalizeDateKey(left.Date);
+            var rightDate = NormalizeDateKey(right.Date);
+            return leftDate.Length > 0 && string.Equals(leftDate, rightDate, StringComparison.Ordinal);
         }
 
         private static void NormalizeTeamNames(Item item)

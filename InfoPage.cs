@@ -9,17 +9,17 @@ public sealed class InfoPage : ContentPage
         Title = "情報";
         BackgroundColor = PageStyles.Background;
         Shell.SetNavBarIsVisible(this, false);
-        Content = new ScrollView
+        Content = PageStyles.WithBottomNavigation(this, new ScrollView
         {
             Content = new VerticalStackLayout
             {
                 Children =
                 {
-                    PageStyles.NavigationTitle(this, "One Rugby Navi2"),
+                    PageStyles.NavigationTitle("One Rugby Navi2"),
                     _body.Margin(new Thickness(0, 0, 0, 12))
                 }
             }
-        };
+        }, BottomNavigationSection.More);
     }
 
     protected override async void OnAppearing()
@@ -31,13 +31,6 @@ public sealed class InfoPage : ContentPage
     private async Task LoadAsync()
     {
         _body.Children.Clear();
-        _body.Children.Add(new Button
-        {
-            Text = "選手検索を開く",
-            BackgroundColor = PageStyles.Blue,
-            TextColor = Colors.White,
-            Command = new Command(async () => await Shell.Current.GoToAsync(nameof(PlayersPage)))
-        });
         try
         {
             var summary = await AppServices.Database.GetSummaryAsync();

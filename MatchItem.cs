@@ -1,9 +1,29 @@
-﻿using System.Linq;
+using System.Linq;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace OneRugbyNavi2
 {
-    public class MatchItem
+    public class MatchItem : INotifyPropertyChanged
     {
+        private bool _areScoresHidden;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public bool AreScoresHidden
+        {
+            get => _areScoresHidden;
+            set
+            {
+                if (_areScoresHidden == value || (value && !HasResult)) return;
+                _areScoresHidden = value;
+                OnPropertyChanged(nameof(AreScoresHidden));
+                OnPropertyChanged(nameof(HomeScoreText));
+                OnPropertyChanged(nameof(AwayScoreText));
+                OnPropertyChanged(nameof(ResultVisibilityActionText));
+                OnPropertyChanged(nameof(ScoreVisibilityDescription));
+            }
+        }
         public string SeasonKey { get; set; } = "";
         public string SeasonLabel { get; set; } = "";
         public int SeasonStartYear { get; set; }
@@ -35,6 +55,10 @@ namespace OneRugbyNavi2
         public string AwayBadgeText { get; set; } = "";
 
         public bool HasResult => HomeScore.HasValue && AwayScore.HasValue;
+        public string HomeScoreText => AreScoresHidden ? "••" : HasResult ? HomeScore!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-";
+        public string AwayScoreText => AreScoresHidden ? "••" : HasResult ? AwayScore!.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "-";
+        public string ResultVisibilityActionText => AreScoresHidden ? "結果を表示" : "結果を隠す";
+        public string ScoreVisibilityDescription => AreScoresHidden ? "試合結果は非表示です。結果を表示します" : "試合結果を表示中です。結果を隠します";
         public bool HasHomeLogo => !string.IsNullOrWhiteSpace(HomeLogoPath);
         public bool HasAwayLogo => !string.IsNullOrWhiteSpace(AwayLogoPath);
         public bool HasHomeBadge => !HasHomeLogo && !string.IsNullOrWhiteSpace(HomeBadgeText);
@@ -62,6 +86,7 @@ namespace OneRugbyNavi2
 
         public string HomeVsAway => $"{HomeTeam} vs {AwayTeam}";
         public string DateTimeCompact => $"{MatchDate}  {KickoffTime}";
+        public string RoundTimeCompact => string.IsNullOrWhiteSpace(KickoffTime) ? Section : $"{Section} · {KickoffTime}";
         public string VenueCompact => string.IsNullOrWhiteSpace(Prefecture) ? VenueDisplayName : $"{Prefecture}\u30FB{VenueDisplayName}";
         public string StatusText => string.IsNullOrWhiteSpace(MatchStatus) ? (HasResult ? "\u8A66\u5408\u7D42\u4E86" : "\u8A66\u5408\u524D") : MatchStatus;
         public bool IsInProgress =>
@@ -84,5 +109,7 @@ namespace OneRugbyNavi2
             "\u9806\u5EF6",
             "\u53D6\u6D88"
         };
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

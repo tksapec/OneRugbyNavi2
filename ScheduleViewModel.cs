@@ -42,6 +42,7 @@ namespace OneRugbyNavi2
 
         public string? TeamFilter { get; set; }
         public IReadOnlyCollection<string> FavoriteTeamFilters { get; set; } = Array.Empty<string>();
+        public bool ShowFavoritesAcrossDivisions { get; set; }
         public string? VenueFilter { get; set; }
         public DateRangeFilter PeriodFilter { get; set; } = DateRangeFilter.All;
         public int CurrentDivision { get; private set; } = 1;
@@ -106,7 +107,9 @@ namespace OneRugbyNavi2
                 return;
             }
 
-            var query = _currentSource.AsEnumerable();
+            var query = (ShowFavoritesAcrossDivisions
+                ? new[] { ItemsDiv1, ItemsDiv2, ItemsDiv3 }.SelectMany(items => items)
+                : _currentSource.AsEnumerable());
 
             if (!string.IsNullOrWhiteSpace(TeamFilter))
             {
@@ -143,8 +146,17 @@ namespace OneRugbyNavi2
 
         public int GetCurrentDivisionItemCount()
         {
-            return _currentSource?.Count ?? 0;
+            return ShowFavoritesAcrossDivisions
+                ? ItemsDiv1.Count + ItemsDiv2.Count + ItemsDiv3.Count
+                : _currentSource?.Count ?? 0;
         }
+
+        public MatchItem? GetNextMatch(DateTime now)
+            => FilteredItems
+                .Where(match => !match.IsCompleted && !match.IsInProgress)
+                .Where(match => TryGetMatchStart(match, out var start) && start >= now)
+                .OrderBy(match => TryGetMatchStart(match, out var start) ? start : DateTime.MaxValue)
+                .FirstOrDefault();
 
         public int GetDivisionItemCount(int division)
         {
@@ -163,7 +175,10 @@ namespace OneRugbyNavi2
                 return new List<string> { "" };
             }
 
-            var teams = _currentSource
+            var source = ShowFavoritesAcrossDivisions
+                ? ItemsDiv1.Concat(ItemsDiv2).Concat(ItemsDiv3)
+                : _currentSource;
+            var teams = source
                 .SelectMany(m => new[] { m.HomeTeam, m.AwayTeam })
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .Distinct()
@@ -181,7 +196,10 @@ namespace OneRugbyNavi2
                 return new List<string> { "" };
             }
 
-            var venues = _currentSource
+            var source = ShowFavoritesAcrossDivisions
+                ? ItemsDiv1.Concat(ItemsDiv2).Concat(ItemsDiv3)
+                : _currentSource;
+            var venues = source
                 .Select(m => m.VenueCompact)
                 .Where(s => !string.IsNullOrWhiteSpace(s))
                 .Distinct()

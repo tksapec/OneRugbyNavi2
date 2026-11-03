@@ -79,7 +79,11 @@ public sealed class PlayerFiltersPage : ContentPage
         stack.Add(Labeled("所属区分", type));
         stack.Add(reset);
         stack.Add(submit);
-        Content = new ScrollView { Content = stack };
+        Content = PageStyles.WithBottomNavigation(
+            this,
+            new ScrollView { Content = stack },
+            BottomNavigationSection.Players,
+            isModal: true);
     }
 
     private static Picker CreatePicker(string title, string[] items, int index)

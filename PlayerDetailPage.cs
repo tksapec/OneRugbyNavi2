@@ -38,7 +38,11 @@ public sealed class PlayerDetailPage : ContentPage
         AddRepresentativeHistory(content, player);
         AddSources(content, player);
 
-        Content = new ScrollView { Content = content };
+        Content = PageStyles.WithBottomNavigation(
+            this,
+            new ScrollView { Content = content },
+            BottomNavigationSection.Players,
+            isModal: true);
     }
 
     private static void AddIdentity(VerticalStackLayout content, PlayerRecord player, string title)

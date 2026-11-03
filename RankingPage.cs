@@ -26,7 +26,7 @@ public sealed class RankingPage : ContentPage
                 : "公式ランキングを読み込めませんでした。通信状態を確認してください。";
         };
 
-        Content = new Grid
+        Content = PageStyles.WithBottomNavigation(this, new Grid
         {
             RowDefinitions = { new RowDefinition(GridLength.Auto), new RowDefinition(GridLength.Star) },
             Children =
@@ -36,13 +36,13 @@ public sealed class RankingPage : ContentPage
                     Spacing = 4,
                     Children =
                     {
-                        PageStyles.NavigationTitle(this, "公式ランキング"),
+                        PageStyles.NavigationTitle("公式ランキング"),
                         _status.Margin(new Thickness(16, 0, 16, 8))
                     }
                 },
                 _rankingView.Row(1)
             }
-        };
+        }, BottomNavigationSection.More);
     }
 
     protected override void OnAppearing()
