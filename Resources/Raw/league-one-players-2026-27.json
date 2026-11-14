@@ -113745,7 +113745,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "南アフリカ代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
@@ -113777,8 +113784,22 @@
             "currentTeamName",
             "positions"
           ]
+        },
+        {
+          "publisher": "栃木ホンダヒート（公式選手プロフィール）",
+          "url": "https://www.honda-heat.jp/member/2026/8750/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "representativeHistory"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1990-11-27",
+      "heightCm": 198,
+      "weightKg": 108
     },
     {
       "playerId": "rugbydb-131-1859",
@@ -114357,7 +114378,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
@@ -114396,6 +114424,14 @@
             "nameEn",
             "currentTeamName",
             "positions"
+          ]
+        },
+        {
+          "publisher": "ジャパンラグビー リーグワン（クラブ公式発表）",
+          "url": "https://league-one.jp/news/6210",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ]
