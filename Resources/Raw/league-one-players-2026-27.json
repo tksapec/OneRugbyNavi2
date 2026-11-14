@@ -15268,7 +15268,20 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ジュニア・ジャパン",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "U20日本代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -15320,6 +15333,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1321.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -15804,7 +15825,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U17日本代表",
+          "level": "U17",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -15848,6 +15876,14 @@
             "nameJa",
             "positions",
             "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1454.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -15997,8 +16033,9 @@
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
       "representativeHistory": [],
@@ -16062,11 +16099,20 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "weightKg",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "2000-10-27",
       "heightCm": 169,
-      "weightKg": 106
+      "weightKg": 103
     },
     {
       "playerId": "leagueone-126-1147",
@@ -16080,7 +16126,7 @@
         "梁正秀"
       ],
       "positions": [
-        "PR"
+        "HO"
       ],
       "schools": [
         "石見智翠館高校",
@@ -16169,6 +16215,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1147.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "positions"
+          ]
         }
       ],
       "birthDate": "1999-07-13",
@@ -16216,7 +16270,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U20日本代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -16260,6 +16321,14 @@
             "nameJa",
             "positions",
             "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1834.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -16306,12 +16375,6 @@
           "type": "club",
           "fromSeason": "",
           "toSeason": "2025-26"
-        },
-        {
-          "teamId": "126",
-          "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -16330,7 +16393,7 @@
         {
           "publisher": "浦安D-Rocks（選手公式プロフィール）",
           "url": "https://urayasu-d-rocks.com/team/player/detail_1883.html",
-          "checkedOn": "2026-10-12",
+          "checkedOn": "2026-11-15",
           "fields": [
             "schools",
             "teamHistory"
@@ -16363,8 +16426,21 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2001-07-01",
+      "heightCm": 183,
+      "weightKg": 110
     },
     {
       "playerId": "leagueone-126-1152",
@@ -16522,7 +16598,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U17日本代表",
+          "level": "U17",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -16567,6 +16650,14 @@
             "positions",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1455.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "2001-07-16",
@@ -16586,9 +16677,16 @@
         "LO"
       ],
       "schools": [
-        "セントポールズカトリックカレッジ"
+        "セントポールズ・カトリック高校"
       ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:セントポールズ・カトリック高校",
+          "teamName": "セントポールズ・カトリック高校",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
         {
           "teamId": "rugbydb:team:722",
           "teamName": "埼玉パナソニックワイルドナイツ",
@@ -16599,8 +16697,9 @@
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
       "representativeHistory": [],
@@ -16656,11 +16755,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "heightCm",
+            "weightKg",
+            "schools",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1999-04-21",
-      "heightCm": 198,
-      "weightKg": 120
+      "heightCm": 199,
+      "weightKg": 124
     },
     {
       "playerId": "leagueone-126-1754",
@@ -16916,7 +17026,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U20日本代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -16961,6 +17078,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1667.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -17206,7 +17331,26 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U17日本代表",
+          "level": "U17",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "高校日本代表",
+          "level": "高校",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "U20日本代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -17250,6 +17394,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1250.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -17397,7 +17549,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U17日本代表",
+          "level": "U17",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -17441,6 +17600,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1456.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -17546,8 +17713,17 @@
         "FL",
         "No.8"
       ],
-      "schools": [],
+      "schools": [
+        "Hastings Boys High School"
+      ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:Hastings Boys High School",
+          "teamName": "Hastings Boys High School",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
         {
           "teamId": "rugbydb:team:249",
           "teamName": "ハリケーンズ",
@@ -17603,6 +17779,15 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "schools",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1999-07-20",
@@ -17650,7 +17835,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U23日本代表",
+          "level": "U23",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -17694,6 +17886,14 @@
             "nameJa",
             "positions",
             "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1836.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -17740,12 +17940,6 @@
           "type": "highSchool",
           "fromSeason": "",
           "toSeason": ""
-        },
-        {
-          "teamId": "126",
-          "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -17764,10 +17958,13 @@
         {
           "publisher": "浦安D-Rocks（選手公式プロフィール）",
           "url": "https://urayasu-d-rocks.com/team/player/detail_1837.html",
-          "checkedOn": "2026-10-12",
+          "checkedOn": "2026-11-15",
           "fields": [
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "birthDate",
+            "heightCm",
+            "weightKg"
           ]
         },
         {
@@ -17792,7 +17989,10 @@
             "teamHistory"
           ]
         }
-      ]
+      ],
+      "birthDate": "2003-12-29",
+      "heightCm": 192,
+      "weightKg": 114
     },
     {
       "playerId": "leagueone-126-1755",
@@ -18035,7 +18235,20 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "南アフリカ代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "U20南アフリカ代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -18088,6 +18301,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1539.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -18246,7 +18467,26 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U17日本代表",
+          "level": "U17",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "U18日本代表",
+          "level": "U18",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "高校日本代表",
+          "level": "高校",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -18307,6 +18547,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1175.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "2000-02-08",
@@ -18354,7 +18602,20 @@
           "toSeason": "2026-27"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "高校日本代表",
+          "level": "高校",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "セブンズユース日本代表",
+          "level": "7人制ユース",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -18398,6 +18659,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1251.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -18535,7 +18804,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -18603,6 +18879,14 @@
           "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1180.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -18750,7 +19034,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ジュニア・ジャパン",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -18803,6 +19094,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1322.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1993-09-12",
@@ -18822,8 +19121,17 @@
         "SO",
         "FB"
       ],
-      "schools": [],
+      "schools": [
+        "Sunshine Coast Grammar School"
+      ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:Sunshine Coast Grammar School",
+          "teamName": "Sunshine Coast Grammar School",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
@@ -18863,6 +19171,15 @@
             "nameJa",
             "positions",
             "currentTeamName"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "schools",
+            "teamHistory"
           ]
         }
       ],
@@ -19003,7 +19320,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "7人制日本代表",
+          "level": "7人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -19048,6 +19372,14 @@
             "positions",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1194.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1997-10-01",
@@ -19064,7 +19396,8 @@
       "nameEn": "VINCE ASO",
       "aliases": [],
       "positions": [
-        "CTB"
+        "CTB",
+        "WTB"
       ],
       "schools": [
         "セントピーターズ高校",
@@ -19102,8 +19435,9 @@
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
       "representativeHistory": [],
@@ -19167,6 +19501,15 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "positions",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1995-01-05",
@@ -19205,7 +19548,14 @@
           "toSeason": "2026-27"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "7人制日本代表",
+          "level": "7人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -19249,6 +19599,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1189.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -19302,7 +19660,20 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "オーストラリア代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "7人制オーストラリア代表",
+          "level": "7人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -19355,6 +19726,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1323.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1993-09-27",
@@ -19399,7 +19778,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "日本代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -19499,6 +19885,14 @@
           "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1190.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -20001,7 +20395,8 @@
         "金秀隆"
       ],
       "positions": [
-        "WTB"
+        "WTB",
+        "FB"
       ],
       "schools": [
         "大阪朝鮮高校",
@@ -20032,8 +20427,9 @@
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
       "representativeHistory": [],
@@ -20097,11 +20493,21 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "weightKg",
+            "positions",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1998-01-16",
       "heightCm": 186,
-      "weightKg": 85
+      "weightKg": 86
     },
     {
       "playerId": "leagueone-126-1460",
@@ -20209,7 +20615,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -20254,6 +20667,14 @@
             "nameJa",
             "positions",
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1546.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -20308,7 +20729,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "7人制日本代表",
+          "level": "7人制フル代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -20353,6 +20781,14 @@
             "positions",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1186.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "2000-03-17",
@@ -20369,8 +20805,8 @@
       "nameEn": "JORDAN PETAIA",
       "aliases": [],
       "positions": [
-        "CTB",
         "FB",
+        "CTB",
         "WTB"
       ],
       "schools": [
@@ -20443,10 +20879,11 @@
         {
           "publisher": "浦安D-Rocks（選手公式プロフィール）",
           "url": "https://urayasu-d-rocks.com/team/player/detail_1889.html",
-          "checkedOn": "2026-10-12",
+          "checkedOn": "2026-11-15",
           "fields": [
             "schools",
-            "teamHistory"
+            "teamHistory",
+            "positions"
           ]
         }
       ],
@@ -20502,7 +20939,20 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "日本代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "ジュニア・ジャパン",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -20562,6 +21012,14 @@
           "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1197.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -20695,7 +21153,10 @@
         "土橋郁矢"
       ],
       "positions": [
-        "UBK"
+        "UBK",
+        "SO",
+        "FB",
+        "WTB"
       ],
       "schools": [
         "黒沢尻工業",
@@ -20719,8 +21180,9 @@
         {
           "teamId": "126",
           "teamName": "浦安D-Rocks",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
       "representativeHistory": [],
@@ -20776,11 +21238,21 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "浦安D-Rocks（2026-27新加入選手発表）",
+          "url": "https://urayasu-d-rocks.com/news/team/index_1980.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "weightKg",
+            "positions",
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "2001-02-13",
       "heightCm": 181,
-      "weightKg": 85
+      "weightKg": 87
     },
     {
       "playerId": "leagueone-126-1540",
@@ -20828,7 +21300,20 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "U20ニュージーランド代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "U20サモア代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "浦安D-Rocks",
@@ -20889,6 +21374,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "浦安D-Rocks（公式選手プロフィール）",
+          "url": "https://urayasu-d-rocks.com/team/player/detail_1540.html",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
