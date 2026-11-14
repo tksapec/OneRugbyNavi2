@@ -15715,6 +15715,20 @@
           "type": "club",
           "fromSeason": "2022-23",
           "toSeason": ""
+        },
+        {
+          "teamId": "rugbydb:team:252",
+          "teamName": "ハイランダーズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:otago",
+          "teamName": "オタゴ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -15775,6 +15789,14 @@
           "publisher": "JAPAN RUGBY LEAGUE ONE",
           "url": "https://league-one.jp/match/22549/print",
           "checkedOn": "2026-10-12",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/sekonaia-j-pole",
+          "checkedOn": "2026-11-15",
           "fields": [
             "teamHistory"
           ]
@@ -17485,6 +17507,27 @@
           "fromSeason": "2025-26",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "rugbydb:team:252",
+          "teamName": "ハイランダーズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:southland",
+          "teamName": "サウスランド",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:bay-of-plenty",
+          "teamName": "ベイ・オブ・プレンティ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -17538,6 +17581,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/manaaki-w-h-selby-rickit",
+          "checkedOn": "2026-11-15",
           "fields": [
             "teamHistory"
           ]
@@ -17782,6 +17833,13 @@
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "external:hawkes-bay",
+          "teamName": "ホークスベイ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -17831,6 +17889,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "schools",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Hurricanes",
+          "url": "https://www.hurricanes.co.nz/news/article/devan-flanders-to-depart-hurricanes-following-2026-super-rugby-pacific-season",
+          "checkedOn": "2026-11-15",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -20798,6 +20864,20 @@
           "type": "club",
           "fromSeason": "2024-25",
           "toSeason": ""
+        },
+        {
+          "teamId": "external:waikato",
+          "teamName": "ワイカト",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:king-country",
+          "teamName": "キング・カントリー",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [
@@ -20860,6 +20940,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/tana-tuhakaraina",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
