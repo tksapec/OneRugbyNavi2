@@ -60686,7 +60686,20 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "日本U20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "ジュニア・ジャパン",
+          "level": "日本選抜",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
@@ -60738,6 +60751,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2025/07/22/20250721_newmember/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -61553,7 +61574,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "日本U20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
@@ -61621,6 +61649,14 @@
           "checkedOn": "2026-10-12",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2025/07/22/20250721_newmember/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -61728,7 +61764,9 @@
       "nameEn": "Ryno Pieterse",
       "aliases": [],
       "positions": [
-        "LO"
+        "LO",
+        "FL",
+        "No.8"
       ],
       "schools": [
         "ホエルスクール・ガルスフォンテン"
@@ -61801,6 +61839,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2025/07/22/20250721_newmember/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "positions"
           ]
         }
       ],
@@ -63542,7 +63588,8 @@
         "吉本大悟"
       ],
       "positions": [
-        "SO"
+        "SO",
+        "CTB"
       ],
       "schools": [
         "東海大学付属大阪仰星高校",
@@ -63629,7 +63676,8 @@
           "url": "https://hanazono-liners.jp/2026/01/27/new-player-announcement/",
           "checkedOn": "2026-11-15",
           "fields": [
-            "representativeHistory"
+            "representativeHistory",
+            "positions"
           ]
         }
       ],
