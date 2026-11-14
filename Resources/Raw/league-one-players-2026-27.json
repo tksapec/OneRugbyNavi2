@@ -16375,6 +16375,20 @@
           "type": "club",
           "fromSeason": "",
           "toSeason": "2025-26"
+        },
+        {
+          "teamId": "rugbydb:team:251",
+          "teamName": "ブルーズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:auckland",
+          "teamName": "オークランド",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -16435,6 +16449,22 @@
             "birthDate",
             "heightCm",
             "weightKg"
+          ]
+        },
+        {
+          "publisher": "Highlanders",
+          "url": "https://thehighlanders.co.nz/news/highlanders-confirm-five-players-for-2025new-blog-post/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/soane-m-vikena",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
@@ -16801,6 +16831,13 @@
           "fromSeason": "2025-26",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "external:tasman-mako",
+          "teamName": "タスマン・マコ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -16853,6 +16890,14 @@
           "publisher": "RUGBY DATABASE",
           "url": "https://rugbydb.tokyo/list/transfer25.html",
           "checkedOn": "2026-10-10",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/quinten-j-strange",
+          "checkedOn": "2026-11-15",
           "fields": [
             "teamHistory"
           ]
@@ -18135,6 +18180,27 @@
           "type": "club",
           "fromSeason": "2023-24",
           "toSeason": ""
+        },
+        {
+          "teamId": "external:perth-spirit",
+          "teamName": "パース・スピリッツ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:western-force",
+          "teamName": "ウェスタン・フォース",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -18190,6 +18256,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "J SPORTS",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20300/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
+          ]
         }
       ],
       "birthDate": "1999-10-27",
@@ -18232,6 +18306,13 @@
           "teamName": "浦安D-Rocks",
           "type": "club",
           "fromSeason": "2024-25",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:cheetahs",
+          "teamName": "チーターズ",
+          "type": "club",
+          "fromSeason": "",
           "toSeason": ""
         }
       ],
@@ -18309,6 +18390,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "BBC Sport",
+          "url": "https://www.bbc.co.uk/sport/rugby-union/53514172",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
@@ -18802,6 +18891,27 @@
           "type": "club",
           "fromSeason": "2022-23",
           "toSeason": ""
+        },
+        {
+          "teamId": "rugbydb:team:249",
+          "teamName": "ハリケーンズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:manawatu",
+          "teamName": "マナワツ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:bay-of-plenty",
+          "teamName": "ベイ・オブ・プレンティ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [
@@ -18887,6 +18997,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/otere-black",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
@@ -19138,6 +19256,13 @@
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "external:brothers-rugby-club",
+          "teamName": "Brothers Rugby Club",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -19438,6 +19563,13 @@
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "external:auckland",
+          "teamName": "オークランド",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -19508,6 +19640,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Hurricanes",
+          "url": "https://www.hurricanes.co.nz/news/article/meet-the-player-vince-aso",
+          "checkedOn": "2026-11-15",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -19658,6 +19798,20 @@
           "type": "club",
           "fromSeason": "2023-24",
           "toSeason": ""
+        },
+        {
+          "teamId": "rugbydb:team:254",
+          "teamName": "レッズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:brisbane-city",
+          "teamName": "ブリスベン・シティ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [
@@ -19733,6 +19887,22 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "Australian Olympic Committee",
+          "url": "https://www.olympics.com.au/olympians/samu-kerevi/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Queensland Rugby",
+          "url": "https://qld.rugby/news/2019/06/20/samu-kerevi-re-signs-with-st-george-queensland-reds-for-2019",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
@@ -20021,6 +20191,13 @@
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "external:nrl-newcastle-knights",
+          "teamName": "ニューカッスル・ナイツ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -20062,6 +20239,14 @@
           "checkedOn": "2026-10-12",
           "fields": [
             "schools",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Newcastle Knights",
+          "url": "https://www.newcastleknights.com.au/news/2025/05/09/marcus-dacre-signs/",
+          "checkedOn": "2026-11-15",
+          "fields": [
             "teamHistory"
           ]
         }
@@ -20833,6 +21018,13 @@
           "fromSeason": "2026-27",
           "toSeason": "",
           "type": "club"
+        },
+        {
+          "teamId": "rugbydb:team:254",
+          "teamName": "レッズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [],
@@ -20884,6 +21076,14 @@
             "schools",
             "teamHistory",
             "positions"
+          ]
+        },
+        {
+          "publisher": "Queensland Rugby",
+          "url": "https://qld.rugby/news/queensland-reds-farewell-jordan-petaia-as-nfl-pathway-beckons-2024122",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
@@ -21298,6 +21498,13 @@
           "type": "club",
           "fromSeason": "2024-25",
           "toSeason": ""
+        },
+        {
+          "teamId": "rugbydb:team:719",
+          "teamName": "NTTコミュニケーションズシャイニングアークス東京ベイ浦安",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
         }
       ],
       "representativeHistory": [
@@ -21382,6 +21589,14 @@
           "checkedOn": "2026-11-15",
           "fields": [
             "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "J SPORTS",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20311/?webview=1",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
           ]
         }
       ],
