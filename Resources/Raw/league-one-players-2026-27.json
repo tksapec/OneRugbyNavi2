@@ -6099,7 +6099,7 @@
         "土屋英慈"
       ],
       "positions": [
-        "プロップ"
+        "PR"
       ],
       "schools": [
         "流通経済大学柏高校",
@@ -6170,8 +6170,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6047",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2003-07-22",
+      "heightCm": 176,
+      "weightKg": 105
     },
     {
       "playerId": "leagueone-124-13784",
@@ -7083,7 +7097,8 @@
       "nameEn": "MAX DOUGLAS",
       "aliases": [],
       "positions": [
-        "ロック/フランカー"
+        "LO",
+        "FL"
       ],
       "schools": [],
       "teamHistory": [
@@ -7172,8 +7187,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6047",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2000-01-01",
+      "heightCm": 201,
+      "weightKg": 115
     },
     {
       "playerId": "leagueone-124-13716",
@@ -7185,7 +7214,7 @@
       "nameEn": "ANTONIO SHALFOON",
       "aliases": [],
       "positions": [
-        "ロック"
+        "LO"
       ],
       "schools": [
         "Lincoln High School",
@@ -7256,8 +7285,22 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6047",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1997-08-10",
+      "heightCm": 199,
+      "weightKg": 120
     },
     {
       "playerId": "leagueone-124-13717",
@@ -9032,7 +9075,8 @@
       "nameEn": "AKI TUIVAILALA",
       "aliases": [],
       "positions": [
-        "センター/ウイング"
+        "CTB",
+        "WTB"
       ],
       "schools": [
         "Hamilton Boys’ High School"
@@ -9053,7 +9097,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "静岡ブルーレヴズ",
@@ -9102,8 +9153,22 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6047",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2004-09-24",
+      "heightCm": 186,
+      "weightKg": 98
     },
     {
       "playerId": "leagueone-124-13738",
@@ -9115,7 +9180,7 @@
       "nameEn": "HUNTER PAISAMI",
       "aliases": [],
       "positions": [
-        "センター"
+        "CTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -9134,7 +9199,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "オーストラリア代表",
+          "level": "15人制フル代表",
+          "caps": 35,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "静岡ブルーレヴズ",
@@ -9174,8 +9246,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6071",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1998-04-10",
+      "heightCm": 177,
+      "weightKg": 100
     },
     {
       "playerId": "leagueone-124-13739",
@@ -11979,7 +12065,7 @@
         "エド・カスプロウィッツ"
       ],
       "positions": [
-        "LO ロック"
+        "LO"
       ],
       "schools": [
         "セントジョセフ・ナッジー高校",
@@ -12049,8 +12135,22 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6079",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2007-01-18",
+      "heightCm": 203,
+      "weightKg": 105
     },
     {
       "playerId": "leagueone-125-iino.html",
@@ -13381,7 +13481,7 @@
         "齋藤直人"
       ],
       "positions": [
-        "SH スクラムハーフ"
+        "SH"
       ],
       "schools": [
         "桐蔭学園高校",
@@ -13488,8 +13588,22 @@
           "fields": [
             "representativeHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6033",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1997-08-26",
+      "heightCm": 165,
+      "weightKg": 73
     },
     {
       "playerId": "leagueone-125-takamoto.html",
@@ -14147,7 +14261,8 @@
         "ジャームズ・ロウ"
       ],
       "positions": [
-        "WTB ウイング"
+        "WTB",
+        "FB"
       ],
       "schools": [
         "ネルソン・カレッジ",
@@ -14183,7 +14298,20 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "アイルランド代表",
+          "level": "15人制フル代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "東京サントリーサンゴリアス",
@@ -14233,8 +14361,22 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6079",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1992-07-08",
+      "heightCm": 188,
+      "weightKg": 101
     },
     {
       "playerId": "leagueone-125-nakano_s.html",
@@ -17401,7 +17543,8 @@
       "nameEn": "DEVAN FLANDERS",
       "aliases": [],
       "positions": [
-        "FL"
+        "FL",
+        "No.8"
       ],
       "schools": [],
       "teamHistory": [
@@ -17461,7 +17604,10 @@
             "teamHistory"
           ]
         }
-      ]
+      ],
+      "birthDate": "1999-07-20",
+      "heightCm": 192,
+      "weightKg": 110
     },
     {
       "playerId": "leagueone-126-1836",
@@ -18673,7 +18819,8 @@
       "nameEn": "FINN PRASS",
       "aliases": [],
       "positions": [
-        "SO"
+        "SO",
+        "FB"
       ],
       "schools": [],
       "teamHistory": [
@@ -18718,7 +18865,10 @@
             "currentTeamName"
           ]
         }
-      ]
+      ],
+      "birthDate": "2005-02-17",
+      "heightCm": 196,
+      "weightKg": 100
     },
     {
       "playerId": "leagueone-126-1458",
@@ -19521,7 +19671,10 @@
             "teamHistory"
           ]
         }
-      ]
+      ],
+      "birthDate": "2004-07-20",
+      "heightCm": 195,
+      "weightKg": 98
     },
     {
       "playerId": "leagueone-126-1669",
@@ -20216,7 +20369,9 @@
       "nameEn": "JORDAN PETAIA",
       "aliases": [],
       "positions": [
-        "FB"
+        "CTB",
+        "FB",
+        "WTB"
       ],
       "schools": [
         "ブリスベン・ステート高校"
@@ -20294,7 +20449,10 @@
             "teamHistory"
           ]
         }
-      ]
+      ],
+      "birthDate": "2000-03-14",
+      "heightCm": 193,
+      "weightKg": 100
     },
     {
       "playerId": "leagueone-126-1197",
@@ -22232,7 +22390,8 @@
         "Matthew Dalton"
       ],
       "positions": [
-        "ロック"
+        "LO",
+        "FL"
       ],
       "schools": [],
       "teamHistory": [
@@ -22288,8 +22447,20 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6078",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "heightCm": 200,
+      "weightKg": 116
     },
     {
       "playerId": "leagueone-127-takuma_motohashi",
@@ -23462,7 +23633,8 @@
       "nameEn": "Grant Williams",
       "aliases": [],
       "positions": [
-        "スクラムハーフ"
+        "SH",
+        "WTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -23481,7 +23653,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "南アフリカ代表",
+          "level": "15人制フル代表",
+          "caps": 28,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "コベルコ神戸スティーラーズ",
@@ -23521,8 +23700,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6023",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1996-07-22",
+      "heightCm": 174,
+      "weightKg": 80
     },
     {
       "playerId": "leagueone-127-itsuki_kamimura",
@@ -23921,7 +24114,8 @@
       "nameEn": "George Bridge",
       "aliases": [],
       "positions": [
-        "センター"
+        "CTB",
+        "WTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -23940,7 +24134,20 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランド代表",
+          "level": "15人制フル代表",
+          "caps": 19,
+          "seasons": []
+        },
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "コベルコ神戸スティーラーズ",
@@ -23980,8 +24187,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6023",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1995-04-01",
+      "heightCm": 186,
+      "weightKg": 96
     },
     {
       "playerId": "leagueone-127-talilotu_fakatulolo",
@@ -29381,7 +29602,14 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "オーストラリアU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "埼玉パナソニックワイルドナイツ",
@@ -29422,8 +29650,21 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6044",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2005-09-20",
+      "heightCm": 183,
+      "weightKg": 101
     },
     {
       "playerId": "leagueone-128-takeyama_koki",
@@ -29861,8 +30102,21 @@
             "schools",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6044",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2005-02-19",
+      "heightCm": 179,
+      "weightKg": 88
     },
     {
       "playerId": "leagueone-128-taniguchi_yoshiaki",
@@ -30075,7 +30329,7 @@
       "nameEn": "ATUNAISA MOLI",
       "aliases": [],
       "positions": [
-        "プロップ"
+        "PR"
       ],
       "schools": [],
       "teamHistory": [
@@ -32404,7 +32658,7 @@
       "nameEn": "JACK DEMPSEY",
       "aliases": [],
       "positions": [
-        "フランカー"
+        "FL"
       ],
       "schools": [],
       "teamHistory": [
@@ -34195,7 +34449,7 @@
       "nameEn": "DAVID HAVILI",
       "aliases": [],
       "positions": [
-        "センター"
+        "CTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -35658,7 +35912,7 @@
       "nameEn": "APHELELE FASSI",
       "aliases": [],
       "positions": [
-        "フルバック"
+        "FB"
       ],
       "schools": [],
       "teamHistory": [
@@ -44734,7 +44988,14 @@
           "toSeason": "2025-26"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "南アフリカ代表",
+          "level": "15人制フル代表",
+          "caps": 30,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "三菱重工相模原ダイナボアーズ",
@@ -44789,6 +45050,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6049",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ]
@@ -46152,7 +46421,7 @@
         "俵啓斗"
       ],
       "positions": [
-        "FW/PR"
+        "PR"
       ],
       "schools": [
         "函館工業高校",
@@ -46230,8 +46499,22 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2002-02-13",
+      "heightCm": 178,
+      "weightKg": 112
     },
     {
       "playerId": "leagueone-133-kazuki_kurizaki.html",
@@ -47035,7 +47318,7 @@
       "nameEn": "Laghlan McWhannell",
       "aliases": [],
       "positions": [
-        "FW/LO"
+        "LO"
       ],
       "schools": [],
       "teamHistory": [
@@ -47109,8 +47392,22 @@
           "fields": [
             "representativeHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1998-10-20",
+      "heightCm": 198,
+      "weightKg": 114
     },
     {
       "playerId": "leagueone-133-katsuto_kubo.html",
@@ -47442,7 +47739,9 @@
       "nameEn": "Samipeni Finau",
       "aliases": [],
       "positions": [
-        "FW/LO_FL_NO8"
+        "LO",
+        "FL",
+        "No.8"
       ],
       "schools": [],
       "teamHistory": [
@@ -47481,8 +47780,22 @@
           "fields": [
             "representativeHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1999-05-10",
+      "heightCm": 193,
+      "weightKg": 115
     },
     {
       "playerId": "leagueone-133-gerrit_ockerse.html",
@@ -47562,7 +47875,9 @@
       "nameEn": "Gage Jackson",
       "aliases": [],
       "positions": [
-        "FW/LO_FL_NO8"
+        "LO",
+        "FL",
+        "No.8"
       ],
       "schools": [],
       "teamHistory": [
@@ -47606,8 +47921,22 @@
             "positions",
             "currentTeamName"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2003-04-11",
+      "heightCm": 194,
+      "weightKg": 109
     },
     {
       "playerId": "leagueone-133-randall_baker.html",
@@ -48548,7 +48877,8 @@
       "nameEn": "Stephen Perofeta",
       "aliases": [],
       "positions": [
-        "BK/SO"
+        "SO",
+        "FB"
       ],
       "schools": [],
       "teamHistory": [
@@ -48622,8 +48952,22 @@
           "fields": [
             "representativeHistory"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1997-03-12",
+      "heightCm": 181,
+      "weightKg": 85
     },
     {
       "playerId": "leagueone-133-yuragi_muto.html",
@@ -115983,7 +116327,8 @@
         "ジャック・ボーエン"
       ],
       "positions": [
-        "SO"
+        "SO",
+        "FB"
       ],
       "schools": [],
       "teamHistory": [
@@ -116001,7 +116346,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "オーストラリアU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "RUGBY DATABASE（独立系二次データベース）",
@@ -116041,8 +116393,22 @@
             "currentTeamName",
             "positions"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6123",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2003-12-30",
+      "heightCm": 178,
+      "weightKg": 90
     },
     {
       "playerId": "rugbydb-134-4536",
@@ -116297,6 +116663,7 @@
       "nameEn": "",
       "aliases": [],
       "positions": [
+        "SO",
         "FB"
       ],
       "schools": [],
@@ -116355,8 +116722,22 @@
             "currentTeamName",
             "positions"
           ]
+        },
+        {
+          "publisher": "リーグワン・クラブ公式発表",
+          "url": "https://league-one.jp/news/6081",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1996-09-23",
+      "heightCm": 192,
+      "weightKg": 97
     },
     {
       "playerId": "rugbydb-135-4567",
@@ -126354,7 +126735,8 @@
       "nameEn": "",
       "aliases": [],
       "positions": [
-        "CTB / WTB"
+        "CTB",
+        "WTB"
       ],
       "schools": [],
       "teamHistory": [
@@ -126555,7 +126937,14 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "JAPAN RUGBY LEAGUE ONE",
