@@ -127412,6 +127412,73 @@
           ]
         }
       ]
+    },
+    {
+      "playerId": "leagueone-133-kurt-eklund",
+      "leagueOnePlayerId": "",
+      "currentTeamId": "133",
+      "currentTeamName": "横浜キヤノンイーグルス",
+      "division": "DIV1",
+      "nameJa": "カート・エクランド",
+      "nameEn": "Kurt Eklund",
+      "aliases": [
+        "カートエクランド"
+      ],
+      "positions": [
+        "HO"
+      ],
+      "birthDate": "1992-01-05",
+      "heightCm": 176,
+      "weightKg": 100,
+      "schools": [],
+      "teamHistory": [
+        {
+          "teamId": "external:blues",
+          "teamName": "ブルーズ",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": "2025-26"
+        },
+        {
+          "teamId": "133",
+          "teamName": "横浜キヤノンイーグルス",
+          "type": "club",
+          "fromSeason": "2026-27",
+          "toSeason": ""
+        }
+      ],
+      "representativeHistory": [
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        },
+        {
+          "teamName": "All Blacks XV",
+          "level": "選抜代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
+      "sources": [
+        {
+          "publisher": "ジャパンラグビー リーグワン（横浜キヤノンイーグルス発表）",
+          "url": "https://league-one.jp/news/6040",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "nameJa",
+            "nameEn",
+            "currentTeamName",
+            "positions",
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "teamHistory",
+            "representativeHistory"
+          ]
+        }
+      ]
     }
   ]
 }
