@@ -59949,7 +59949,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60034,7 +60034,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60126,7 +60126,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60209,7 +60209,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60301,7 +60301,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60400,7 +60400,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60500,7 +60500,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60592,7 +60592,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60691,7 +60691,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60791,7 +60791,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60883,7 +60883,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -60975,7 +60975,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61067,7 +61067,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61159,7 +61159,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61236,12 +61236,19 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "日本代表",
+          "level": "15人制フル代表",
+          "caps": 10,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61289,6 +61296,14 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "日本ラグビーフットボール協会",
+          "url": "https://www.rugby-japan.jp/japan/member/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1995-07-17",
@@ -61332,7 +61347,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61421,7 +61436,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61543,7 +61558,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61649,7 +61664,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61739,7 +61754,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61826,16 +61841,43 @@
         {
           "teamId": "140",
           "teamName": "花園近鉄ライナーズ",
-          "fromSeason": "",
-          "toSeason": ""
+          "fromSeason": "2026-27",
+          "toSeason": "",
+          "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "ニュージーランド選抜",
+          "caps": null,
+          "seasons": [
+            "2021",
+            "2022"
+          ]
+        },
+        {
+          "teamName": "All Blacks XV",
+          "level": "ニュージーランド選抜",
+          "caps": null,
+          "seasons": [
+            "2022"
+          ]
+        },
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": [
+            "2014"
+          ]
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -61891,6 +61933,23 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2026/07/13/news-newmember/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "NZ Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/joshua-m-dickson",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory",
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1994-11-02",
@@ -61943,7 +62002,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62035,7 +62094,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62134,7 +62193,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62236,12 +62295,21 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "オーストラリアU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": [
+            "2018"
+          ]
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62281,6 +62349,14 @@
             "positions",
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "J SPORTS",
+          "url": "https://www.jsports.co.jp/rugby/league-one/player/20665/?webview=1",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "1999-07-19",
@@ -62316,7 +62392,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62408,7 +62484,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62500,7 +62576,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62585,7 +62661,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62677,7 +62753,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62764,12 +62840,19 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "高校日本代表",
+          "level": "高校日本代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62809,6 +62892,14 @@
             "positions",
             "currentTeamName"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2026/01/27/new-player-announcement/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "2003-04-10",
@@ -62846,12 +62937,43 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランド代表 (All Blacks)",
+          "level": "15人制フル代表",
+          "caps": 21,
+          "seasons": [
+            "2020",
+            "2021",
+            "2022"
+          ]
+        },
+        {
+          "teamName": "マオリ・オールブラックス",
+          "level": "ニュージーランド選抜",
+          "caps": null,
+          "seasons": [
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019"
+          ]
+        },
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": [
+            "2015"
+          ]
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -62898,6 +63020,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "New Zealand Rugby（All Blacks公式統計）",
+          "url": "https://stats.allblacks.com/all-players/profile/Akira-Ioane-AB-1166",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -62951,7 +63081,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63043,7 +63173,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63135,7 +63265,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63234,7 +63364,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63320,12 +63450,25 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "南アフリカ代表 (Springboks)",
+          "level": "15人制フル代表",
+          "caps": 34,
+          "seasons": []
+        },
+        {
+          "teamName": "南アフリカU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63372,6 +63515,14 @@
           "checkedOn": "2026-10-10",
           "fields": [
             "teamHistory"
+          ]
+        },
+        {
+          "publisher": "SA Rugby（南アフリカラグビー協会）",
+          "url": "https://springboks.rugby/sa-teams-players/springboks/manie-libbok",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
           ]
         }
       ],
@@ -63420,12 +63571,19 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "高校日本代表",
+          "level": "高校日本代表",
+          "caps": null,
+          "seasons": []
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63465,6 +63623,14 @@
             "positions",
             "currentTeamName"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2026/01/27/new-player-announcement/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
       ],
       "birthDate": "2004-03-25",
@@ -63479,12 +63645,59 @@
       "division": "DIV2",
       "nameJa": "ジョニー・マクフィリップス",
       "nameEn": "Johnny McPhillips",
-      "aliases": [],
+      "aliases": [
+        "ジョニーマクフィリップス",
+        "John McPhillips"
+      ],
       "positions": [
         "SO"
       ],
-      "schools": [],
+      "schools": [
+        "セドバーグ・スクール"
+      ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:セドバーグ・スクール",
+          "teamName": "セドバーグ・スクール",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:ulster-rugby",
+          "teamName": "アルスター・ラグビー",
+          "type": "club",
+          "fromSeason": "2017-18",
+          "toSeason": "2018-19"
+        },
+        {
+          "teamId": "external:leicester-tigers",
+          "teamName": "レスター・タイガース",
+          "type": "club",
+          "fromSeason": "2019-20",
+          "toSeason": "2020-21"
+        },
+        {
+          "teamId": "external:us-carcassonne",
+          "teamName": "USカルカソンヌ",
+          "type": "club",
+          "fromSeason": "2021-22",
+          "toSeason": "2021-22"
+        },
+        {
+          "teamId": "external:provence-rugby",
+          "teamName": "プロヴァンス・ラグビー",
+          "type": "club",
+          "fromSeason": "2022-23",
+          "toSeason": "2023-24"
+        },
+        {
+          "teamId": "external:us-carcassonne",
+          "teamName": "USカルカソンヌ",
+          "type": "club",
+          "fromSeason": "2024-25",
+          "toSeason": "2025-26"
+        },
         {
           "teamId": "140",
           "teamName": "花園近鉄ライナーズ",
@@ -63493,12 +63706,30 @@
           "type": "club"
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "アイルランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": [
+            "2016",
+            "2017"
+          ]
+        },
+        {
+          "teamName": "イングランドU18代表",
+          "level": "U18",
+          "caps": null,
+          "seasons": [
+            "2015"
+          ]
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63525,8 +63756,49 @@
             "positions",
             "currentTeamName"
           ]
+        },
+        {
+          "publisher": "プロヴァンス・ラグビー",
+          "url": "https://www.provencerugby.com/officiel-johnny-mcphillips-renfort-de-choix-a-louverture/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/2026/07/13/news-newmember/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions",
+            "representativeHistory",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "USカルカソンヌ",
+          "url": "https://www.uscarcassonne.com/2024/08/30/welcome-back-johnny/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "Rugby World（本人インタビュー）",
+          "url": "https://www.rugbyworld.com/in-the-mag/hotshots/hotshot-ulster-fly-half-johnny-mcphillips-76245",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "schools",
+            "representativeHistory"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1997-03-13",
+      "heightCm": 182,
+      "weightKg": 87
     },
     {
       "playerId": "leagueone-140-12_patrick_stehlin",
@@ -63567,7 +63839,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63659,7 +63931,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63751,7 +64023,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63828,12 +64100,29 @@
           "toSeason": ""
         }
       ],
-      "representativeHistory": [],
+      "representativeHistory": [
+        {
+          "teamName": "ニュージーランド代表 (All Blacks)",
+          "level": "15人制フル代表",
+          "caps": 1,
+          "seasons": [
+            "2020"
+          ]
+        },
+        {
+          "teamName": "ニュージーランドU20代表",
+          "level": "U20",
+          "caps": null,
+          "seasons": [
+            "2016"
+          ]
+        }
+      ],
       "sources": [
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -63868,8 +64157,30 @@
           "fields": [
             "teamHistory"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://hanazono-liners.jp/members/peter_umaga_jensen/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions"
+          ]
+        },
+        {
+          "publisher": "NZ Rugby History",
+          "url": "https://www.rugbyhistory.co.nz/player/peter-umaga-jensen",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "representativeHistory"
+          ]
         }
-      ]
+      ],
+      "birthDate": "1997-12-31",
+      "heightCm": 187,
+      "weightKg": 106
     },
     {
       "playerId": "leagueone-140-burger_odendaal",
@@ -63929,7 +64240,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64007,12 +64318,38 @@
       "division": "DIV2",
       "nameJa": "ヴィリアミ・ヴァイレア",
       "nameEn": "Viliami Vailea",
-      "aliases": [],
-      "positions": [
-        "CTB"
+      "aliases": [
+        "ヴィリアミヴァイレア"
       ],
-      "schools": [],
+      "positions": [
+        "CTB",
+        "WTB"
+      ],
+      "schools": [
+        "アオレレ・カレッジ"
+      ],
       "teamHistory": [
+        {
+          "teamId": "highSchool:アオレレ・カレッジ",
+          "teamName": "アオレレ・カレッジ",
+          "type": "highSchool",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:nrl-warriors",
+          "teamName": "ニュージーランド・ウォリアーズ (13人制NRL、2021〜2023年)",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
+        {
+          "teamId": "external:nrl-cowboys",
+          "teamName": "ノースクイーンズランド・カウボーイズ (13人制NRL、2024〜2026年)",
+          "type": "club",
+          "fromSeason": "",
+          "toSeason": ""
+        },
         {
           "teamId": "140",
           "teamName": "花園近鉄ライナーズ",
@@ -64026,7 +64363,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64053,8 +64390,35 @@
             "positions",
             "currentTeamName"
           ]
+        },
+        {
+          "publisher": "花園近鉄ライナーズ",
+          "url": "https://league-one.jp/news/6166",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "birthDate",
+            "heightCm",
+            "weightKg",
+            "positions",
+            "teamHistory"
+          ]
+        },
+        {
+          "publisher": "ノースクイーンズランド・カウボーイズ（NRL）",
+          "url": "https://www.cowboys.com.au/teams/nrl-premiership/north-queensland-cowboys/viliami-vailea/",
+          "checkedOn": "2026-11-15",
+          "fields": [
+            "schools",
+            "teamHistory",
+            "birthDate",
+            "heightCm",
+            "weightKg"
+          ]
         }
-      ]
+      ],
+      "birthDate": "2002-11-17",
+      "heightCm": 185,
+      "weightKg": 98
     },
     {
       "playerId": "leagueone-140-48_ren_takano",
@@ -64102,7 +64466,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64197,7 +64561,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64289,7 +64653,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64381,7 +64745,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64466,7 +64830,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64558,7 +64922,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64657,7 +65021,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
@@ -64746,7 +65110,7 @@
         {
           "publisher": "花園近鉄ライナーズ",
           "url": "https://hanazono-liners.jp/members/",
-          "checkedOn": "2026-10-08",
+          "checkedOn": "2026-11-15",
           "fields": [
             "nameJa",
             "nameEn",
