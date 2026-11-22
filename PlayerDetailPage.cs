@@ -63,7 +63,7 @@ public sealed class PlayerDetailPage : ContentPage
         };
         var team = new Label
         {
-            Text = $"{player.CurrentTeamName} · {player.Division}",
+            Text = $"{player.CurrentTeamDisplayName} · {player.Division}",
             FontSize = 15,
             FontAttributes = FontAttributes.Bold,
             TextColor = PageStyles.Blue

@@ -48,8 +48,11 @@ namespace OneRugbyNavi2
         public MainPage()
         {
             InitializeComponent();
-            bottomNavigationHost.Content = PageStyles.CreateBottomNavigation(
+            var scheduleLayout = Content;
+            Content = null;
+            Content = PageStyles.WithBottomNavigation(
                 this,
+                scheduleLayout,
                 BottomNavigationSection.Schedule,
                 moreAction: OnInfoMenuAsync);
 #if ANDROID

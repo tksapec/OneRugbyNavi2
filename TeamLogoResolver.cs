@@ -14,7 +14,7 @@ namespace OneRugbyNavi2
             ["コベルコ神戸スティーラーズ"] = "127",
             ["埼玉パナソニックワイルドナイツ"] = "128",
             ["埼玉ワイルドナイツ"] = "128",
-            ["静岡ブルーレヴズ"] = "124",
+            [SeasonCatalog.CurrentShizuokaTeamName] = "124",
             ["東京サントリーサンゴリアス"] = "125",
             ["東京サンゴリアス"] = "125",
             ["東芝ブレイブルーパス武蔵"] = "129",
@@ -58,6 +58,7 @@ namespace OneRugbyNavi2
 
         private static readonly Dictionary<string, string> CurrentSeasonLogos = new()
         {
+            [SeasonCatalog.CurrentShizuokaTeamName] = "shizuoka_blue_revs.png",
             ["埼玉パナソニックワイルドナイツ"] = "saitama_panasonic_wild_knights_2026.png",
             ["東京サントリーサンゴリアス"] = "tokyo_suntory_sungoliath_2026.png",
             ["東芝ブレイブルーパス武蔵"] = "toshiba_brave_lupus_musashi_2026.png",
@@ -114,14 +115,25 @@ namespace OneRugbyNavi2
             var name = teamName.Trim();
             if (seasonStartYear >= 2026)
             {
-                if (CurrentLeagueOneTeamIds.TryGetValue(name, out var teamId))
+                var canonicalName = GetCurrentLogoName(name);
+                if (CurrentLeagueOneTeamIds.TryGetValue(canonicalName, out var teamId))
                 {
                     var currentLogo = ImageAssetCache.GetCachedPath(teamId);
                     if (!string.IsNullOrWhiteSpace(currentLogo)) return currentLogo;
                 }
+            }
 
+            return GetBundledLogoPath(name, seasonStartYear);
+        }
+
+        internal static string? GetBundledLogoPath(string? teamName, int seasonStartYear)
+        {
+            if (string.IsNullOrWhiteSpace(teamName)) return null;
+            var name = teamName.Trim();
+            if (seasonStartYear >= 2026)
+            {
+                name = GetCurrentLogoName(name);
                 if (CurrentSeasonLogos.TryGetValue(name, out var currentSeasonLogo)) return currentSeasonLogo;
-
                 if (ChangedOrRenamedCurrentNames.Contains(name)) return null;
             }
 
@@ -129,6 +141,9 @@ namespace OneRugbyNavi2
                 ? fileName
                 : null;
         }
+
+        private static string GetCurrentLogoName(string name)
+            => SeasonCatalog.GetTeamIdentityKey(SeasonCatalog.GetTeamIdentityKey(name, 2025), 2026);
 
         public static string GetBadgeText(string? teamName)
         {

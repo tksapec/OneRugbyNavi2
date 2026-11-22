@@ -7,6 +7,8 @@ namespace OneRugbyNavi2;
 public static class SeasonCatalog
 {
     private const int SeasonBoundaryMonth = 9;
+    private const string PreviousShizuokaTeamName = "静岡ブルーレヴズ";
+    internal const string CurrentShizuokaTeamName = "ヤマハ静岡ブルーレヴズ";
 
     public sealed record TeamSeasonInfo(
         string TeamName,
@@ -23,7 +25,7 @@ public static class SeasonCatalog
         new TeamSeasonInfo("クボタスピアーズ船橋・東京ベイ", "DIV1", LeagueOneTeamId: "123", TeamUrl: "https://league-one.jp/team/123"),
         new TeamSeasonInfo("コベルコ神戸スティーラーズ", "DIV1", LeagueOneTeamId: "127", TeamUrl: "https://league-one.jp/team/127"),
         new TeamSeasonInfo("埼玉パナソニックワイルドナイツ", "DIV1", LeagueOneTeamId: "128", TeamUrl: "https://league-one.jp/team/128"),
-        new TeamSeasonInfo("静岡ブルーレヴズ", "DIV1", LeagueOneTeamId: "124", TeamUrl: "https://league-one.jp/team/124"),
+        new TeamSeasonInfo("ヤマハ静岡ブルーレヴズ", "DIV1", LeagueOneTeamId: "124", TeamUrl: "https://league-one.jp/team/124"),
         new TeamSeasonInfo("東京サントリーサンゴリアス", "DIV1", LeagueOneTeamId: "125", TeamUrl: "https://league-one.jp/team/125"),
         new TeamSeasonInfo("東芝ブレイブルーパス武蔵", "DIV1", LeagueOneTeamId: "129", TeamUrl: "https://league-one.jp/team/129"),
         new TeamSeasonInfo("栃木ホンダヒート", "DIV1", LeagueOneTeamId: "131", TeamUrl: "https://league-one.jp/team/131"),
@@ -56,6 +58,7 @@ public static class SeasonCatalog
     private static readonly IReadOnlyDictionary<string, string> TeamIdentityAliases2026 =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            [PreviousShizuokaTeamName] = CurrentShizuokaTeamName,
             ["埼玉ワイルドナイツ"] = "埼玉パナソニックワイルドナイツ",
             ["東京サンゴリアス"] = "東京サントリーサンゴリアス",
             ["ブラックラムズ東京"] = "リコーブラックラムズ東京",
@@ -122,6 +125,15 @@ public static class SeasonCatalog
     public static string NormalizeTeamName(string? teamName, int seasonStartYear)
         => teamName?.Trim() ?? "";
 
+    internal static string GetTeamDisplayName(string? teamName, int seasonStartYear)
+        => seasonStartYear >= 2026 ? GetCurrentTeamDisplayName(teamName) : NormalizeTeamName(teamName, seasonStartYear);
+
+    internal static string GetCurrentTeamDisplayName(string? teamName)
+    {
+        var name = teamName?.Trim() ?? "";
+        return name == PreviousShizuokaTeamName ? CurrentShizuokaTeamName : name;
+    }
+
     public static bool AreSameTeamName(string? left, string? right, int seasonStartYear)
     {
         var leftKey = GetTeamIdentityKey(left, seasonStartYear);
@@ -129,7 +141,7 @@ public static class SeasonCatalog
         return leftKey.Length > 0 && string.Equals(leftKey, rightKey, StringComparison.Ordinal);
     }
 
-    private static string GetTeamIdentityKey(string? teamName, int seasonStartYear)
+    internal static string GetTeamIdentityKey(string? teamName, int seasonStartYear)
     {
         var value = teamName?.Trim() ?? "";
         if (seasonStartYear == 2025 && TeamIdentityAliases2025.TryGetValue(value, out var historicalCanonical))

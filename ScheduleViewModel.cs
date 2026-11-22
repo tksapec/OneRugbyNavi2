@@ -279,8 +279,8 @@ namespace OneRugbyNavi2
             var seasonLabel = !string.IsNullOrWhiteSpace(item.SeasonLabel)
                 ? item.SeasonLabel
                 : SeasonCatalog.ToSeasonLabel(seasonKey);
-            var home = SeasonCatalog.NormalizeTeamName(item.Home, seasonStartYear);
-            var away = SeasonCatalog.NormalizeTeamName(item.Away, seasonStartYear);
+            var home = SeasonCatalog.GetTeamDisplayName(item.Home, seasonStartYear);
+            var away = SeasonCatalog.GetTeamDisplayName(item.Away, seasonStartYear);
 
             return new MatchItem
             {

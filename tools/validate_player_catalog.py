@@ -15,6 +15,7 @@ from normalize_player_history import normalize_player
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "Resources" / "Raw" / "league-one-players-2026-27.json"
 SEASON = re.compile(r"^\d{4}-\d{2}$")
+PREVIOUS_TEAM_NAMES = {"124": {"静岡ブルーレヴズ"}}
 
 
 def normalized_name(value: str) -> str:
@@ -56,7 +57,9 @@ def validate(catalog: dict) -> tuple[list[str], list[str]]:
         expected = expected_teams.get(team_id)
         if expected is None:
             errors.append(f"{name}: unknown currentTeamId {team_id}")
-        elif (player.get("currentTeamName"), player.get("division")) != expected:
+        elif player.get("division") != expected[1] or player.get("currentTeamName") not in (
+            {expected[0]} | PREVIOUS_TEAM_NAMES.get(team_id, set())
+        ):
             errors.append(f"{name}: current team name or division does not match SeasonCatalog")
         if not player.get("playerId") or not player.get("nameJa"):
             errors.append(f"{name}: missing playerId or Japanese name")

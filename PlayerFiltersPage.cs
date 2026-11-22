@@ -23,7 +23,7 @@ public sealed class PlayerFiltersPage : ContentPage
         var division = CreatePicker("ディビジョン", Divisions.Select(option => option.Label).ToArray(),
             Math.Max(0, Array.FindIndex(Divisions, option => option.Value == current.Division)));
         var teams = players.Where(player => current.Division.Length == 0 || player.Division == current.Division)
-            .Select(player => player.CurrentTeamName).Distinct(StringComparer.Ordinal)
+            .Select(player => player.CurrentTeamDisplayName).Distinct(StringComparer.Ordinal)
             .OrderBy(name => name, StringComparer.CurrentCulture).ToArray();
         var teamOptions = new[] { "すべて" }.Concat(teams).ToArray();
         var teamIndex = Array.IndexOf(teamOptions, current.Team);
@@ -39,7 +39,7 @@ public sealed class PlayerFiltersPage : ContentPage
             var code = Divisions.ElementAtOrDefault(division.SelectedIndex).Value ?? "";
             var selected = team.SelectedItem as string;
             var filteredTeams = players.Where(player => code.Length == 0 || player.Division == code)
-                .Select(player => player.CurrentTeamName).Distinct(StringComparer.Ordinal)
+                .Select(player => player.CurrentTeamDisplayName).Distinct(StringComparer.Ordinal)
                 .OrderBy(name => name, StringComparer.CurrentCulture).ToArray();
             team.ItemsSource = new[] { "すべて" }.Concat(filteredTeams).ToArray();
             team.SelectedIndex = selected is not null && filteredTeams.Contains(selected, StringComparer.Ordinal)

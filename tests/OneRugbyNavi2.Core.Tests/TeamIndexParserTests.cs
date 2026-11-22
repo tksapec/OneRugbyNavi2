@@ -5,6 +5,26 @@ namespace OneRugbyNavi2.Core.Tests;
 
 public sealed class TeamIndexParserTests
 {
+    [Theory]
+    [InlineData("静岡ブルーレヴズ")]
+    [InlineData("ヤマハ静岡ブルーレヴズ")]
+    public void Current_team_index_recognizes_both_shizuoka_names(string name)
+    {
+        var html = $"""
+            <html><body><h1>2026-27シーズン</h1>
+              <section id="division-1"><h2>DIVISION 1</h2>
+                <a href="https://www.shizuoka-bluerevs.com/"><img alt="{name}" /></a>
+              </section>
+            </body></html>
+            """;
+
+        var result = TeamIndexParser.Parse(html, 2026, "https://league-one.jp/content/team/2026");
+
+        var team = Assert.Single(result.Teams);
+        Assert.Equal("124", team.LeagueOneTeamId);
+        Assert.Equal(name, team.TeamName);
+    }
+
     [Fact]
     public void Team_index_rejects_previous_season()
     {

@@ -200,7 +200,13 @@ public sealed class PlayersPage : ContentPage
             PopulateTeamPicker();
             _updatingFilters = true;
             if (_savedSearch.Team.Length > 0)
-                _teamPicker.SelectedIndex = Math.Max(Array.IndexOf(_teamPicker.ItemsSource.Cast<string>().ToArray(), _savedSearch.Team), 0);
+            {
+                var seasonYear = SeasonCatalog.ParseSeasonStartYear(catalog.Season.Split('-')[0]);
+                var teamOptions = _teamPicker.ItemsSource.Cast<string>();
+                var matchingTeam = teamOptions.FirstOrDefault(team =>
+                    SeasonCatalog.AreSameTeamName(team, _savedSearch.Team, seasonYear));
+                _teamPicker.SelectedIndex = matchingTeam is null ? 0 : _teamPicker.ItemsSource.IndexOf(matchingTeam);
+            }
             if (_savedSearch.Position.Length > 0)
                 _positionPicker.SelectedIndex = Math.Max(Array.IndexOf(_positionPicker.ItemsSource.Cast<string>().ToArray(), _savedSearch.Position), 0);
             _updatingFilters = false;
@@ -287,7 +293,7 @@ public sealed class PlayersPage : ContentPage
         var selectedTeam = _teamPicker.SelectedItem as string;
         var teams = _players
             .Where(player => _selectedDivision.Length == 0 || player.Division == _selectedDivision)
-            .Select(player => player.CurrentTeamName)
+            .Select(player => player.CurrentTeamDisplayName)
             .Distinct(StringComparer.Ordinal)
             .OrderBy(name => name, StringComparer.CurrentCulture)
             .ToArray();
@@ -331,7 +337,7 @@ public sealed class PlayersPage : ContentPage
         var position = _positionPicker.SelectedItem as string;
         var matches = PlayerSearch.Search(_players, _searchBar.Text)
             .Where(player => _selectedDivision.Length == 0 || player.Division == _selectedDivision)
-            .Where(player => string.IsNullOrWhiteSpace(team) || team == AllTeams || player.CurrentTeamName == team)
+            .Where(player => string.IsNullOrWhiteSpace(team) || team == AllTeams || player.CurrentTeamDisplayName == team)
             .Where(player => string.IsNullOrWhiteSpace(position) || position == AllPositions || HasPosition(player, position))
             .Where(player => string.IsNullOrEmpty(_selectedAffiliationType) ||
                 (player.TeamHistory ?? []).Any(history => history is not null && history.Type == _selectedAffiliationType))
@@ -493,7 +499,7 @@ internal sealed class PlayerDisplayNameConverter : IValueConverter
 internal sealed class PlayerMetadataConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
-        => value is PlayerRecord player ? $"{player.CurrentTeamName} · {string.Join(" / ", player.Positions ?? [])}" : "";
+        => value is PlayerRecord player ? $"{player.CurrentTeamDisplayName} · {string.Join(" / ", player.Positions ?? [])}" : "";
     public object ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture) => throw new NotSupportedException();
 }
 

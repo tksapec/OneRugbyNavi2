@@ -50,7 +50,7 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto"
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*"
           Padding="14,10"
           RowSpacing="10">
 
@@ -436,9 +436,7 @@
             </Grid>
         </Grid>
 
-        <ContentView x:Name="bottomNavigationHost" Grid.Row="5" Margin="-14,0" />
-
-        <GraphicsView x:Name="pageCurlOverlay" Grid.RowSpan="6"
+        <GraphicsView x:Name="pageCurlOverlay" Grid.RowSpan="5"
                           IsVisible="False"
                           InputTransparent="True"
                           ZIndex="10" />

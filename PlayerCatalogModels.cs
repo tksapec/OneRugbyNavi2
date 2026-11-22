@@ -14,6 +14,7 @@ public sealed class PlayerRecord
     public string LeagueOnePlayerId { get; init; } = "";
     public string CurrentTeamId { get; init; } = "";
     public string CurrentTeamName { get; init; } = "";
+    internal string CurrentTeamDisplayName => SeasonCatalog.GetCurrentTeamDisplayName(CurrentTeamName);
     public string Division { get; init; } = "";
     public string NameJa { get; init; } = "";
     public string NameEn { get; init; } = "";

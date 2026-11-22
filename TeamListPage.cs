@@ -56,7 +56,7 @@ public sealed class TeamListPage : ContentPage
             _teamGroups.Clear();
             var seasonYear = SeasonCatalog.CurrentSeasonStartYear;
             var catalog = await _catalogFetcher.GetAsync(seasonYear);
-            var displayTeams = await BuildTeamCardsAsync(catalog.Snapshot);
+            var displayTeams = await BuildTeamCardsAsync(catalog.Snapshot, seasonYear);
 
             foreach (var division in new[] { "DIV1", "DIV2", "DIV3" })
             {
@@ -89,7 +89,7 @@ public sealed class TeamListPage : ContentPage
         }
     }
 
-    private static async Task<IReadOnlyList<TeamCard>> BuildTeamCardsAsync(TeamIndexResult catalog)
+    private static async Task<IReadOnlyList<TeamCard>> BuildTeamCardsAsync(TeamIndexResult catalog, int seasonYear)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         var cards = await Task.WhenAll(catalog.Teams.Select(async official =>
@@ -121,11 +121,12 @@ public sealed class TeamListPage : ContentPage
             return new TeamCard
             {
                 LeagueOneTeamId = official.LeagueOneTeamId,
-                TeamName = official.TeamName,
+                TeamName = SeasonCatalog.GetTeamDisplayName(official.TeamName, seasonYear),
                 DivisionCode = official.DivisionCode,
                 OfficialTeamPageUrl = official.OfficialTeamPageUrl,
                 LogoUrl = official.LogoUrl,
-                LocalAssetPath = imagePath
+                LocalAssetPath = imagePath,
+                BundledLogoPath = TeamLogoResolver.GetBundledLogoPath(official.TeamName, seasonYear)
             };
         }));
 
@@ -149,6 +150,7 @@ public sealed class TeamListPage : ContentPage
             FontSize = 12
         };
         badge.SetBinding(Label.TextProperty, nameof(TeamCard.BadgeText));
+        badge.SetBinding(VisualElement.IsVisibleProperty, nameof(TeamCard.ShowLogoBadge));
 
         var imageLayer = new Grid { WidthRequest = 56, HeightRequest = 56 };
         imageLayer.Children.Add(badge);

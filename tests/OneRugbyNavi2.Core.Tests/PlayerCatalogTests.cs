@@ -32,7 +32,7 @@ public sealed class PlayerCatalogTests
             var team = Assert.Single(SeasonCatalog.Teams2026, item => item.LeagueOneTeamId == teamPlayers.Key);
             Assert.All(teamPlayers, player =>
             {
-                Assert.Equal(team.TeamName, player.CurrentTeamName);
+                Assert.Equal(team.TeamName, player.CurrentTeamDisplayName);
                 Assert.Equal(team.DivisionCode, player.Division);
                 Assert.NotEmpty(player.Sources);
             });
@@ -355,6 +355,71 @@ public sealed class PlayerCatalogTests
     {
         var player = new PlayerRecord { NameJa = "ショーン・スティーブンソン" };
         Assert.Same(player, Assert.Single(PlayerSearch.Search([player], query)));
+    }
+
+    [Fact]
+    public void Search_hiragana_reading_finds_real_kanji_name_through_sourced_katakana_alias()
+    {
+        var catalog = LoadBundledCatalog();
+
+        var player = Assert.Single(PlayerSearch.Search(catalog.Players, "しむらだいき"));
+
+        Assert.Equal("leagueone-137-17265", player.PlayerId);
+        Assert.Equal("志村 太基", player.NameJa);
+        Assert.Contains("シムラ ダイキ", player.Aliases);
+    }
+
+    [Fact]
+    public void Search_hiragana_matches_katakana_name_from_real_roster()
+    {
+        var catalog = LoadBundledCatalog();
+
+        var player = Assert.Single(PlayerSearch.Search(catalog.Players, "しよーんすていーぶんそん"));
+
+        Assert.Equal("leagueone-123-shaun-stevenson", player.PlayerId);
+        Assert.Equal("ショーン・スティーブンソン", player.NameJa);
+    }
+
+    [Fact]
+    public void Search_natural_hiragana_long_vowel_matches_katakana_roster_name()
+    {
+        var catalog = LoadBundledCatalog();
+        var player = Assert.Single(catalog.Players, player => player.PlayerId == "leagueone-123-shaun-stevenson");
+
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "しょうん")));
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "しょん")));
+    }
+
+    [Theory]
+    [InlineData("きたがわ けんご", "leagueone-123-kengo-kitagawa", "KENGO KITAGAWA")]
+    [InlineData("きたがわけんご", "leagueone-123-kengo-kitagawa", "KENGO KITAGAWA")]
+    [InlineData("あおき ゆうき", "leagueone-123-yuki-aoki", "YUKI AOKI")]
+    public void Search_hiragana_reading_matches_published_romanized_name(
+        string query, string playerId, string expectedNameEn)
+    {
+        var catalog = LoadBundledCatalog();
+
+        var player = Assert.Single(PlayerSearch.Search(catalog.Players, query));
+
+        Assert.Equal(playerId, player.PlayerId);
+        Assert.Equal(expectedNameEn, player.NameEn);
+        Assert.Contains(player.NameJa, character => character is >= '\u3400' and <= '\u9FFF');
+    }
+
+    [Fact]
+    public void Search_hiragana_reading_matches_published_name_with_macron()
+    {
+        var player = new PlayerRecord { NameJa = "北川 賢吾", NameEn = "KENGŌ KITAGAWA" };
+
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "きたがわ けんご")));
+    }
+
+    [Fact]
+    public void Search_does_not_guess_kanji_reading_from_romanized_name_without_reading_alias()
+    {
+        var player = new PlayerRecord { NameJa = "山田 太郎", NameEn = "Someone Else" };
+
+        Assert.Empty(PlayerSearch.Search([player], "たろう"));
     }
 
     [Fact]
