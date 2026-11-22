@@ -6,6 +6,13 @@ namespace OneRugbyNavi2.Core.Tests;
 public sealed class ScheduleParserTests
 {
     [Fact]
+    public void Detail_page_schema_check_accepts_empty_recognized_sections_only()
+    {
+        Assert.False(ScheduleFetcher.HasRecognizedDetailSchema("<html><body><h2>2026-27シーズン</h2></body></html>"));
+        Assert.True(ScheduleFetcher.HasRecognizedDetailSchema("<html><body><div id='tab4'></div></body></html>"));
+    }
+
+    [Fact]
     public void Merges_2025_greens_rockets_schedule_alias_with_finished_match_result()
     {
         var annual = new ScheduleFetcher.Item
@@ -209,6 +216,39 @@ public sealed class ScheduleParserTests
         Assert.Equal("未定", match.Kickoff);
         Assert.Equal("未定", match.Status);
         Assert.Equal("", match.Conference);
+    }
+
+    [Fact]
+    public void Failed_division_keeps_fresh_rows_and_adds_missing_cached_rows()
+    {
+        var cached = new ScheduleFetcher.Item { Home = "A", Away = "B", SeasonStartYear = 2026, Date = "12月1日" };
+        Assert.Same(cached, Assert.Single(ScheduleFetcher.SelectDivisionWithCache([], [cached], "network error")));
+        Assert.Empty(ScheduleFetcher.SelectDivisionWithCache([], [cached], null));
+        var current = new ScheduleFetcher.Item { Home = "C", Away = "D", SeasonStartYear = 2026, Date = "12月2日" };
+        var merged = ScheduleFetcher.SelectDivisionWithCache([current], [cached], "network error");
+        Assert.Equal(2, merged.Count);
+        Assert.Contains(current, merged);
+        Assert.Contains(cached, merged);
+        Assert.Same(current, Assert.Single(ScheduleFetcher.SelectDivisionWithCache([current], [cached], null)));
+    }
+
+    [Fact]
+    public void Partial_cache_does_not_restore_old_scores_onto_a_cancelled_fresh_fixture()
+    {
+        var current = new ScheduleFetcher.Item
+        {
+            SeasonStartYear = 2026, Home = "Club A", Away = "Club B", Date = "12月1日", MatchId = "match-1", Status = "中止"
+        };
+        var cached = new ScheduleFetcher.Item
+        {
+            SeasonStartYear = 2026, Home = "Club A", Away = "Club B", Date = "12月1日", MatchId = "match-1", HomeScore = 21, AwayScore = 14, Status = "試合終了"
+        };
+
+        var merged = Assert.Single(ScheduleFetcher.SelectDivisionWithCache([current], [cached], "annual source failed"));
+
+        Assert.Equal("中止", merged.Status);
+        Assert.Null(merged.HomeScore);
+        Assert.Null(merged.AwayScore);
     }
 
     [Fact]

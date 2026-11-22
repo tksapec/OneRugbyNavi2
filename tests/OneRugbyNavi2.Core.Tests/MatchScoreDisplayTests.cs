@@ -42,13 +42,16 @@ public class MatchScoreDisplayTests
 
         Assert.Equal("••", match.HomeScoreText);
         Assert.Equal("••", match.AwayScoreText);
+        Assert.Equal("•• - ••", match.ScoreText);
         Assert.Equal("結果を表示", match.ResultVisibilityActionText);
         Assert.Contains(nameof(MatchItem.HomeScoreText), changed);
         Assert.Contains(nameof(MatchItem.AwayScoreText), changed);
+        Assert.Contains(nameof(MatchItem.ScoreText), changed);
 
         match.AreScoresHidden = false;
         Assert.Equal("24", match.HomeScoreText);
         Assert.Equal("17", match.AwayScoreText);
+        Assert.Equal("24 - 17", match.ScoreText);
     }
 
     [Fact]

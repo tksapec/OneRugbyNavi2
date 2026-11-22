@@ -138,6 +138,10 @@ namespace OneRugbyNavi2
                 seasons = ParseSeasons(doc);
                 var selectedSeason = SelectSeason(seasons, requestedKey);
                 var categories = ParseCategories(doc);
+                if (!HasRecognizedDetailSchema(doc))
+                {
+                    detailError = "The official schedule detail page structure was not recognized.";
+                }
 
                 foreach (var category in categories)
                 {
@@ -224,9 +228,11 @@ namespace OneRugbyNavi2
                 Replacement = Deduplicate(replacement),
                 Other = Deduplicate(other),
                 DataConsistencyWarning = dataConsistencyWarning,
-                Div1Error = div1.Count == 0 ? tableDiv1.Error : null,
-                Div2Error = div2.Count == 0 ? tableDiv2.Error : null,
-                Div3Error = div3.Count == 0 ? tableDiv3.Error : null,
+                Div1Error = tableDiv1.Error,
+                Div2Error = tableDiv2.Error,
+                Div3Error = tableDiv3.Error,
+                ReplacementError = detailError,
+                OtherError = detailError,
                 ResultsError = !hasAnyData
                     ? detailError ?? "No schedule data was found on the official League One pages."
                     : null
@@ -253,6 +259,22 @@ namespace OneRugbyNavi2
             return conflicts.Count == 0
                 ? null
                 : $"公式チーム一覧とDivision別日程で所属が一致しないチームがあります: {string.Join("、", conflicts)}。各公式ページの表示を保持しています。";
+        }
+
+        internal static bool HasRecognizedDetailSchema(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+            return HasRecognizedDetailSchema(doc);
+        }
+
+        private static bool HasRecognizedDetailSchema(HtmlDocument doc)
+        {
+            var categoryLinks = doc.DocumentNode.SelectNodes(
+                "//div[contains(@class,'tab-content-wrap')]//ul[contains(@class,'tab-links')]//a[@href]");
+            if (categoryLinks is { Count: > 0 }) return true;
+
+            return doc.DocumentNode.SelectSingleNode("//div[@id='tab1' or @id='tab2' or @id='tab3' or @id='tab4']") is not null;
         }
 
         private static async Task<DivisionFetchResult> FetchScheduleTableAsync(SeasonOption season, string division)
@@ -330,7 +352,7 @@ namespace OneRugbyNavi2
             return result;
         }
 
-        private static void MergeCachedMatch(Item target, Item incoming)
+        private static void MergeCachedMatch(Item target, Item incoming, bool restoreResult = true)
         {
             if (string.IsNullOrWhiteSpace(target.SeasonKey)) target.SeasonKey = incoming.SeasonKey;
             if (string.IsNullOrWhiteSpace(target.SeasonLabel)) target.SeasonLabel = incoming.SeasonLabel;
@@ -344,10 +366,13 @@ namespace OneRugbyNavi2
             if (string.IsNullOrWhiteSpace(target.Conference)) target.Conference = incoming.Conference;
             if (string.IsNullOrWhiteSpace(target.Pref)) target.Pref = incoming.Pref;
             if (string.IsNullOrWhiteSpace(target.Venue)) target.Venue = incoming.Venue;
-            target.HomeScore ??= incoming.HomeScore;
-            target.AwayScore ??= incoming.AwayScore;
-            if (string.IsNullOrWhiteSpace(target.Status) || target.Status == "未定")
-                target.Status = incoming.Status;
+            if (restoreResult)
+            {
+                target.HomeScore ??= incoming.HomeScore;
+                target.AwayScore ??= incoming.AwayScore;
+                if (string.IsNullOrWhiteSpace(target.Status) || target.Status == "未定")
+                    target.Status = incoming.Status;
+            }
             if (string.IsNullOrWhiteSpace(target.MatchId)) target.MatchId = incoming.MatchId;
             if (string.IsNullOrWhiteSpace(target.MatchCode)) target.MatchCode = incoming.MatchCode;
             if (string.IsNullOrWhiteSpace(target.MatchInfoUrl)) target.MatchInfoUrl = incoming.MatchInfoUrl;
@@ -357,6 +382,35 @@ namespace OneRugbyNavi2
             if (target.BroadcastLinks.Count == 0 && incoming.BroadcastLinks.Count > 0)
                 target.BroadcastLinks = incoming.BroadcastLinks;
             if (string.IsNullOrWhiteSpace(target.SourceUrl)) target.SourceUrl = incoming.SourceUrl;
+        }
+
+        internal static List<Item> SelectDivisionWithCache(
+            IEnumerable<Item> currentSchedule,
+            IEnumerable<Item> cachedItems,
+            string? error)
+        {
+            var current = currentSchedule.ToList();
+            if (string.IsNullOrWhiteSpace(error))
+            {
+                return EnrichWithCachedResults(current, cachedItems);
+            }
+
+            // A failed annual source can still contain parsed rows. Keep those
+            // fresh rows and use the cache only to fill holes in the response.
+            foreach (var cached in cachedItems)
+            {
+                var existing = current.FirstOrDefault(item =>
+                    IsSameFixture(item, cached) && HasSameFixtureDateOrId(item, cached));
+                if (existing is null)
+                {
+                    current.Add(cached);
+                    continue;
+                }
+
+                MergeCachedMatch(existing, cached, CanRestoreCachedResult(existing.Status));
+            }
+
+            return current;
         }
 
         internal static List<Item> EnrichWithCachedResults(

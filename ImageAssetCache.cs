@@ -1,26 +1,48 @@
 using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace OneRugbyNavi2;
 
 public static class ImageAssetCache
 {
     private const int MaxImageBytes = 8 * 1024 * 1024;
+    private static readonly TimeSpan CacheMaxAge = TimeSpan.FromDays(90);
     private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(12) };
     private static readonly SemaphoreSlim DownloadGate = new(4, 4);
 
     public static string? GetCachedPath(string entityId)
     {
-        if (string.IsNullOrWhiteSpace(entityId) || entityId.Any(character => !char.IsAsciiDigit(character)))
+        if (!IsValidEntityId(entityId)) return null;
+        var directory = GetEntityDirectory(entityId);
+        var metadata = ReadMetadata(directory);
+        if (metadata is not null && IsMetadataPathValid(directory, metadata) && IsValidImage(metadata.FilePath))
+        {
+            return metadata.FilePath;
+        }
+
+        return FindExistingValidImage(directory);
+    }
+
+    public static string? GetCachedPath(string entityId, string sourceUrl)
+    {
+        return GetCachedPathCore(entityId, sourceUrl, allowExpired: false);
+    }
+
+    public static string? GetCachedPathForFallback(string entityId, string? sourceUrl)
+    {
+        if (!IsValidEntityId(entityId)) return null;
+        if (string.IsNullOrWhiteSpace(sourceUrl)) return GetCachedPath(entityId);
+
+        var directory = GetEntityDirectory(entityId);
+        var metadata = ReadMetadata(directory);
+        if (metadata is null) return FindExistingValidImage(directory);
+        if (!IsMetadataPathValid(directory, metadata) ||
+            !string.Equals(metadata.SourceUrl, sourceUrl, StringComparison.Ordinal))
         {
             return null;
         }
 
-        return FindExistingValidImage(Path.Combine(
-            LeagueOneDatabase.AppDataRoot,
-            "cache",
-            "images",
-            "teams",
-            entityId));
+        return IsValidImage(metadata.FilePath) ? metadata.FilePath : null;
     }
 
     public static async Task<string?> FetchAndCacheAsync(
@@ -29,13 +51,12 @@ public static class ImageAssetCache
         CancellationToken cancellationToken = default)
     {
         if (!Uri.TryCreate(sourceUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps ||
-            string.IsNullOrWhiteSpace(entityId) ||
-            entityId.Any(character => !char.IsAsciiDigit(character)))
+            !IsValidEntityId(entityId))
         {
             return null;
         }
 
-        var entityDirectory = Path.Combine(LeagueOneDatabase.AppDataRoot, "cache", "images", "teams", entityId);
+        var entityDirectory = GetEntityDirectory(entityId);
         try
         {
             Directory.CreateDirectory(entityDirectory);
@@ -46,7 +67,7 @@ public static class ImageAssetCache
                 response.EnsureSuccessStatusCode();
                 if (response.Content.Headers.ContentLength is > MaxImageBytes)
                 {
-                    return FindExistingValidImage(entityDirectory);
+                    return FindFallback(entityId, sourceUrl);
                 }
 
                 await using var source = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -58,7 +79,7 @@ public static class ImageAssetCache
                     if (count == 0) break;
                     if (buffer.Length + count > MaxImageBytes)
                     {
-                        return FindExistingValidImage(entityDirectory);
+                        return FindFallback(entityId, sourceUrl);
                     }
 
                     await buffer.WriteAsync(chunk.AsMemory(0, count), cancellationToken);
@@ -68,12 +89,16 @@ public static class ImageAssetCache
                 var extension = ImageSignatureValidator.GetExtension(bytes);
                 if (extension is null)
                 {
-                    return FindExistingValidImage(entityDirectory);
+                    return FindFallback(entityId, sourceUrl);
                 }
 
                 var hash = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
                 var targetPath = Path.Combine(entityDirectory, $"{hash}{extension}");
-                if (File.Exists(targetPath)) return targetPath;
+                if (File.Exists(targetPath))
+                {
+                    await WriteMetadataAsync(entityDirectory, sourceUrl, targetPath, cancellationToken);
+                    return targetPath;
+                }
 
                 var temporaryPath = Path.Combine(entityDirectory, $".{Guid.NewGuid():N}.tmp");
                 try
@@ -88,7 +113,9 @@ public static class ImageAssetCache
                         // Another request stored the same verified content.
                     }
 
-                    return File.Exists(targetPath) ? targetPath : null;
+                    if (!File.Exists(targetPath)) return null;
+                    await WriteMetadataAsync(entityDirectory, sourceUrl, targetPath, cancellationToken);
+                    return targetPath;
                 }
                 finally
                 {
@@ -106,7 +133,77 @@ public static class ImageAssetCache
         }
         catch
         {
-            return FindExistingValidImage(entityDirectory);
+            return FindFallback(entityId, sourceUrl);
+        }
+    }
+
+    private static string GetEntityDirectory(string entityId)
+        => Path.Combine(LeagueOneDatabase.AppDataRoot, "cache", "images", "teams", entityId);
+
+    private static bool IsValidEntityId(string entityId)
+        => !string.IsNullOrWhiteSpace(entityId) && entityId.All(char.IsAsciiDigit);
+
+    private static string? FindFallback(string entityId, string sourceUrl)
+        => GetCachedPathForFallback(entityId, sourceUrl);
+
+    private static string? GetCachedPathCore(string entityId, string sourceUrl, bool allowExpired)
+    {
+        if (string.IsNullOrWhiteSpace(sourceUrl) || !IsValidEntityId(entityId)) return null;
+        var directory = GetEntityDirectory(entityId);
+        var metadata = ReadMetadata(directory);
+        if (metadata is null || !IsMetadataPathValid(directory, metadata) ||
+            !string.Equals(metadata.SourceUrl, sourceUrl, StringComparison.Ordinal) ||
+            !allowExpired && DateTimeOffset.UtcNow - metadata.CachedAt > CacheMaxAge)
+        {
+            return null;
+        }
+
+        return IsValidImage(metadata.FilePath) ? metadata.FilePath : null;
+    }
+
+    private static CacheMetadata? ReadMetadata(string directory)
+    {
+        try
+        {
+            var metadataPath = Path.Combine(directory, "source.json");
+            return File.Exists(metadataPath)
+                ? JsonSerializer.Deserialize<CacheMetadata>(File.ReadAllText(metadataPath))
+                : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool IsMetadataPathValid(string directory, CacheMetadata metadata)
+        => !string.IsNullOrWhiteSpace(metadata.SourceUrl) &&
+           !string.IsNullOrWhiteSpace(metadata.FilePath) &&
+           string.Equals(Path.GetDirectoryName(metadata.FilePath), directory, StringComparison.OrdinalIgnoreCase);
+
+    private static async Task WriteMetadataAsync(string directory, string sourceUrl, string filePath, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var metadataPath = Path.Combine(directory, "source.json");
+            var tempPath = metadataPath + ".tmp-" + Guid.NewGuid().ToString("N");
+            try
+            {
+                await File.WriteAllTextAsync(tempPath, JsonSerializer.Serialize(new CacheMetadata(sourceUrl, DateTimeOffset.UtcNow, filePath)), cancellationToken);
+                File.Move(tempPath, metadataPath, true);
+            }
+            finally
+            {
+                if (File.Exists(tempPath)) File.Delete(tempPath);
+            }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch
+        {
+            // The downloaded image remains usable even if metadata storage fails.
         }
     }
 
@@ -115,18 +212,11 @@ public static class ImageAssetCache
         try
         {
             if (!Directory.Exists(directory)) return null;
-            Span<byte> signature = stackalloc byte[12];
-            foreach (var path in Directory.EnumerateFiles(directory))
+            foreach (var path in Directory.EnumerateFiles(directory).OrderBy(Path.GetFileName, StringComparer.Ordinal))
             {
                 try
                 {
-                    var expectedExtension = Path.GetExtension(path).ToLowerInvariant();
-                    if (expectedExtension is not (".png" or ".jpg" or ".gif" or ".webp")) continue;
-                    var fileInfo = new FileInfo(path);
-                    if (fileInfo.Length <= 0 || fileInfo.Length > MaxImageBytes) continue;
-                    using var stream = File.OpenRead(path);
-                    var count = stream.Read(signature);
-                    if (string.Equals(ImageSignatureValidator.GetExtension(signature[..count]), expectedExtension, StringComparison.Ordinal)) return path;
+                    if (IsValidImage(path)) return path;
                 }
                 catch
                 {
@@ -141,4 +231,26 @@ public static class ImageAssetCache
 
         return null;
     }
+
+    private static bool IsValidImage(string path)
+    {
+        try
+        {
+            if (!File.Exists(path)) return false;
+            var expectedExtension = Path.GetExtension(path).ToLowerInvariant();
+            if (expectedExtension is not (".png" or ".jpg" or ".gif" or ".webp")) return false;
+            var fileInfo = new FileInfo(path);
+            if (fileInfo.Length <= 0 || fileInfo.Length > MaxImageBytes) return false;
+            Span<byte> signature = stackalloc byte[12];
+            using var stream = File.OpenRead(path);
+            var count = stream.Read(signature);
+            return string.Equals(ImageSignatureValidator.GetExtension(signature[..count]), expectedExtension, StringComparison.Ordinal);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private sealed record CacheMetadata(string SourceUrl, DateTimeOffset CachedAt, string FilePath);
 }

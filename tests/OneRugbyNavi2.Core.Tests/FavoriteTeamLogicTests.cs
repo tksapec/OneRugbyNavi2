@@ -102,6 +102,23 @@ public sealed class FavoriteTeamLogicTests
     }
 
     [Fact]
+    public void ToggleInDivisionUsesSelectedTeamsDivisionWhenCurrentDivisionDiffers()
+    {
+        var d1 = new[] { Match("d1", "Club A", "Club B") };
+        var d2 = new[] { Match("d2", "Club C", "Club D") };
+        var result = FavoriteTeamLogic.ToggleInDivision(["Club A", "Club C"], "Club C", 1, 2026, d1, d2, []);
+        Assert.Equal(new[] { "Club A" }, result);
+    }
+
+    [Fact]
+    public void ToggleInDivisionDoesNotChangeFavoritesForUnknownTeam()
+    {
+        var d1 = new[] { Match("d1", "Club A", "Club B") };
+        var result = FavoriteTeamLogic.ToggleInDivision(["Club A"], "Unknown", 1, 2026, d1, [], []);
+        Assert.Equal(new[] { "Club A" }, result);
+    }
+
+    [Fact]
     public void NormalizeByDivisionKeepsOneExistingFavoritePerDivision()
     {
         var favorites = new[]

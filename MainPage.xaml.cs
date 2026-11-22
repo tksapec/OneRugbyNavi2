@@ -85,14 +85,14 @@ namespace OneRugbyNavi2
                 UpdateFavoriteUi();
                 if (!previousFavorites.SequenceEqual(_favoriteTeams, StringComparer.Ordinal) && _isFavoriteFilterActive)
                 {
-                    var matchingFavorites = FindMatchingFavoritesForCurrentDivision();
-                    if (matchingFavorites.Count == 0)
+                    if (_favoriteTeams.Count == 0)
                     {
                         ExitFavoriteFilterMode();
                     }
                     else
                     {
-                        _vm.FavoriteTeamFilters = matchingFavorites;
+                        _vm.FavoriteTeamFilters = _favoriteTeams.ToArray();
+                        _vm.ShowFavoritesAcrossDivisions = true;
                     }
                     _vm.ApplyFilters();
                     RefreshPickers(preserveSelection: true);
@@ -128,11 +128,6 @@ namespace OneRugbyNavi2
 
             try
             {
-                var currentCategory = _vm.CurrentCategory;
-                var preserveFavoriteFilter = _isFavoriteFilterActive && !chooseFavoriteDivision;
-                var selectedTeam = chooseFavoriteDivision ? null : _vm.TeamFilter;
-                var selectedVenue = _vm.VenueFilter;
-                var selectedPeriod = _vm.PeriodFilter;
                 ScheduleFetcher.FetchAllResult? fetchResult = null;
                 try
                 {
@@ -150,14 +145,17 @@ namespace OneRugbyNavi2
                 IReadOnlyCollection<ScheduleFetcher.Item> other = fetchResult == null ? Array.Empty<ScheduleFetcher.Item>() : fetchResult.Other;
                 _isShowingCache = false;
 
+                ScheduleCacheData? previousCache = null;
                 if (fetchResult?.HasAnyData == true)
                 {
-                    var previousCache = await ScheduleCacheStore.LoadAsync(fetchResult.SeasonKey, fetchResult.SeasonLabel);
+                    previousCache = await ScheduleCacheStore.LoadAsync(fetchResult.SeasonKey, fetchResult.SeasonLabel);
                     if (previousCache != null)
                     {
-                        div1 = ScheduleFetcher.EnrichWithCachedResults(div1, previousCache.Div1);
-                        div2 = ScheduleFetcher.EnrichWithCachedResults(div2, previousCache.Div2);
-                        div3 = ScheduleFetcher.EnrichWithCachedResults(div3, previousCache.Div3);
+                        div1 = ScheduleFetcher.SelectDivisionWithCache(div1, previousCache.Div1, fetchResult.Div1Error);
+                        div2 = ScheduleFetcher.SelectDivisionWithCache(div2, previousCache.Div2, fetchResult.Div2Error);
+                        div3 = ScheduleFetcher.SelectDivisionWithCache(div3, previousCache.Div3, fetchResult.Div3Error);
+                        replacement = ScheduleFetcher.SelectDivisionWithCache(replacement, previousCache.Replacement, fetchResult.ReplacementError);
+                        other = ScheduleFetcher.SelectDivisionWithCache(other, previousCache.Other, fetchResult.OtherError);
                     }
                 }
 
@@ -171,13 +169,29 @@ namespace OneRugbyNavi2
                     var fetchedAt = fetchResult?.FetchedAt ?? DateTimeOffset.Now;
                     _selectedSeasonKey = fetchResult?.SeasonKey ?? _selectedSeasonKey;
                     _selectedSeasonLabel = fetchResult?.SeasonLabel ?? _selectedSeasonLabel;
-                    _dataConsistencyWarning = fetchResult?.DataConsistencyWarning;
-                    await ScheduleCacheStore.SaveAsync(_selectedSeasonKey, _selectedSeasonLabel, div1, div2, div3, replacement, other, fetchedAt);
+                    var errors = fetchResult?.GetErrors().ToArray() ?? Array.Empty<string>();
+                    var warnings = new System.Collections.Generic.List<string>();
+                    if (!string.IsNullOrWhiteSpace(fetchResult?.DataConsistencyWarning)) warnings.Add(fetchResult.DataConsistencyWarning);
+                    if (errors.Length > 0)
+                    {
+                        warnings.Add("一部の日程を取得できませんでした。保存済みデータがある場合は表示しています: " + string.Join(" / ", errors));
+                    }
+                    try
+                    {
+                        var cacheTimestamp = errors.Length > 0 ? previousCache?.SavedAt ?? fetchedAt : fetchedAt;
+                        var isPartial = errors.Length > 0;
+                        await ScheduleCacheStore.SaveAsync(_selectedSeasonKey, _selectedSeasonLabel, div1, div2, div3, replacement, other, cacheTimestamp, isPartial);
+                    }
+                    catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+                    {
+                        warnings.Add("日程は取得できましたが、端末への保存に失敗しました。");
+                    }
+                    _dataConsistencyWarning = warnings.Count == 0 ? null : string.Join("\n", warnings);
                     _databaseBuildTimestampText = fetchedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
-                    var statusMessage = fetchResult?.DataConsistencyWarning is { Length: > 0 } warning
+                    var statusMessage = _dataConsistencyWarning is { Length: > 0 } warning
                         ? $"{FetchedOfficialScheduleMessage}\n{warning}"
                         : FetchedOfficialScheduleMessage;
-                    SetMessage(statusMessage, true, autoHide: string.IsNullOrWhiteSpace(fetchResult?.DataConsistencyWarning));
+                    SetMessage(statusMessage, true, autoHide: string.IsNullOrWhiteSpace(_dataConsistencyWarning));
                 }
                 else
                 {
@@ -191,7 +205,7 @@ namespace OneRugbyNavi2
                             Array.Empty<ScheduleFetcher.Item>(),
                             Array.Empty<ScheduleFetcher.Item>(),
                             Array.Empty<ScheduleFetcher.Item>());
-                        _vm.SetSource(currentCategory);
+                        _vm.SetSource(_vm.CurrentCategory);
                         _vm.TeamFilter = null;
                         ExitFavoriteFilterMode();
                         _vm.VenueFilter = null;
@@ -214,23 +228,18 @@ namespace OneRugbyNavi2
                     _selectedSeasonLabel = cache.SeasonLabel;
                     UpdateSeasonTitle();
                     _databaseBuildTimestampText = cache.LastUpdated.ToLocalTime().ToString("yyyy/MM/dd HH:mm");
-                    SetMessage("前回取得した試合日程を表示中", true, autoHide: false);
+                    _dataConsistencyWarning = cache.IsPartial ? "前回取得できた一部の日程のみを表示しています。" : null;
+                    SetMessage(cache.IsPartial ? "前回取得した一部の日程を表示中" : "前回取得した試合日程を表示中", true, autoHide: false);
                 }
 
+                // Read the selected category and filters after all network and cache awaits so changes
+                // made by the user while refresh was running are retained.
+                var currentCategory = _vm.CurrentCategory;
+                var preserveFavoriteFilter = _isFavoriteFilterActive && !chooseFavoriteDivision;
+                var selectedTeam = chooseFavoriteDivision ? null : _vm.TeamFilter;
+                var selectedVenue = _vm.VenueFilter;
+                var selectedPeriod = _vm.PeriodFilter;
                 _vm.SetItems(div1, div2, div3, replacement, other);
-                var normalizedFavorites = FavoriteTeamLogic.NormalizeByDivision(
-                    _favoriteTeams,
-                    GetSelectedSeasonStartYear(),
-                    _vm.ItemsDiv1.ToList(),
-                    _vm.ItemsDiv2.ToList(),
-                    _vm.ItemsDiv3.ToList());
-                if (!_favoriteTeams.SequenceEqual(normalizedFavorites, StringComparer.Ordinal))
-                {
-                    _favoriteTeams = normalizedFavorites;
-                    Preferences.Set(FavoriteTeamsKey, FavoriteTeamLogic.Serialize(_favoriteTeams));
-                    Preferences.Remove(LegacyFavoriteTeamKey);
-                }
-
                 _vm.SetSource(currentCategory);
                 if (_vm.GetCurrentDivisionItemCount() == 0)
                 {
@@ -256,15 +265,15 @@ namespace OneRugbyNavi2
                 _vm.PeriodFilter = selectedPeriod;
                 if (preserveFavoriteFilter)
                 {
-                    var matchingFavorites = FindMatchingFavoritesForCurrentDivision();
-                    if (matchingFavorites.Count == 0)
+                    if (_favoriteTeams.Count == 0)
                     {
                         ExitFavoriteFilterMode();
                         SetMessage(NoFavoriteMatchMessage, true, autoHide: true);
                     }
                     else
                     {
-                        _vm.FavoriteTeamFilters = matchingFavorites;
+                        _vm.FavoriteTeamFilters = _favoriteTeams.ToArray();
+                        _vm.ShowFavoritesAcrossDivisions = true;
                     }
                 }
                 else
@@ -339,7 +348,7 @@ namespace OneRugbyNavi2
                 _vm.ShowFavoritesAcrossDivisions = false;
                 _vm.TeamFilter = null;
                 _teamFilterManuallySelected = false;
-                _vm.FavoriteTeamFilters = FindMatchingFavoritesForCurrentDivision();
+                _vm.FavoriteTeamFilters = _favoriteTeams.ToArray();
                 _isFavoriteFilterActive = true;
             }
             else
@@ -746,10 +755,24 @@ namespace OneRugbyNavi2
             }
 
             var value = teamPicker.SelectedItem as string;
+            var wasAcrossDivisions = _vm.ShowFavoritesAcrossDivisions;
             ExitFavoriteFilterMode();
+            if (wasAcrossDivisions && !string.IsNullOrWhiteSpace(value))
+            {
+                var division = FavoriteTeamLogic.FindDivisionForTeam(value, GetSelectedSeasonStartYear(),
+                    _vm.ItemsDiv1.ToList(), _vm.ItemsDiv2.ToList(), _vm.ItemsDiv3.ToList());
+                if (division.HasValue)
+                {
+                    _vm.SetSource(DivisionToCategory(division.Value));
+                    UpdateTabVisual(_vm.CurrentCategory);
+                    if (!string.IsNullOrWhiteSpace(_vm.VenueFilter) && !_vm.GetVenuesForPicker().Contains(_vm.VenueFilter))
+                        _vm.VenueFilter = null;
+                }
+            }
             _vm.TeamFilter = string.IsNullOrWhiteSpace(value) ? null : value;
             _teamFilterManuallySelected = !string.IsNullOrWhiteSpace(_vm.TeamFilter);
             _vm.ApplyFilters();
+            if (wasAcrossDivisions) RefreshPickers(preserveSelection: true);
             ScrollScheduleToStart();
             UpdateEmptyState();
             UpdateFavoriteUi();
@@ -860,8 +883,12 @@ namespace OneRugbyNavi2
             RefreshPickers(preserveSelection: true);
             if (_vm.GetNextMatch(DateTime.Now) is { } next)
             {
-                var group = _scheduleDateGroups.FirstOrDefault(candidate => candidate.Contains(next));
-                list.ScrollTo(next, group, ScrollToPosition.MakeVisible, animate: true);
+                Dispatcher.Dispatch(() =>
+                {
+                    if (!_vm.FilteredItems.Contains(next)) return;
+                    var group = _scheduleDateGroups.FirstOrDefault(candidate => candidate.Contains(next));
+                    if (group != null) list.ScrollTo(next, group, ScrollToPosition.MakeVisible, animate: true);
+                });
             }
             else
             {
@@ -934,22 +961,6 @@ namespace OneRugbyNavi2
             }
         }
 
-        private async void OnHomeTeamLogoClicked(object sender, EventArgs e)
-        {
-            if (sender is BindableObject { BindingContext: MatchItem match })
-            {
-                await TeamOfficialPageNavigator.OpenAsync(this, match.HomeTeam);
-            }
-        }
-
-        private async void OnAwayTeamLogoClicked(object sender, EventArgs e)
-        {
-            if (sender is BindableObject { BindingContext: MatchItem match })
-            {
-                await TeamOfficialPageNavigator.OpenAsync(this, match.AwayTeam);
-            }
-        }
-
         private async Task NavigateToMatchAsync(MatchItem match)
         {
             await Navigation.PushAsync(new MatchDetailPage(
@@ -974,11 +985,17 @@ namespace OneRugbyNavi2
             }
 
             var seasonYear = GetSelectedSeasonStartYear();
+            var teamDivision = FavoriteTeamLogic.FindDivisionForTeam(team, seasonYear, _vm.ItemsDiv1.ToList(), _vm.ItemsDiv2.ToList(), _vm.ItemsDiv3.ToList());
+            if (!teamDivision.HasValue)
+            {
+                SetMessage("このチームのDivisionを確認できません。", true, autoHide: true);
+                return;
+            }
             var wasFavorite = IsFavoriteTeam(team, seasonYear);
             _favoriteTeams = FavoriteTeamLogic.ToggleInDivision(
                 _favoriteTeams,
                 team,
-                _vm.CurrentDivision,
+                teamDivision.Value,
                 seasonYear,
                 _vm.ItemsDiv1.ToList(),
                 _vm.ItemsDiv2.ToList(),
@@ -1020,6 +1037,7 @@ namespace OneRugbyNavi2
         private void SetLoading(bool isLoading)
         {
             loadingPanel.IsVisible = isLoading;
+            seasonPicker.IsEnabled = !isLoading;
         }
 
         private void SetMessage(string message, bool visible, bool autoHide = true)
@@ -1294,6 +1312,11 @@ namespace OneRugbyNavi2
         {
             try
             {
+                if (_isRefreshing)
+                {
+                    await DisplayAlert("確認", "日程の更新が終わってからキャッシュを削除してください。", "OK");
+                    return;
+                }
                 var confirmed = await DisplayAlert(
                     "\u78BA\u8A8D",
                     "\u4FDD\u5B58\u6E08\u307F\u306E\u30AD\u30E3\u30C3\u30B7\u30E5\u3092\u524A\u9664\u3057\u307E\u3059\u3002\u3088\u308D\u3057\u3044\u3067\u3059\u304B\uFF1F",
@@ -1301,6 +1324,12 @@ namespace OneRugbyNavi2
                     "\u30AD\u30E3\u30F3\u30BB\u30EB");
                 if (!confirmed)
                 {
+                    return;
+                }
+
+                if (_isRefreshing)
+                {
+                    await DisplayAlert("確認", "日程の更新が終わってからキャッシュを削除してください。", "OK");
                     return;
                 }
 

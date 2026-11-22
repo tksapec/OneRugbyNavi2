@@ -114,14 +114,22 @@ public static class FavoriteTeamLogic
             return current;
         }
 
-        var selectedIsFavorite = current.Any(value =>
-            SeasonCatalog.AreSameTeamName(value, name, seasonStartYear));
         var divisionMatches = division switch
         {
             1 => div1,
             2 => div2,
             _ => div3
         };
+        if (!divisionMatches.Any(match =>
+                SeasonCatalog.AreSameTeamName(match.HomeTeam, name, seasonStartYear) ||
+                SeasonCatalog.AreSameTeamName(match.AwayTeam, name, seasonStartYear)))
+        {
+            var actualDivision = FindDivisionForTeam(name, seasonStartYear, div1, div2, div3);
+            if (!actualDivision.HasValue) return current;
+            divisionMatches = actualDivision.Value switch { 1 => div1, 2 => div2, _ => div3 };
+        }
+        var selectedIsFavorite = current.Any(value =>
+            SeasonCatalog.AreSameTeamName(value, name, seasonStartYear));
         var currentDivisionFavorites = FindMatchingFavorites(divisionMatches, current);
 
         current.RemoveAll(value => currentDivisionFavorites.Any(existing =>

@@ -31,21 +31,21 @@ public static class PlayerSearch
                 var searchableFields = GetSearchFields(player, scope).Select(Normalize).Where(value => value.Length > 0).ToArray();
                 return tokens.All(token => searchableFields.Any(field =>
                     field.Contains(token, StringComparison.Ordinal) ||
-                    NormalizeKana(field).Contains(NormalizeKana(token), StringComparison.Ordinal))) ||
-                    (scope == PlayerSearchScope.All && MatchesSeason(player, tokens));
+                    NormalizeKana(field).Contains(NormalizeKana(token), StringComparison.Ordinal)) ||
+                    (scope == PlayerSearchScope.All && MatchesSeason(player, token)));
             })
             .ToArray();
     }
 
-    private static bool MatchesSeason(PlayerRecord player, IReadOnlyList<string> tokens)
+    private static bool MatchesSeason(PlayerRecord player, string token)
     {
-        if (tokens.Count != 1 || tokens[0].Length != 6) return false;
-        var year = tokens[0][..4];
-        var suffix = tokens[0][4..];
+        if (token.Length != 6) return false;
+        var year = token[..4];
+        var suffix = token[4..];
         if (!int.TryParse(year, out var seasonYear) || !int.TryParse(suffix, out var seasonEnd)) return false;
         if (seasonEnd != (seasonYear + 1) % 100) return false;
         return (player.TeamHistory ?? []).Any(history => history is not null &&
-            IsWithinRange(tokens[0], history.FromSeason, history.ToSeason));
+            IsWithinRange(token, history.FromSeason, history.ToSeason));
     }
 
     private static bool IsWithinRange(string season, string? from, string? to)
@@ -166,23 +166,18 @@ public static class PlayerSearch
         var builder = new StringBuilder(value.Length);
         foreach (var character in value)
         {
-            if (character is >= '\u30A1' and <= '\u30F6')
-            {
-                var hiragana = (char)(character - 0x60);
-                builder.Append(hiragana switch
-                {
-                    'ぁ' => 'あ', 'ぃ' => 'い', 'ぅ' => 'う', 'ぇ' => 'え', 'ぉ' => 'お',
-                    'ゃ' => 'や', 'ゅ' => 'ゆ', 'ょ' => 'よ', 'っ' => 'つ', 'ゎ' => 'わ', _ => hiragana
-                });
-            }
-            else if (character == 'ー')
+            if (character == 'ー')
             {
                 continue;
             }
-            else
+            var hiragana = character is >= '\u30A1' and <= '\u30F6'
+                ? (char)(character - 0x60)
+                : character;
+            builder.Append(hiragana switch
             {
-                builder.Append(character);
-            }
+                'ぁ' => 'あ', 'ぃ' => 'い', 'ぅ' => 'う', 'ぇ' => 'え', 'ぉ' => 'お',
+                'ゃ' => 'や', 'ゅ' => 'ゆ', 'ょ' => 'よ', 'っ' => 'つ', 'ゎ' => 'わ', _ => hiragana
+            });
         }
 
         return builder.ToString();

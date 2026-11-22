@@ -35,10 +35,16 @@ public sealed class PlayerCatalogUpdateService
     }
 
     public Task<PlayerCatalogUpdateResult> UpdateAsync(CancellationToken cancellationToken = default)
-        => UpdateAsync(bundledManifestJson: null, cancellationToken);
+        => UpdateAsync(bundledManifestJson: null, bundledCatalogJson: null, cancellationToken);
 
     public async Task<PlayerCatalogUpdateResult> UpdateAsync(
         string? bundledManifestJson,
+        CancellationToken cancellationToken = default)
+        => await UpdateAsync(bundledManifestJson, bundledCatalogJson: null, cancellationToken).ConfigureAwait(false);
+
+    public async Task<PlayerCatalogUpdateResult> UpdateAsync(
+        string? bundledManifestJson,
+        string? bundledCatalogJson,
         CancellationToken cancellationToken = default)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -66,6 +72,19 @@ public sealed class PlayerCatalogUpdateService
             throw new InvalidDataException(string.Join(Environment.NewLine, errors));
         if (catalog.Players.Count == 0)
             throw new InvalidDataException("The player catalog contains no players.");
+        if (!PlayerCatalogCache.HasExpectedCoverage(catalog))
+            throw new InvalidDataException("The player catalog does not cover the expected roster.");
+
+        PlayerCatalogDocument? reference = null;
+        if (bundledCatalogJson is not null && PlayerCatalogParser.TryParse(bundledCatalogJson, out var bundled, out _) &&
+            bundled.Players.Count > 0 && PlayerCatalogCache.HasExpectedCoverage(bundled))
+            reference = bundled;
+        var cached = await PlayerCatalogCache.TryLoadAsync(_cachePath, timeout.Token).ConfigureAwait(false);
+        if (cached is not null && PlayerCatalogCache.HasExpectedCoverage(cached) &&
+            (reference is null || PlayerCatalogCache.CompareCatalogs(cached, reference) > 0))
+            reference = cached;
+        if (reference is not null && PlayerCatalogCache.CompareCatalogs(catalog, reference) < 0)
+            throw new InvalidDataException("The downloaded player catalog is older or less complete than the current catalog.");
 
         var previousJson = File.Exists(_cachePath)
             ? await File.ReadAllTextAsync(_cachePath, Encoding.UTF8, timeout.Token).ConfigureAwait(false)

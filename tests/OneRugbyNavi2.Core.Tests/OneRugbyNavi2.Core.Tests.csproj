@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Microsoft.Maui.Storage" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <None Include="../../MainPage.xaml" Link="Fixtures/MainPage.xaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../Resources/Raw/leagueone_seed.db" Link="Fixtures/leagueone_seed.db" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Resources/Raw/league-one-players-2026-27.json" Link="Fixtures/league-one-players-2026-27.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Resources/Raw/player-catalog-manifest.json" Link="Fixtures/player-catalog-manifest.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="../../Resources/Images/Teams/**" Link="Fixtures/Teams/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
@@ -34,15 +36,19 @@
     <Compile Include="../../PlayerTeamHistoryDisplayGroup.cs" Link="Production/PlayerTeamHistoryDisplayGroup.cs" />
     <Compile Include="../../PlayerCatalogDuplicateDetector.cs" Link="Production/PlayerCatalogDuplicateDetector.cs" />
     <Compile Include="../../PlayerSearch.cs" Link="Production/PlayerSearch.cs" />
+    <Compile Include="../../PlayerPositionMatcher.cs" Link="Production/PlayerPositionMatcher.cs" />
     <Compile Include="../../PlayerCatalogParser.cs" Link="Production/PlayerCatalogParser.cs" />
     <Compile Include="../../LeagueOneSyncModels.cs" Link="Production/LeagueOneSyncModels.cs" />
     <Compile Include="../../LeagueOneSeasonDetector.cs" Link="Production/LeagueOneSeasonDetector.cs" />
     <Compile Include="../../TeamCatalogParser.cs" Link="Production/TeamCatalogParser.cs" />
     <Compile Include="../../TeamIndexParser.cs" Link="Production/TeamIndexParser.cs" />
+    <Compile Include="../../TeamCatalogFetcher.cs" Link="Production/TeamCatalogFetcher.cs" />
     <Compile Include="../../ImageSignatureValidator.cs" Link="Production/ImageSignatureValidator.cs" />
     <Compile Include="../../SeasonCatalog.cs" Link="Production/SeasonCatalog.cs" />
     <Compile Include="../../ScheduleTableParser.cs" Link="Production/ScheduleTableParser.cs" />
     <Compile Include="../../ScheduleFetcher.cs" Link="Production/ScheduleFetcher.cs" />
+    <Compile Include="../../ScheduleCacheStore.cs" Link="Production/ScheduleCacheStore.cs" />
+    <Compile Include="../../LeagueOneDatabase.cs" Link="Production/LeagueOneDatabase.cs" />
     <Compile Include="../../OfficialRankingUrl.cs" Link="Production/OfficialRankingUrl.cs" />
     <Compile Include="../../ScheduleDisplayOrder.cs" Link="Production/ScheduleDisplayOrder.cs" />
     <Compile Include="../../DivisionSwipeNavigation.cs" Link="Production/DivisionSwipeNavigation.cs" />

@@ -132,8 +132,8 @@ namespace OneRugbyNavi2
 
             if (PeriodFilter != DateRangeFilter.All)
             {
-                var today = DateTime.Today;
-                query = query.Where(m => TryMatchPeriod(m, today, PeriodFilter));
+                var now = DateTime.Now;
+                query = query.Where(m => TryMatchPeriod(m, now, PeriodFilter));
             }
 
             var list = SortMatches(query, DateTime.Now, PeriodFilter).ToList();
@@ -154,9 +154,21 @@ namespace OneRugbyNavi2
         public MatchItem? GetNextMatch(DateTime now)
             => FilteredItems
                 .Where(match => !match.IsCompleted && !match.IsInProgress)
-                .Where(match => TryGetMatchStart(match, out var start) && start >= now)
-                .OrderBy(match => TryGetMatchStart(match, out var start) ? start : DateTime.MaxValue)
+                .Where(match => !IsCancelledOrIndefinitelyPostponed(match.MatchStatus))
+                .Where(match => TryGetMatchDate(match, out var date) && date >= now.Date &&
+                    (!TryGetMatchStart(match, out var start) || start >= now))
+                .OrderBy(match => TryGetMatchDate(match, out var date) ? date : DateTime.MaxValue)
+                .ThenBy(match => TryGetMatchStart(match, out var start) ? start : DateTime.MaxValue)
                 .FirstOrDefault();
+
+        private static bool IsCancelledOrIndefinitelyPostponed(string? status)
+        {
+            var value = status?.Trim() ?? "";
+            return value.Contains("取消", StringComparison.Ordinal) ||
+                   value.Contains("中止", StringComparison.Ordinal) ||
+                   value.Contains("延期", StringComparison.Ordinal) &&
+                       value.Contains("未定", StringComparison.Ordinal);
+        }
 
         public int GetDivisionItemCount(int division)
         {
@@ -346,32 +358,40 @@ namespace OneRugbyNavi2
                 return false;
             }
 
-            var parsed = Regex.Match(match.KickoffTime, @"(?<hour>\d{1,2}):(?<minute>\d{2})");
+            var parsed = Regex.Match(match.KickoffTime ?? "", @"^\s*(?<hour>[0-9]{1,2}):(?<minute>[0-9]{2})\s*$");
             if (!parsed.Success)
             {
                 return false;
             }
 
-            start = date
-                .AddHours(int.Parse(parsed.Groups["hour"].Value))
-                .AddMinutes(int.Parse(parsed.Groups["minute"].Value));
+            var hour = int.Parse(parsed.Groups["hour"].Value);
+            var minute = int.Parse(parsed.Groups["minute"].Value);
+            if (hour > 23 || minute > 59) return false;
+            start = date.AddHours(hour).AddMinutes(minute);
             return true;
         }
 
-        private static bool TryMatchPeriod(MatchItem match, DateTime today, DateRangeFilter filter)
+        internal static bool TryMatchPeriod(MatchItem match, DateTime now, DateRangeFilter filter)
         {
+            if (filter == DateRangeFilter.Upcoming && IsCancelledOrIndefinitelyPostponed(match.MatchStatus))
+            {
+                return false;
+            }
+
             if (!TryGetMatchDate(match, out var matchDate))
             {
                 return false;
             }
 
+            var today = now.Date;
             var finishedTodayOrEarlier = matchDate < today || (matchDate == today && IsCompletedMatch(match));
             if (filter == DateRangeFilter.Past)
             {
                 return finishedTodayOrEarlier;
             }
 
-            return matchDate > today || (matchDate == today && !IsCompletedMatch(match));
+            return matchDate > today || (matchDate == today && !IsCompletedMatch(match) && !match.IsInProgress &&
+                (!TryGetMatchStart(match, out var start) || start >= now));
         }
 
         private static bool IsCompletedMatch(MatchItem match)

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace OneRugbyNavi2;
 
@@ -35,6 +36,10 @@ public static partial class PlayerCatalogParser
             var found = new List<string>();
             if (parsed.SchemaVersion != SupportedSchemaVersion) found.Add($"Unsupported schema version: {parsed.SchemaVersion}.");
             if (!IsValidSeason(parsed.Season)) found.Add("Season must use YYYY-YY format.");
+            if (!string.IsNullOrEmpty(parsed.CatalogRevision) &&
+                !DateOnly.TryParseExact(parsed.CatalogRevision, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
+                found.Add("Catalog revision must use YYYY-MM-DD format when present.");
             if (parsed.Players is null) found.Add("Players must be an array.");
 
             var ids = new HashSet<string>(StringComparer.Ordinal);

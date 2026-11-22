@@ -94,21 +94,28 @@ public sealed class TeamListPage : ContentPage
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         var cards = await Task.WhenAll(catalog.Teams.Select(async official =>
         {
-            var imagePath = ImageAssetCache.GetCachedPath(official.LeagueOneTeamId);
-            if (imagePath is null)
+            var imagePath = ImageAssetCache.GetCachedPath(official.LeagueOneTeamId, official.LogoUrl);
+            if (imagePath is null && !string.IsNullOrWhiteSpace(official.LogoUrl))
             {
+                var cachedFallback = ImageAssetCache.GetCachedPathForFallback(official.LeagueOneTeamId, official.LogoUrl);
                 try
                 {
                     imagePath = await ImageAssetCache.FetchAndCacheAsync(
                         official.LogoUrl,
                         official.LeagueOneTeamId,
                         timeout.Token);
+                    imagePath ??= cachedFallback;
                 }
                 catch (OperationCanceledException) when (timeout.IsCancellationRequested)
                 {
                     // Keep the URL-backed image or initials badge if the batch
                     // cache exceeds the page-load budget.
+                    imagePath = cachedFallback;
                 }
+            }
+            else if (imagePath is null)
+            {
+                imagePath = ImageAssetCache.GetCachedPathForFallback(official.LeagueOneTeamId, null);
             }
 
             return new TeamCard

@@ -4,6 +4,8 @@ namespace OneRugbyNavi2;
 
 public sealed class PlayersPage : ContentPage
 {
+    private sealed record SearchState(string Query, string Division, string Team, string Position, string AffiliationType);
+    private static SearchState _savedSearch = new("", "", "", "", "");
     private const string AllTeams = "すべてのチーム";
     private const string AllPositions = "すべてのポジション";
     private static readonly (string Label, string Code)[] Divisions =
@@ -77,6 +79,9 @@ public sealed class PlayersPage : ContentPage
         Title = "選手検索";
         BackgroundColor = PageStyles.Background;
         Shell.SetNavBarIsVisible(this, false);
+        _selectedDivision = _savedSearch.Division;
+        _selectedAffiliationType = _savedSearch.AffiliationType;
+        _searchBar.Text = _savedSearch.Query;
         _searchBar.TextChanged += OnSearchTextChanged;
         _teamPicker.SelectedIndexChanged += OnFilterChanged;
         _positionPicker.SelectedIndexChanged += OnFilterChanged;
@@ -169,6 +174,16 @@ public sealed class PlayersPage : ContentPage
         if (!_loaded && !_loading) await LoadAsync();
     }
 
+    protected override void OnDisappearing()
+    {
+        _savedSearch = new SearchState(
+            _searchBar.Text ?? "", _selectedDivision,
+            _loaded ? _teamPicker.SelectedItem as string ?? "" : _savedSearch.Team,
+            _loaded ? _positionPicker.SelectedItem as string ?? "" : _savedSearch.Position,
+            _selectedAffiliationType);
+        base.OnDisappearing();
+    }
+
     private async Task LoadAsync()
     {
         if (_loading) return;
@@ -183,6 +198,12 @@ public sealed class PlayersPage : ContentPage
             _loaded = true;
             _filterButton.IsEnabled = true;
             PopulateTeamPicker();
+            _updatingFilters = true;
+            if (_savedSearch.Team.Length > 0)
+                _teamPicker.SelectedIndex = Math.Max(Array.IndexOf(_teamPicker.ItemsSource.Cast<string>().ToArray(), _savedSearch.Team), 0);
+            if (_savedSearch.Position.Length > 0)
+                _positionPicker.SelectedIndex = Math.Max(Array.IndexOf(_positionPicker.ItemsSource.Cast<string>().ToArray(), _savedSearch.Position), 0);
+            _updatingFilters = false;
             RefreshResults();
             _catalogStatus.Text = BuildCatalogStatus(catalog);
         }
@@ -211,7 +232,8 @@ public sealed class PlayersPage : ContentPage
         try
         {
             var bundledManifestJson = await PlayerCatalogLoader.LoadBundledManifestJsonAsync();
-            var result = await _updateService.UpdateAsync(bundledManifestJson);
+            var bundledCatalogJson = await PlayerCatalogLoader.LoadBundledCatalogJsonAsync();
+            var result = await _updateService.UpdateAsync(bundledManifestJson, bundledCatalogJson);
             Preferences.Set(LastCatalogCheckPreferenceKey, result.CheckedAtUtc.ToString("O"));
             _players = result.Catalog.Players;
             _loaded = true;
@@ -346,7 +368,8 @@ public sealed class PlayersPage : ContentPage
     }
 
     private int ActiveFilterCount()
-        => (_selectedDivision.Length > 0 ? 1 : 0) + (_selectedAffiliationType.Length > 0 ? 1 : 0) +
+        => (!string.IsNullOrWhiteSpace(_searchBar.Text) ? 1 : 0) +
+           (_selectedDivision.Length > 0 ? 1 : 0) + (_selectedAffiliationType.Length > 0 ? 1 : 0) +
            (_teamPicker.SelectedItem is string team && team != AllTeams ? 1 : 0) +
            (_positionPicker.SelectedItem is string position && position != AllPositions ? 1 : 0);
 
@@ -389,33 +412,7 @@ public sealed class PlayersPage : ContentPage
     }
 
     internal static bool HasPosition(PlayerRecord player, string position)
-    {
-        var aliases = position switch
-        {
-            "PR" => new[] { "PR", "PROP", "プロップ" },
-            "HO" => new[] { "HO", "HOOKER", "フッカー" },
-            "LO" => new[] { "LO", "LOCK", "ロック" },
-            "FL" => new[] { "FL", "FLANKER", "フランカー" },
-            "No.8" => new[] { "NO8", "NO.8", "NUMBER8", "ナンバーエイト", "エイト" },
-            "SH" => new[] { "SH", "SCRUMHALF", "スクラムハーフ" },
-            "SO" => new[] { "SO", "STANDOFF", "スタンドオフ" },
-            "CTB" => new[] { "CTB", "CENTER", "センター" },
-            "WTB" => new[] { "WTB", "WING", "ウイング", "ウィング" },
-            "FB" => new[] { "FB", "FULLBACK", "フルバック" },
-            "UTB" => new[] { "UTB", "UBK", "UTILITYBACK", "ユーティリティーバックス", "ユーティリティーバック" },
-            _ => new[] { position }
-        };
-
-        return (player.Positions ?? []).Any(value =>
-        {
-            if (string.IsNullOrWhiteSpace(value)) return false;
-            var normalized = NormalizePositionText(value);
-            return aliases.Any(alias => normalized.Contains(NormalizePositionText(alias), StringComparison.Ordinal));
-        });
-    }
-
-    private static string NormalizePositionText(string value)
-        => new(value.Normalize().Where(char.IsLetterOrDigit).Select(char.ToUpperInvariant).ToArray());
+        => PlayerPositionMatcher.HasPosition(player, position);
 
     internal static string PositionBadgeFor(PlayerRecord player)
         => PositionFilters.FirstOrDefault(position => HasPosition(player, position)) ?? "選手";

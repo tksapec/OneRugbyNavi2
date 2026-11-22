@@ -109,6 +109,74 @@ public sealed class PlayerCatalogUpdateServiceTests
         Assert.True(result.CheckedAtUtc <= DateTimeOffset.UtcNow);
     }
 
+    [Fact]
+    public async Task Update_accepts_newer_same_season_revision_with_fewer_players()
+    {
+        var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        Assert.True(PlayerCatalogParser.TryParse(bundled, out var parsed, out var errors), string.Join(Environment.NewLine, errors));
+        var updated = new PlayerCatalogDocument
+        {
+            SchemaVersion = parsed.SchemaVersion,
+            Season = parsed.Season,
+            CatalogRevision = "2026-11-23",
+            Players = parsed.Players.Skip(1).ToList()
+        };
+        var updatedJson = System.Text.Json.JsonSerializer.Serialize(updated);
+        using var temp = new TemporaryDirectory();
+        var cachePath = Path.Combine(temp.Path, "players.json");
+        await File.WriteAllTextAsync(cachePath, bundled);
+        var handler = new QueueHandler(Reply(HttpStatusCode.OK, ManifestJson), Reply(HttpStatusCode.OK, updatedJson));
+
+        var result = await CreateService(handler, cachePath).UpdateAsync(ManifestJson, bundled);
+
+        Assert.True(result.Changed);
+        Assert.Equal("2026-11-23", result.Catalog.CatalogRevision);
+        Assert.True(result.Catalog.Players.Count < parsed.Players.Count);
+        Assert.True(PlayerCatalogParser.TryParse(await File.ReadAllTextAsync(cachePath), out var saved, out var savedErrors),
+            string.Join(Environment.NewLine, savedErrors));
+        Assert.Equal("2026-11-23", saved.CatalogRevision);
+    }
+
+    [Fact]
+    public async Task Update_rejects_older_and_partial_catalogs_without_replacing_cache()
+    {
+        var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        Assert.True(PlayerCatalogParser.TryParse(bundled, out var parsed, out var errors), string.Join(Environment.NewLine, errors));
+        var older = new PlayerCatalogDocument
+        {
+            SchemaVersion = parsed.SchemaVersion,
+            Season = "2025-26",
+            Players = parsed.Players
+        };
+        var partial = new PlayerCatalogDocument
+        {
+            SchemaVersion = parsed.SchemaVersion,
+            Season = parsed.Season,
+            CatalogRevision = "2026-11-23",
+            Players = parsed.Players.Where(player => player.CurrentTeamId != parsed.Players[0].CurrentTeamId).ToList()
+        };
+        var futurePartial = new PlayerCatalogDocument
+        {
+            SchemaVersion = parsed.SchemaVersion,
+            Season = "2027-28",
+            Players = [parsed.Players[0]]
+        };
+
+        foreach (var response in new[] { older, partial, futurePartial })
+        {
+            using var temp = new TemporaryDirectory();
+            var cachePath = Path.Combine(temp.Path, "players.json");
+            await File.WriteAllTextAsync(cachePath, bundled);
+            var handler = new QueueHandler(Reply(HttpStatusCode.OK, ManifestJson),
+                Reply(HttpStatusCode.OK, System.Text.Json.JsonSerializer.Serialize(response)));
+
+            await Assert.ThrowsAsync<InvalidDataException>(() => CreateService(handler, cachePath)
+                .UpdateAsync(ManifestJson, bundled));
+
+            Assert.Equal(bundled, await File.ReadAllTextAsync(cachePath));
+        }
+    }
+
     [Theory]
     [InlineData(HttpStatusCode.ServiceUnavailable, "")]
     [InlineData(HttpStatusCode.OK, "not json")]
@@ -298,7 +366,84 @@ public sealed class PlayerCatalogUpdateServiceTests
 public sealed class PlayerCatalogCacheTests
 {
     [Fact]
-    public async Task Load_cached_catalog_without_calling_bundled_fallback()
+    public async Task Load_prefers_newer_bundled_catalog_over_stale_cache()
+    {
+        var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        const string stale = """
+        {"schemaVersion":1,"season":"2025-26","players":[{
+          "playerId":"old","currentTeamId":"team","currentTeamName":"Club","nameJa":"選手",
+          "sources":[{"publisher":"League One","url":"https://league-one.jp/player/1","fields":["nameJa"]}]
+        }]}
+        """;
+        using var temp = new PlayerCatalogUpdateServiceTests.TemporaryDirectory();
+        var cachePath = Path.Combine(temp.Path, "players.json");
+        await File.WriteAllTextAsync(cachePath, stale);
+
+        var catalog = await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, _ => Task.FromResult(bundled));
+
+        Assert.Equal("2026-27", catalog.Season);
+    }
+
+    [Fact]
+    public async Task Load_prefers_bundled_catalog_with_newer_explicit_revision()
+    {
+        var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        Assert.True(PlayerCatalogParser.TryParse(bundled, out var parsed, out var errors), string.Join(Environment.NewLine, errors));
+        var staleCatalog = new PlayerCatalogDocument
+        {
+            SchemaVersion = parsed.SchemaVersion,
+            Season = parsed.Season,
+            CatalogRevision = "2026-10-01",
+            Players = parsed.Players.Skip(1).ToList()
+        };
+        var stale = System.Text.Json.JsonSerializer.Serialize(staleCatalog);
+        Assert.True(staleCatalog.Players.Count < parsed.Players.Count);
+        Assert.Equal(27, staleCatalog.Players.Select(player => player.CurrentTeamId).Distinct().Count());
+        using var temp = new PlayerCatalogUpdateServiceTests.TemporaryDirectory();
+        var cachePath = Path.Combine(temp.Path, "players.json");
+        await File.WriteAllTextAsync(cachePath, stale);
+
+        var catalog = await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, _ => Task.FromResult(bundled));
+
+        Assert.Equal("2026-11-22", catalog.CatalogRevision);
+    }
+
+    [Fact]
+    public async Task Load_prefers_bundled_catalog_with_broader_team_coverage()
+    {
+        var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        Assert.True(PlayerCatalogParser.TryParse(bundled, out var completeCatalog, out var errors), string.Join(Environment.NewLine, errors));
+        var firstTeam = completeCatalog.Players[0].CurrentTeamId;
+        var partial = new PlayerCatalogDocument
+        {
+            SchemaVersion = completeCatalog.SchemaVersion,
+            Season = completeCatalog.Season,
+            Players = completeCatalog.Players.Where(player => player.CurrentTeamId == firstTeam).ToList()
+        };
+        using var temp = new PlayerCatalogUpdateServiceTests.TemporaryDirectory();
+        var cachePath = Path.Combine(temp.Path, "players.json");
+        await File.WriteAllTextAsync(cachePath, System.Text.Json.JsonSerializer.Serialize(partial));
+
+        var catalog = await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, _ => Task.FromResult(bundled));
+
+        Assert.Equal(27, catalog.Players.Select(player => player.CurrentTeamId).Distinct().Count());
+    }
+
+    [Fact]
+    public async Task Load_keeps_valid_cache_when_bundled_catalog_is_invalid()
+    {
+        var cached = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
+        using var temp = new PlayerCatalogUpdateServiceTests.TemporaryDirectory();
+        var cachePath = Path.Combine(temp.Path, "players.json");
+        await File.WriteAllTextAsync(cachePath, cached);
+
+        var catalog = await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, _ => Task.FromResult("not json"));
+
+        Assert.Equal("2026-27", catalog.Season);
+    }
+
+    [Fact]
+    public async Task Load_keeps_cached_catalog_when_revision_and_coverage_match_bundled()
     {
         var bundled = await File.ReadAllTextAsync(Path.Combine("Fixtures", "league-one-players-2026-27.json"));
         using var temp = new PlayerCatalogUpdateServiceTests.TemporaryDirectory();
@@ -312,7 +457,7 @@ public sealed class PlayerCatalogCacheTests
             return Task.FromResult(bundled);
         });
 
-        Assert.False(fallbackCalled);
+        Assert.True(fallbackCalled);
         Assert.Equal("2026-27", catalog.Season);
     }
 

@@ -10,7 +10,7 @@ public sealed class PlayerCatalogLoader
         return await PlayerCatalogCache.LoadCachedOrFallbackAsync(cachePath, LoadBundledCatalogJsonAsync, cancellationToken);
     }
 
-    private static async Task<string> LoadBundledCatalogJsonAsync(CancellationToken cancellationToken)
+    public static async Task<string> LoadBundledCatalogJsonAsync(CancellationToken cancellationToken = default)
     {
         var manifestJson = await LoadBundledManifestJsonAsync(cancellationToken);
         if (!PlayerCatalogManifest.TryParse(manifestJson, out var manifest, out var error))

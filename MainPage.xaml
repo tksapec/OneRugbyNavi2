@@ -322,15 +322,15 @@
 
                                 <Grid ColumnDefinitions="48,*,Auto" ColumnSpacing="10">
                                         <Grid WidthRequest="48" HeightRequest="48">
-                                            <ImageButton Source="{Binding HomeLogoPath}"
-                                                         BackgroundColor="{StaticResource AppBackground}"
-                                                         BorderColor="{StaticResource AppStroke}"
-                                                         BorderWidth="1"
-                                                         CornerRadius="24"
-                                                         Padding="8"
-                                                         Aspect="AspectFit"
-                                                         Clicked="OnHomeTeamLogoClicked"
-                                                         SemanticProperties.Hint="チームの公式ページを開く" />
+                                            <Border Stroke="{StaticResource AppStroke}"
+                                                    StrokeThickness="1"
+                                                    BackgroundColor="{StaticResource AppBackground}"
+                                                    Padding="8">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="24" /></Border.StrokeShape>
+                                                <Image Source="{Binding HomeLogoPath}"
+                                                       Aspect="AspectFit"
+                                                       SemanticProperties.Description="ホームチームのロゴ" />
+                                            </Border>
                                             <Label Text="{Binding HomeBadgeText}"
                                                    FontSize="11"
                                                    FontAttributes="Bold"
@@ -365,15 +365,15 @@
                                                VerticalTextAlignment="Center"
                                                LineBreakMode="WordWrap" />
                                         <Grid WidthRequest="48" HeightRequest="48">
-                                            <ImageButton Source="{Binding AwayLogoPath}"
-                                                         BackgroundColor="{StaticResource AppBackground}"
-                                                         BorderColor="{StaticResource AppStroke}"
-                                                         BorderWidth="1"
-                                                         CornerRadius="24"
-                                                         Padding="8"
-                                                         Aspect="AspectFit"
-                                                         Clicked="OnAwayTeamLogoClicked"
-                                                         SemanticProperties.Hint="チームの公式ページを開く" />
+                                            <Border Stroke="{StaticResource AppStroke}"
+                                                    StrokeThickness="1"
+                                                    BackgroundColor="{StaticResource AppBackground}"
+                                                    Padding="8">
+                                                <Border.StrokeShape><RoundRectangle CornerRadius="24" /></Border.StrokeShape>
+                                                <Image Source="{Binding AwayLogoPath}"
+                                                       Aspect="AspectFit"
+                                                       SemanticProperties.Description="アウェイチームのロゴ" />
+                                            </Border>
                                             <Label Text="{Binding AwayBadgeText}"
                                                    FontSize="11"
                                                    FontAttributes="Bold"
@@ -436,7 +436,7 @@
             </Grid>
         </Grid>
 
-        <ContentView x:Name="bottomNavigationHost" Grid.Row="5" />
+        <ContentView x:Name="bottomNavigationHost" Grid.Row="5" Margin="-14,0" />
 
         <GraphicsView x:Name="pageCurlOverlay" Grid.RowSpan="6"
                           IsVisible="False"

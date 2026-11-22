@@ -13,6 +13,7 @@ namespace OneRugbyNavi2
     {
         public int CacheVersion { get; init; }
         public DateTimeOffset SavedAt { get; init; }
+        public bool IsPartial { get; init; }
         public string SeasonLabel { get; init; } = "";
         public string SeasonKey { get; init; } = "";
         public List<ScheduleFetcher.Item> Div1 { get; init; } = new();
@@ -28,6 +29,7 @@ namespace OneRugbyNavi2
     {
         public int CacheVersion { get; set; }
         public DateTimeOffset SavedAt { get; set; }
+        public bool IsPartial { get; set; }
         public string SeasonLabel { get; set; } = "";
         public string SeasonKey { get; set; } = "";
         public List<ScheduleFetcher.Item> Div1 { get; set; } = new();
@@ -64,12 +66,14 @@ namespace OneRugbyNavi2
             IReadOnlyCollection<ScheduleFetcher.Item> div3,
             IReadOnlyCollection<ScheduleFetcher.Item> replacement,
             IReadOnlyCollection<ScheduleFetcher.Item> other,
-            DateTimeOffset savedAt)
+            DateTimeOffset savedAt,
+            bool isPartial = false)
         {
             var payload = new ScheduleCachePayload
             {
                 CacheVersion = CurrentCacheVersion,
                 SavedAt = savedAt,
+                IsPartial = isPartial,
                 SeasonKey = seasonKey,
                 SeasonLabel = seasonLabel,
                 Div1 = new List<ScheduleFetcher.Item>(div1),
@@ -81,7 +85,7 @@ namespace OneRugbyNavi2
 
             Directory.CreateDirectory(FileSystem.AppDataDirectory);
             var json = JsonSerializer.Serialize(payload, JsonOptions);
-            await File.WriteAllTextAsync(GetCachePath(seasonKey, seasonLabel), json);
+            await PlayerCatalogCache.SaveAtomicallyAsync(GetCachePath(seasonKey, seasonLabel), json);
         }
 
         public static Task<ScheduleCacheData?> LoadAsync() => LoadAsync("", "");
@@ -122,6 +126,7 @@ namespace OneRugbyNavi2
                 {
                     CacheVersion = payload.CacheVersion,
                     SavedAt = payload.SavedAt,
+                    IsPartial = payload.IsPartial,
                     SeasonKey = payload.SeasonKey,
                     SeasonLabel = payload.SeasonLabel,
                     Div1 = div1,

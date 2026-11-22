@@ -20,6 +20,7 @@ namespace OneRugbyNavi2
                 OnPropertyChanged(nameof(AreScoresHidden));
                 OnPropertyChanged(nameof(HomeScoreText));
                 OnPropertyChanged(nameof(AwayScoreText));
+                OnPropertyChanged(nameof(ScoreText));
                 OnPropertyChanged(nameof(ResultVisibilityActionText));
                 OnPropertyChanged(nameof(ScoreVisibilityDescription));
             }
@@ -69,6 +70,7 @@ namespace OneRugbyNavi2
             {
                 if (HasResult)
                 {
+                    if (AreScoresHidden) return "•• - ••";
                     return $"{HomeScore} - {AwayScore}";
                 }
 

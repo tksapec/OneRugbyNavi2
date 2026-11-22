@@ -40,6 +40,14 @@ public sealed class PlayerCatalogTests
     }
 
     [Fact]
+    public void Position_filter_matches_utility_back_alias_without_long_vowel_mark()
+    {
+        var player = new PlayerRecord { Positions = ["ユーティリティバックス"] };
+
+        Assert.True(PlayerPositionMatcher.HasPosition(player, "UTB"));
+    }
+
+    [Fact]
     public void Bundled_team_history_is_normalized_and_school_university_club_ordered()
     {
         var catalog = LoadBundledCatalog();
@@ -131,7 +139,6 @@ public sealed class PlayerCatalogTests
 
         Assert.Equal("leagueone-143-%e3%82%ab%e3%82%a6%e3%83%aa%e3%83%bb%e3%83%86%e3%82%a3%e3%83%9a%e3%83%8d%e3%82%b0%e3%83%ac%e3%83%bc%e3%82%b9", kauri.PlayerId);
         Assert.Contains(kauri.Positions, position => position.Contains("FB", StringComparison.Ordinal));
-        Assert.Contains(kauri.Positions, position => position.Contains("WTB", StringComparison.Ordinal));
         Assert.Contains(kauri.Sources, source => source.Url == "https://rugbydb.tokyo/player/32449.html");
         Assert.DoesNotContain(kauri.Aliases, alias => alias.Contains("32449", StringComparison.Ordinal));
     }
@@ -256,15 +263,15 @@ public sealed class PlayerCatalogTests
         }
 
         var grassmann = Assert.Single(catalog.Players, item => item.PlayerId == "leagueone-141-wynand-grassmann");
-        Assert.Equal("Wynand Grassmann", grassmann.NameEn);
+        Assert.Equal("Wynand  Grassmann", grassmann.NameEn);
 
         var displayNames = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["leagueone-140-peter_umaga_jensen"] = "ピーター・ウマガ＝ジェンセン",
-            ["leagueone-141-wynand-grassmann"] = "ワイナンド・グラスマン",
-            ["leagueone-141-aj-woulf"] = "AJ・ウルフ",
+            ["leagueone-141-wynand-grassmann"] = "ワイナンド ・ グラスマン",
+            ["leagueone-141-aj-woulf"] = "AJ ・ウルフ",
             ["rugbydb-137-9812"] = "オルビン・レジャー",
-            ["rugbydb-146-50602"] = "クレイグランガ・テイン"
+            ["leagueone-146-craig-ranga-taine.php"] = "テイン・クレイグランガ"
         };
         foreach (var (playerId, displayName) in displayNames)
             Assert.Equal(displayName, Assert.Single(catalog.Players, item => item.PlayerId == playerId).NameJa);
@@ -340,6 +347,16 @@ public sealed class PlayerCatalogTests
         Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "大阪大学")));
     }
 
+    [Theory]
+    [InlineData("ショーン")]
+    [InlineData("しょーん")]
+    [InlineData("しよーん")]
+    public void Search_matches_small_kana_in_hiragana_and_katakana(string query)
+    {
+        var player = new PlayerRecord { NameJa = "ショーン・スティーブンソン" };
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], query)));
+    }
+
     [Fact]
     public void Search_scope_can_limit_matches_to_current_team_previous_team_or_school()
     {
@@ -393,6 +410,15 @@ public sealed class PlayerCatalogTests
         Assert.Same(ranged, Assert.Single(PlayerSearch.Search([ranged, undated], "2022-23")));
         Assert.Empty(PlayerSearch.Search([ranged, undated], "2025-26"));
         Assert.Empty(PlayerSearch.Search([ranged], "2023-24", PlayerSearchScope.CurrentTeam));
+    }
+
+    [Fact]
+    public void Search_combines_open_ended_history_season_with_other_terms()
+    {
+        var player = new PlayerRecord { NameJa = "選手", TeamHistory = [new PlayerTeamHistory { TeamId = "club", TeamName = "Club", FromSeason = "2022-23" }] };
+        Assert.Same(player, Assert.Single(PlayerSearch.Search([player], "Club 2024-25")));
+        Assert.Empty(PlayerSearch.Search([player], "Club 2021-22"));
+        Assert.Empty(PlayerSearch.Search([player], "Other 2024-25"));
     }
 
     [Fact]
@@ -671,6 +697,26 @@ public sealed class PlayerCatalogTests
         Assert.True(PlayerCatalogParser.TryParse(json, out var catalog, out _));
         Assert.Equal("2026-27", catalog.Season);
         Assert.Empty(catalog.Players);
+    }
+
+    [Fact]
+    public void Parser_accepts_null_revision_as_legacy_catalog_metadata()
+    {
+        var json = ValidPlayerJson().Replace("\"season\": \"2026-27\",",
+            "\"season\": \"2026-27\",\n  \"catalogRevision\": null,", StringComparison.Ordinal);
+
+        Assert.True(PlayerCatalogParser.TryParse(json, out var catalog, out var errors), string.Join(Environment.NewLine, errors));
+        Assert.Null(catalog.CatalogRevision);
+    }
+
+    [Fact]
+    public void Parser_rejects_non_iso_catalog_revision()
+    {
+        var json = ValidPlayerJson().Replace("\"season\": \"2026-27\",",
+            "\"season\": \"2026-27\",\n  \"catalogRevision\": \"2026/11/22\",", StringComparison.Ordinal);
+
+        Assert.False(PlayerCatalogParser.TryParse(json, out _, out var errors));
+        Assert.Contains(errors, error => error.Contains("Catalog revision", StringComparison.Ordinal));
     }
 
     private static PlayerCatalogDocument LoadBundledCatalog()

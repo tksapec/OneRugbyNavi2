@@ -5,6 +5,7 @@ namespace OneRugbyNavi2;
 
 public sealed class LeagueOneDatabase
 {
+    private static readonly SemaphoreSlim InitializationGate = new(1, 1);
     public const string DatabaseFileName = "leagueone.db";
     public const string SeedDatabaseFileName = "leagueone_seed.db";
     private const string CacheManifestFileName = "cache_manifest.txt";
@@ -17,21 +18,29 @@ public sealed class LeagueOneDatabase
 
     public async Task InitializeAsync()
     {
-        Directory.CreateDirectory(AppDataRoot);
-        var seedTempPath = Path.Combine(AppDataRoot, "leagueone_seed_compare.tmp.db");
-        await CopyPackageFileAsync(SeedDatabaseFileName, seedTempPath);
-
-        var shouldReplace = !File.Exists(DatabasePath) || IsSeedNewer(seedTempPath, DatabasePath);
-        if (shouldReplace)
+        await InitializationGate.WaitAsync();
+        try
         {
-            ReplaceDatabase(seedTempPath, DatabasePath);
-        }
-        else if (File.Exists(seedTempPath))
-        {
-            File.Delete(seedTempPath);
-        }
+            Directory.CreateDirectory(AppDataRoot);
+            var seedTempPath = Path.Combine(AppDataRoot, "leagueone_seed_compare.tmp.db");
+            await CopyPackageFileAsync(SeedDatabaseFileName, seedTempPath);
 
-        await EnsureCacheAsync(force: shouldReplace);
+            var shouldReplace = !File.Exists(DatabasePath) || IsSeedNewer(seedTempPath, DatabasePath);
+            if (shouldReplace)
+            {
+                ReplaceDatabase(seedTempPath, DatabasePath);
+            }
+            else if (File.Exists(seedTempPath))
+            {
+                File.Delete(seedTempPath);
+            }
+
+            await EnsureCacheAsync(force: shouldReplace);
+        }
+        finally
+        {
+            InitializationGate.Release();
+        }
     }
 
     public string GetDatabasePath() => DatabasePath;
@@ -227,7 +236,7 @@ public sealed class LeagueOneDatabase
 
     private static DatabaseVersion ReadDatabaseVersion(string path)
     {
-        using var connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly");
+        using var connection = new SqliteConnection($"Data Source={path};Mode=ReadOnly;Pooling=False");
         connection.Open();
 
         string Setting(string key)
@@ -253,6 +262,9 @@ public sealed class LeagueOneDatabase
             return;
         }
 
+        // A missing marker makes an interrupted refresh retry every packaged asset.
+        if (File.Exists(markerPath)) File.Delete(markerPath);
+
         await using var manifestStream = await FileSystem.OpenAppPackageFileAsync(CacheManifestFileName);
         using var reader = new StreamReader(manifestStream);
         while (await reader.ReadLineAsync() is { } packagePath)
@@ -263,11 +275,6 @@ public sealed class LeagueOneDatabase
             }
 
             var destinationPath = Path.Combine(AppDataRoot, packagePath.Replace('/', Path.DirectorySeparatorChar));
-            if (!force && File.Exists(destinationPath))
-            {
-                continue;
-            }
-
             await CopyPackageFileAsync(packagePath, destinationPath);
         }
 
